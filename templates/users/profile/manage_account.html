@@ -1,7 +1,16 @@
 {% extends "base.html" %}
+{% load logged_in %}
 {% load crispy_forms_tags %}
 {% block content %} 
-    <a href="{% url 'manage-store' %}"><button class = "btn btn-outline-info">Manage Store</button></a>
+
+    {% if request.user|has_group:"Vendor" %}
+        <a href="{% url 'manage-vendor' %}"><button class = "btn btn-outline-info">Edit Vendor info</button></a>
+    {% endif %}
+    {% if request.user|has_group:"Buyer" %}
+        <a href="{% url 'manage-buyer' %}"><button class = "btn btn-outline-info">Edit Buyer Info</button></a>
+    {% else %}
+        <a href="{% url 'become-buyer' %}"><button class = "btn btn-outline-info">Become a Buyer</button></a> <!-- separate this button frm profile nav -->
+    {% endif %}
     <h1>Manage Account</h1>
     <div class="content-section">
         <form method = "POST" enctype = "multipart/form-data">

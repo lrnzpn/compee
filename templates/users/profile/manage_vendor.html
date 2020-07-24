@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %} 
+
+    {% if request.user|has_group:"Buyer" %}
+        <a href="{% url 'manage-buyer' %}"><button class = "btn btn-outline-info">Edit Buyer Info</button></a>
+    {% endif %}
+
     <a href="{% url 'manage-account' %}"><button class = "btn btn-outline-info">Manage Account</button></a>
+
+
     <h1>Manage Store</h1>
     <div class="content-section">
         <div class="media">

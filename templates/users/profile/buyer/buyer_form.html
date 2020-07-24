@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load logged_in %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% if request.user|has_group:"Vendor" %}
+    <a href="{% url 'manage-vendor' %}"><button class = "btn btn-outline-info">Manage Store</button></a>
+{% endif %}
+<a href="{% url 'manage-account' %}"><button class = "btn btn-outline-info">Manage Account</button></a>
+
+<h1>Buyer Information</h1>
+<p>insert buyer terms and agreements here</p> <!--pop up modal ? -->
+<div class = "content-section">
+    <form method = "POST">
+        {% csrf_token %}
+        <fieldset class = "form-group"> 
+            {{ form|crispy }}
+        </fieldset>
+        <button class = "btn btn-outline-info" type = "submit">Submit</button>
+    </form>
+</div>
+{% endblock content %}

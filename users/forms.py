@@ -1,18 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import SiteUser
+from .models import Vendor, Buyer
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
-
-class SiteUserUpdateForm(forms.ModelForm):
-    class Meta:
-        model = SiteUser
-        fields = ['store_name', 'store_info', 'address_line', 'city','state','zip_code', 'contact_no', 'secondary_no','image']
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
@@ -34,5 +29,23 @@ class PasswordResetForm(forms.ModelForm):
     class Meta:
         model = User
         fields = []
+
+class VendorUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+                'zip_code', 'contact_no', 'secondary_no', 'image']
+
+class BuyerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Buyer
+        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+                'zip_code', 'contact_no', 'secondary_no', 'image']
+
+class BuyerCreateForm(forms.ModelForm):
+    class Meta:
+        model = Buyer
+        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+                'zip_code', 'contact_no', 'secondary_no']
 
 

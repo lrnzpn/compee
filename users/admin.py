@@ -1,4 +1,5 @@
 from django.contrib import admin
-from .models import SiteUser
+from .models import Vendor, Buyer
 
-admin.site.register(SiteUser)
+admin.site.register(Vendor)
+admin.site.register(Buyer)
