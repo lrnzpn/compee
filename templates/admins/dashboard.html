@@ -3,9 +3,8 @@
     <h1>Admin Dashboard</h1>
 
     <!-- side nav pls -->
-    <a href="#">Manage Vendors</a>
+    <a href="{% url 'vendors' %}" class="btn btn-primary">Manage Vendors</a>
 
     <!-- main content -->
-    <p>idk wat to put here</p>
     {% block dash-content %} {%endblock%}
 {% endblock content %}

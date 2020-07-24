@@ -4,9 +4,9 @@
 {% block content %}
 
 {% if request.user|has_group:"Vendor" %}
-    <a href="{% url 'manage-vendor' %}"><button class = "btn btn-outline-info">Manage Store</button></a>
+    <a href="{% url 'manage-vendor' %}" class="btn btn-primary">Manage Store</a>
 {% endif %}
-<a href="{% url 'manage-account' %}"><button class = "btn btn-outline-info">Manage Account</button></a>
+<a href="{% url 'manage-account' %}" class="btn btn-primary">Manage Account</a>
 
 <h1>Buyer Information</h1>
 <p>insert buyer terms and agreements here</p> <!--pop up modal ? -->

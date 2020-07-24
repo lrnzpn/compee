@@ -8,7 +8,7 @@ numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
 
 class Vendor(models.Model):
     vendor_id = models.AutoField(primary_key=True)
-    store_name = models.CharField(max_length=100, blank=True, null=True)
+    store_name = models.CharField(max_length=100, default='no name')
     store_info = models.TextField(blank=True, null=True)
     address_line = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
@@ -33,11 +33,11 @@ class Vendor(models.Model):
 
 class Buyer(models.Model):
     buyer_id = models.AutoField(primary_key=True)
-    store_name = models.CharField(max_length=100, blank=True, null=True)
+    store_name = models.CharField(max_length=100, default='no name')
     store_info = models.TextField(blank=True, null=True)
     address_line = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
-    state = models.CharField(max_length=50, blank=True, null=True)
+    state = models.CharField(max_length=50,blank=True, null=True)
     zip_code = models.PositiveSmallIntegerField(blank=True, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     contact_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])

@@ -1,16 +1,9 @@
-{% extends "base.html" %}
-{% load logged_in %}
+{% extends "admins/dashboard.html" %}
 {% load crispy_forms_tags %}
-{% block content %} 
-
-    {% if request.user|has_group:"Buyer" %}
-        <a href="{% url 'manage-buyer' %}" class="btn btn-primary">Edit Buyer Info</a>
-    {% endif %}
-
-    <a href="{% url 'manage-account' %}" class="btn btn-primary">Manage Account</a>
-
-
-    <h1>Manage Store</h1>
+{% block dash-content %} 
+    <a href="{% url 'vendor-detail' vendor.vendor_id %}" class="btn btn-primary">Back to Vendor</a>
+    <a href="{% url 'vendor-delete' vendor.vendor_id %}" class="btn btn-outline-danger">Delete Vendor</a>
+    <h3>Edit Vendor Information</h3>
     <div class="content-section">
         <div class="media">
             <img src="{{ vendor.image.url }}" width="200px" height="200px">
@@ -19,11 +12,11 @@
             {% csrf_token %}
             <fieldset class = "form-group">
                 <legend class = "border-bottom mb-4">Store Info</legend>
-                {{ s_form|crispy }}
+                {{ form|crispy }}
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-info" type = "submit">Update</button>
             </div>
         </form>
     </div>
-{% endblock content %}
+{% endblock dash-content %}

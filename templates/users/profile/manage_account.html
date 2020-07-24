@@ -4,12 +4,12 @@
 {% block content %} 
 
     {% if request.user|has_group:"Vendor" %}
-        <a href="{% url 'manage-vendor' %}"><button class = "btn btn-outline-info">Edit Vendor info</button></a>
+        <a href="{% url 'manage-vendor' %}" class="btn btn-primary">Edit Vendor info</a>
     {% endif %}
     {% if request.user|has_group:"Buyer" %}
-        <a href="{% url 'manage-buyer' %}"><button class = "btn btn-outline-info">Edit Buyer Info</button></a>
+        <a href="{% url 'manage-buyer' %}" class="btn btn-primary">Edit Buyer Info</a>
     {% else %}
-        <a href="{% url 'become-buyer' %}"><button class = "btn btn-outline-info">Become a Buyer</button></a> <!-- separate this button frm profile nav -->
+        <a href="{% url 'become-buyer' %}" class="btn btn-primary">Become a Buyer</a> <!-- separate this button frm profile nav -->
     {% endif %}
     <h1>Manage Account</h1>
     <div class="content-section">
