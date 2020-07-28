@@ -1,0 +1,18 @@
+{% extends "admins/dashboard.html" %}
+{% block dash-content %} 
+    <a href="{% url 'product-detail' object.product_id %}" class="btn btn-primary">Back to Product</a>
+    <a href="#" class="btn btn-primary">Edit Vendor Info</a>
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">Delete Product</legend>
+                <h2>Are you sure you want to delete the product "{{ object.name }}" </h2>
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
+                <a class = "btn btn-outline-secondary" href = "{% url 'product-detail' object.product_id %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock dash-content %}

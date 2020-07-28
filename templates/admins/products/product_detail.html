@@ -1,0 +1,54 @@
+{% extends "admins/dashboard.html" %}
+{% block dash-content %}
+    <h3>{{ object.name }}</h3>
+    <div class="row">
+        <div class="col-md-8">
+            <h5>Description: </h5>
+            <p>{{ object.description }}</p>
+            <h5>Price: </h5>
+            <p>{{ object.price }}</p>
+            <h5>Stock: </h5>
+            <p>{{ object.item_stock }}</p>
+            <h5>Date Created: </h5>
+            <p>{{ object.date_created }}</p>
+            {% for cat in category %}
+                {% if cat.term.term_type == 'Category' %}
+                    <h5>Category: </h5>
+                    <p>{{ cat.term.name }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            <img src="{{ object.image.url }}" width="100%" height="200px">
+            <p><b>Created by: </b> {{ object.vendor.store_name }}</p>
+            <a href="{% url 'product-update' object.product_id %}" class="btn btn-primary">Edit Product</a>
+            <a href="{% url 'product-delete' object.product_id %}" class="btn btn-outline-danger">Delete Product</a>
+        </div>
+    </div>
+
+    <!-- Products here -->
+    <h3>Other Products</h3>
+    <a href="{% url 'product-new' object.vendor.vendor_id %}" class="btn btn-primary">Add New Product</a>
+    <div class="row">
+        {% for product in products %}
+            {% if product != object %}
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <img src="{{ product.image.url }}" width="100%" height="200px">
+                        <div class="card-body">
+                            <p class="card-text">{{ product.name }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <a href="{% url 'product-detail' product.product_id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                    <a href="{% url 'product-update' product.product_id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                </div>
+                                <small class="text-muted">{{ product.price }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+{% endblock dash-content %}
