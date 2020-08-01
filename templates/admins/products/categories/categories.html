@@ -5,7 +5,7 @@
         <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">New Term</legend>
+                <legend class = "border-bottom mb-4">New Category</legend>
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
@@ -17,16 +17,14 @@
         <table>
             <tr>
                 <td>Name</td>
-                <td>Type</td>
                 <td></td>
                 <td></td>
             </tr>
-            {% for term in terms %}
+            {% for cat in categories %}
             <tr>
-                <td>{{ term.name }}</td>
-                <td>{{ term.term_type }}</td>
-                <td><a href="{% url 'term-update' term.term_id %}">Edit</a></td>
-                <td><a href="{% url 'term-delete' term.term_id %}">Delete</a></td>
+                <td>{{ cat.name }}</td>
+                <td><a href="{% url 'category-update' cat.category_id %}">Edit</a></td>
+                <td><a href="{% url 'category-delete' cat.category_id %}">Delete</a></td>
             </tr>
             {% endfor %}
         </table>

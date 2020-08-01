@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from users.models import Vendor
 from PIL import Image
+from taggit.managers import TaggableManager 
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
@@ -13,6 +14,9 @@ class Product(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
     image = models.ImageField(default='default.jpg', upload_to='product_pics')
     vendor = models.ForeignKey(Vendor, models.DO_NOTHING)
+    slug = models.SlugField(unique=True, max_length=100)
+    tags = TaggableManager()
+
 
     def __str__(self):
         return f'{self.name}' 
@@ -25,23 +29,20 @@ class Product(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-TYPE_CHOICES = (
-    ('Category','Category'),
-    ('Tag','Tag'),
-)
-
-class Term(models.Model):
-    term_id = models.AutoField(primary_key=True)
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    term_type = models.CharField(max_length=8, choices=TYPE_CHOICES, default=('Category'))
 
     def __str__(self):
         return f'{self.name}' 
 
-class ProductTerm(models.Model):
+class ProductCategory(models.Model):
     id = models.AutoField(primary_key=True)
-    term = models.ForeignKey(Term, models.DO_NOTHING)
+    category = models.ForeignKey(Category, models.DO_NOTHING)
     product = models.ForeignKey(Product, models.CASCADE)
 
+    def __str__(self):
+        return f'{self.category.name}'
+
     class Meta:
-        unique_together = (('term', 'product'),)
+        unique_together = (('category', 'product'),)

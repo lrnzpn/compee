@@ -1,7 +1,8 @@
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
+from django.template.defaultfilters import slugify
 from users.models import Vendor
-from .models import Product, Term, ProductTerm
+from .models import Product, Category, ProductCategory
 from .forms import ProductCreateForm, AssignCategoryForm
 from django.contrib.auth.models import User, Group
 from django.views.generic import (
@@ -82,67 +83,67 @@ class VendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         messages.success(self.request, 'Vendor has been removed.')
         return reverse('vendors')
 
-class TermCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = Term
-    fields = ['name', 'term_type']
+class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Category
+    fields = ['name']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
-        context = super(TermCreateView, self).get_context_data(**kwargs)
-        context['title'] = "New Term"
-        context['terms'] = Term.objects.all().order_by('term_type')
+        context = super(CategoryCreateView, self).get_context_data(**kwargs)
+        context['title'] = "New Category"
+        context['categories'] = Category.objects.all()
         return context
 
     def form_valid(self, form):
-        if Term.objects.filter(name=form.cleaned_data['name'], term_type=form.cleaned_data['term_type']).exists():
-            messages.error(self.request,'A term of this type already exists!')
+        if Category.objects.filter(name=form.cleaned_data['name']).exists():
+            messages.error(self.request,'This category already exists!')
             return self.render_to_response(self.get_context_data(form=form))
         else:
             return super().form_valid(form)
     
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Term created!')
-        return reverse("term-create")
+        messages.success(self.request, 'Category created!')
+        return reverse("category-create")
 
-class TermUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Term
-    fields = ['name', 'term_type']
+class CategoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Category
+    fields = ['name']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
-        context = super(TermUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Update Term"
+        context = super(CategoryUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Update Category"
         return context
 
     def form_valid(self, form):
-        if Term.objects.filter(name=form.cleaned_data['name'], term_type=form.cleaned_data['term_type']).exists():
-            messages.error(self.request,'A term of this type already exists!')
+        if Category.objects.filter(name=form.cleaned_data['name']).exists():
+            messages.error(self.request,'This category already exists!')
             return self.render_to_response(self.get_context_data(form=form))
         else:
             return super().form_valid(form)
     
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Term updated!')
-        return reverse("term-create")
+        messages.success(self.request, 'Category updated!')
+        return reverse("category-create")
 
-class TermDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Term
+class CategoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Category
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
-        context = super(TermDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Term Delete"
+        context = super(CategoryDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Category Delete"
         return context
 
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Term has been deleted.')
-        return reverse('term-create')
+        messages.success(self.request, 'Category has been deleted.')
+        return reverse('category-create')
 
 @login_required
 def ProductCreateView(request, pk=None):
@@ -153,13 +154,16 @@ def ProductCreateView(request, pk=None):
 
             if p_form.is_valid() and c_form.is_valid():
                 vendor = Vendor.objects.get(vendor_id=pk)
-                p_form.instance.vendor = vendor
-                new_prod = p_form.save()
+                new_prod = p_form.save(commit=False)
+                new_prod.vendor = vendor
+                new_prod.slug = slugify(new_prod.name)
+                new_prod.save()
+                p_form.save_m2m()
                 c_form.instance.product = new_prod
                 c_form.save()
 
                 messages.success(request, 'New product has been added.')
-                return redirect('product-detail', new_prod.product_id)
+                return redirect('product-detail', new_prod.slug)
         else:
             p_form = ProductCreateForm()
             c_form = AssignCategoryForm()
@@ -183,7 +187,8 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created')
-        context['category'] = ProductTerm.objects.filter(product=self.object)
+        if ProductCategory.objects.get(product=self.object):
+            context['category'] = ProductCategory.objects.get(product=self.object)
         context['title'] = "Product Name"
         return context
 
@@ -191,16 +196,16 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 def ProductUpdateView(request, pk=None):
     if request.user.groups.filter(name='Admin').exists():
         product = Product.objects.get(product_id=pk)
-        category = ProductTerm.objects.filter(product=product).first()
+        category = ProductCategory.objects.get(product=product)
         if request.method == "POST":
             p_form = ProductCreateForm(request.POST, instance=product)
             c_form = AssignCategoryForm(request.POST, instance=category)
 
             if p_form.is_valid() and c_form.is_valid():
-                p_form.save()
+                new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Product has been updated.')
-                return redirect('product-detail', pk)
+                return redirect('product-detail', new_prod.slug)
         else:
             p_form = ProductCreateForm(instance=product)
             c_form = AssignCategoryForm(instance=category)
@@ -227,7 +232,7 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return context
 
     def form_valid(self, form):
-        pt = ProductTerm.objects.filter(product = self.object)
+        pt = ProductCategory.objects.get(product = self.object)
         if pt:
             for i in pt:
                 i.delete()

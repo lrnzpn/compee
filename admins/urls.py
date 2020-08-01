@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     MainDashboard, 
     VendorListView, VendorDetailView, VendorUpdateView, VendorDeleteView,
-    TermCreateView, TermUpdateView, TermDeleteView,
+    CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView)
 
 urlpatterns = [
@@ -16,15 +16,15 @@ urlpatterns = [
     path('vendor/<int:pk>/delete/', VendorDeleteView.as_view(
         template_name='admins/vendors/vendor_confirm_delete.html'), name='vendor-delete'),
 
-    path('term/new/', TermCreateView.as_view(
-        template_name='admins/products/terms/terms.html'), name='term-create'),
-    path('term/<int:pk>/update/', TermUpdateView.as_view(
-        template_name='admins/products/terms/term_update.html'), name='term-update'),
-    path('term/<int:pk>/delete/', TermDeleteView.as_view(
-        template_name='admins/products/terms/term_confirm_delete.html'), name='term-delete'),
+    path('category/new/', CategoryCreateView.as_view(
+        template_name='admins/products/categories/categories.html'), name='category-create'),
+    path('category/<int:pk>/update/', CategoryUpdateView.as_view(
+        template_name='admins/products/categories/category_update.html'), name='category-update'),
+    path('category/<int:pk>/delete/', CategoryDeleteView.as_view(
+        template_name='admins/products/categories/category_confirm_delete.html'), name='category-delete'),
 
     path('vendor/<int:pk>/product/new/', ProductCreateView, name='product-new'),
-    path('product/<int:pk>/', ProductDetailView.as_view(
+    path('product/<str:slug>/', ProductDetailView.as_view(
         template_name='admins/products/product_detail.html'), name='product-detail'),
     path('product/<int:pk>/update', ProductUpdateView, name='product-update'),
     path('product/<int:pk>/delete', ProductDeleteView.as_view(
