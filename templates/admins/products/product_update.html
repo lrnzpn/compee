@@ -1,6 +1,7 @@
-{% extends "admins/dashboard.html" %}
+{% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block dash-content %} 
+{% block content %}
+    {%include 'partials/_dashboard_nav.html' %}
     <h1>Update Product</h1>
     <div class="content-section">
         <form method = "POST" enctype = "multipart/form-data">
@@ -15,4 +16,4 @@
             </div>
         </form>
     </div>
-{% endblock dash-content %}
+{% endblock content %}

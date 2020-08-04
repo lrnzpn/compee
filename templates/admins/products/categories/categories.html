@@ -1,6 +1,7 @@
-{% extends "admins/dashboard.html" %}
+{% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block dash-content %}
+{% block content %}
+    {%include 'partials/_dashboard_nav.html' %}
     <div class = "content-section">
         <form method = "POST">
             {% csrf_token %}
@@ -29,4 +30,4 @@
             {% endfor %}
         </table>
     </div>
-{% endblock dash-content %}
+{% endblock content %}

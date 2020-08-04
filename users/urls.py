@@ -1,10 +1,11 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import Register, BecomeBuyer, ManageBuyer, ManageAccount, ManageVendor
+from .views import Register, BecomeBuyer, ManageBuyer, ManageAccount, ManageVendor, DeleteBuyer
 
 urlpatterns = [
     path('profile/become-buyer/', BecomeBuyer, name='become-buyer'),
     path('profile/buyer-info/', ManageBuyer, name='manage-buyer'),
+    path('profile/delete-buyer/', DeleteBuyer, name='delete-buyer'),
     path('profile/vendor-info/', ManageVendor, name='manage-vendor'),
 
     path('register/', Register, name='register'),

@@ -48,4 +48,14 @@ class BuyerCreateForm(forms.ModelForm):
         fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no']
 
+class BuyerDeleteForm(forms.ModelForm):
+    class Meta:
+        model = Buyer
+        fields = []
+
+class AdminForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = []
+
 

@@ -1,0 +1,6 @@
+<div class="col-md-3">
+    <h3>Categories</h3>
+    {% for cat in categories %}
+        <a href="{% url 'category-filter' cat.name %}" class="btn btn-primary">{{ cat.name }}</a><br>
+    {% endfor %}
+</div>

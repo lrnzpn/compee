@@ -1,12 +1,23 @@
 from django.urls import path
 from .views import (
-    MainDashboard, 
+    BuyerListView, BuyerDetailView, BuyerUpdateView, BuyerDeleteView,
     VendorListView, VendorDetailView, VendorUpdateView, VendorDeleteView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
-    ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView)
+    ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
+    UserListView,
+)
+from users.views import VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin
 
 urlpatterns = [
-    path('', MainDashboard, name='main-dash'),
+    path('buyers/', BuyerListView.as_view(
+        template_name='admins/buyers/buyers.html'), name='buyers'),
+    path('buyer/<int:pk>/', BuyerDetailView.as_view(
+        template_name='admins/buyers/buyer_detail.html'), name='buyer-detail' ),
+    path('buyer/<int:pk>/update/', BuyerUpdateView.as_view(
+        template_name='admins/buyers/buyer_update.html'), name='buyer-update'),
+    path('buyer/<int:pk>/delete/', BuyerDeleteView.as_view(
+        template_name='admins/buyers/buyer_confirm_delete.html'), name='buyer-delete'),
+
     path('vendors/', VendorListView.as_view(
         template_name='admins/vendors/vendors.html'), name='vendors'),
     path('vendor/<int:pk>/', VendorDetailView.as_view(
@@ -29,4 +40,13 @@ urlpatterns = [
     path('product/<int:pk>/update', ProductUpdateView, name='product-update'),
     path('product/<int:pk>/delete', ProductDeleteView.as_view(
         template_name='admins/products/product_confirm_delete.html'), name='product-delete'),
+
+    path('users/', UserListView.as_view(
+        template_name='admins/users/users.html'), name='users'),
+    path('vendor/new/<int:pk>/', VendorCreateView.as_view(
+        template_name='admins/users/make_seller.html'), name='make-seller'),
+    path('buyer/new/<int:pk>/', BuyerCreateView.as_view(
+        template_name='admins/users/make_buyer.html'), name='make-buyer'),
+    path('admin/new/<int:pk>', GiveAdmin, name='make-admin'),
+    path('admin/remove/<int:pk>', RemoveAdmin, name='remove-admin')
 ]

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% block content %}
     {%include 'partials/_dashboard_nav.html' %}
     <div class = "content-section">
         <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Update Category</legend>
-                {{ form|crispy }}
+                <legend class = "border-bottom mb-4">Remove Admin</legend>
+                <h2>Are you sure you want to remove admin permissions for {{ user.username }}?</h2>
             </fieldset>
             <div class="form-group">
-                <button class = "btn btn-outline-info" type = "submit">Update</button>
+                <button class = "btn btn-outline-danger" type = "submit">Confirm</button>
+                <a class = "btn btn-outline-secondary" href = "{% url 'users' %}">Cancel</a>
             </div>
         </form>
     </div>

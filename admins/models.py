@@ -13,7 +13,7 @@ class Product(models.Model):
     item_stock = models.PositiveIntegerField()
     date_created = models.DateTimeField(default=timezone.now)
     image = models.ImageField(default='default.jpg', upload_to='product_pics')
-    vendor = models.ForeignKey(Vendor, models.DO_NOTHING)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     slug = models.SlugField(unique=True, max_length=100)
     tags = TaggableManager()
 
@@ -38,8 +38,8 @@ class Category(models.Model):
 
 class ProductCategory(models.Model):
     id = models.AutoField(primary_key=True)
-    category = models.ForeignKey(Category, models.DO_NOTHING)
-    product = models.ForeignKey(Product, models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.category.name}'

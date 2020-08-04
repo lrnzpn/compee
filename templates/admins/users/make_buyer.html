@@ -2,15 +2,16 @@
 {% load crispy_forms_tags %}
 {% block content %}
     {%include 'partials/_dashboard_nav.html' %}
-    <div class = "content-section">
-        <form method = "POST">
+    <h1>Create New Buyer Store</h1>
+    <div class="content-section">
+        <form method = "POST" enctype = "multipart/form-data">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Update Category</legend>
+                <legend class = "border-bottom mb-4">New Buyer Store</legend>
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
-                <button class = "btn btn-outline-info" type = "submit">Update</button>
+                <button class = "btn btn-outline-info" type = "submit">Create</button>
             </div>
         </form>
     </div>

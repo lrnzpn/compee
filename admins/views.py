@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from django.template.defaultfilters import slugify
-from users.models import Vendor
+from users.models import Vendor, Buyer
 from .models import Product, Category, ProductCategory
 from .forms import ProductCreateForm, AssignCategoryForm
 from django.contrib.auth.models import User, Group
@@ -10,12 +10,70 @@ from django.views.generic import (
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-@login_required
-def MainDashboard(request):
-    if request.user.groups.filter(name='Admin').exists():
-        return render(request, 'admins/dashboard.html')
-    else:
-        return redirect('home')
+class BuyerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Buyer
+    context_object_name = 'buyers'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(BuyerListView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Buyer"
+        return context
+
+class BuyerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Buyer
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(BuyerDetailView, self).get_context_data(**kwargs)
+        buyer = Buyer.objects.get(buyer_id=self.kwargs['pk'])
+        context['title'] = buyer.store_name
+        return context
+
+class BuyerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Buyer
+    fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'user']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(BuyerUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Buyer Edit"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Buyer information updated!')
+        return reverse("buyer-detail", kwargs={'pk': self.object.pk})
+
+    
+class BuyerDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Buyer
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(BuyerDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Buyer Delete"
+        return context
+
+    def delete(self, *args, **kwargs):
+        buyer = Buyer.objects.get(buyer_id = self.kwargs['pk'])
+        user = User.objects.get(id = buyer.user.id)
+        v_group = Group.objects.get(name='Buyer')
+        v_group.user_set.remove(user)
+        return super(BuyerDeleteView, self).delete(*args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Buyer has been removed.')
+        return reverse('buyers')
 
 class VendorListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vendor
@@ -27,7 +85,7 @@ class VendorListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super(VendorListView, self).get_context_data(**kwargs)
-        context['title'] = "Vendors | Dashboard"
+        context['title'] = "Dashboard | Vendor"
         return context
 
 class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -40,7 +98,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context = super(VendorDetailView, self).get_context_data(**kwargs)
         vendor = Vendor.objects.get(vendor_id=self.kwargs['pk'])
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
-        context['title'] = "Shop Name"
+        context['title'] = vendor.store_name
         return context
 
 class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -189,7 +247,7 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created')
         if ProductCategory.objects.get(product=self.object):
             context['category'] = ProductCategory.objects.get(product=self.object)
-        context['title'] = "Product Name"
+        context['title'] = self.object.name
         return context
 
 @login_required
@@ -241,3 +299,16 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Product has been deleted.')
         return reverse('vendors')
+
+class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = User
+    context_object_name = 'users'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(UserListView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Users"
+        return context
