@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 from users.models import Vendor
 from PIL import Image
 from taggit.managers import TaggableManager 
@@ -46,3 +47,21 @@ class ProductCategory(models.Model):
 
     class Meta:
         unique_together = (('category', 'product'),)
+
+RATING_CHOICES = (
+    ('1','1'),
+    ('2','2'),
+    ('3', '3'),
+    ('4', '4'),
+    ('5','5')
+)
+
+class ProductReview(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    rating = models.CharField(max_length=1, choices=RATING_CHOICES, default=('3'))
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.author.username}'

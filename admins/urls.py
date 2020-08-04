@@ -4,9 +4,8 @@ from .views import (
     VendorListView, VendorDetailView, VendorUpdateView, VendorDeleteView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
-    UserListView,
+    UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin
 )
-from users.views import VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin
 
 urlpatterns = [
     path('buyers/', BuyerListView.as_view(
