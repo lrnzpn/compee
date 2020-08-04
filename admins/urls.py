@@ -4,6 +4,7 @@ from .views import (
     VendorListView, VendorDetailView, VendorUpdateView, VendorDeleteView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
+    BuyerProductCreateView, BuyerProductDetailView, BuyerProductUpdateView, BuyerProductDeleteView,
     UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin
 )
 
@@ -39,6 +40,13 @@ urlpatterns = [
     path('product/<int:pk>/update', ProductUpdateView, name='product-update'),
     path('product/<int:pk>/delete', ProductDeleteView.as_view(
         template_name='admins/products/product_confirm_delete.html'), name='product-delete'),
+
+    path('buyer/<int:pk>/product/new/', BuyerProductCreateView, name='buyer-product-new'),
+    path('buyer-product/<str:slug>/', BuyerProductDetailView.as_view(
+        template_name='admins/products/product_detail.html'), name='buyer-product-detail'),
+    path('buyer-product/<int:pk>/update', BuyerProductUpdateView, name='buyer-product-update'),
+    path('buyer-product/<int:pk>/delete', BuyerProductDeleteView.as_view(
+        template_name='admins/products/product_confirm_delete.html'), name='buyer-product-delete'),
 
     path('users/', UserListView.as_view(
         template_name='admins/users/users.html'), name='users'),

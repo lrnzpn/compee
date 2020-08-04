@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {%include 'partials/_categories.html' %}
+    {%include 'main/partials/_categories.html' %}
     <h3>{{ object.store_name }}</h3>
     <div class="row">
         <div class="col-md-8">
@@ -21,6 +21,9 @@
 
     <!-- Products here -->
     <h3>Store Products</h3>
-    {%include 'partials/_products.html' %}
-    
+    {% if products %}
+        {%include 'main/partials/_products.html' %}
+    {% else %}
+        <h4>This store has no products!</h4>
+    {% endif %}
 {% endblock content %}

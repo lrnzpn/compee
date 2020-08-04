@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from taggit.models import Tag
-from admins.models import Product, ProductCategory, Category
+from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
 from users.models import Vendor, Buyer
 from django.views.generic import ListView, DetailView
 
@@ -61,6 +61,23 @@ class VendorDetailView(DetailView):
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
         context['title'] = vendor.store_name
         context['categories'] = Category.objects.all()
+        context['is_seller'] = True
+        return context
+
+class ProductDetailView(DetailView):
+    model = Product
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
+        if ProductCategory.objects.get(product=self.object):
+            context['category'] = ProductCategory.objects.get(product=self.object)
+        context['title'] = self.object.name
+        context['categories'] = Category.objects.all()
+        context['is_seller'] = True
         return context
 
 class BuyerListView(ListView):
@@ -83,6 +100,24 @@ class BuyerDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(BuyerDetailView, self).get_context_data(**kwargs)
         buyer = Buyer.objects.get(slug=self.kwargs['slug'])
+        context['products'] = BuyerProduct.objects.filter(buyer=buyer).order_by('-date_created')
         context['title'] = buyer.store_name
         context['categories'] = Category.objects.all()
+        context['is_seller'] = False
+        return context
+
+class BuyerProductDetailView(DetailView):
+    model = BuyerProduct
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(BuyerProductDetailView, self).get_context_data(**kwargs)
+        context['products'] = BuyerProduct.objects.filter(buyer=self.object.buyer).order_by('-date_created').exclude(product_id=self.object.product_id)
+        if BuyerProductCategory.objects.get(product=self.object):
+            context['category'] = BuyerProductCategory.objects.get(product=self.object)
+        context['title'] = self.object.name
+        context['categories'] = Category.objects.all()
+        context['is_seller'] = False
         return context

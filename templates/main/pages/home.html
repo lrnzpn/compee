@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="row">
-        {%include 'partials/_categories.html' %}
+        {%include 'main/partials/_categories.html' %}
         <div class="col-md-4">
             <a href="{% url 'vendors-main' %}" class="btn btn-primary">Vendors</a>
             <a href="{% url 'buyers-main' %}" class="btn btn-primary">Buyers</a>

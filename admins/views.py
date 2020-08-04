@@ -2,8 +2,8 @@ from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from django.template.defaultfilters import slugify
 from users.models import Vendor, Buyer
-from .models import Product, Category, ProductCategory
-from .forms import ProductCreateForm, AssignCategoryForm
+from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory
+from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
 from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
 from django.contrib.auth.models import User, Group
 from django.views.generic import (
@@ -32,8 +32,10 @@ class BuyerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(BuyerDetailView, self).get_context_data(**kwargs)
+        context['products'] = BuyerProduct.objects.filter(buyer=self.object).order_by('-date_created')
         buyer = Buyer.objects.get(buyer_id=self.kwargs['pk'])
         context['title'] = buyer.store_name
+        context['is_seller'] = False
         return context
 
 class BuyerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -48,6 +50,10 @@ class BuyerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super(BuyerUpdateView, self).get_context_data(**kwargs)
         context['title'] = "Buyer Edit"
         return context
+
+    def form_valid(self, form):
+        form.instance.slug = slugify(form.instance.store_name)
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Buyer information updated!')
@@ -100,6 +106,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         vendor = Vendor.objects.get(vendor_id=self.kwargs['pk'])
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
         context['title'] = vendor.store_name
+        context['is_seller'] = True
         return context
 
 class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -114,6 +121,10 @@ class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super(VendorUpdateView, self).get_context_data(**kwargs)
         context['title'] = "Vendor Edit"
         return context
+
+    def form_valid(self, form):
+        form.instance.slug = slugify(form.instance.store_name)
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Vendor information updated!')
@@ -230,7 +241,8 @@ def ProductCreateView(request, pk=None):
         context = {
             'p_form': p_form,
             'c_form': c_form,
-            'title':'New Product'
+            'title':'New Product',
+            'is_seller' : True
         }
 
         return render(request, 'admins/products/product_form.html', context)
@@ -245,10 +257,12 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created')
+        temp = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created')
+        context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
         if ProductCategory.objects.get(product=self.object):
             context['category'] = ProductCategory.objects.get(product=self.object)
         context['title'] = self.object.name
+        context['is_seller'] = True
         return context
 
 @login_required
@@ -261,6 +275,7 @@ def ProductUpdateView(request, pk=None):
             c_form = AssignCategoryForm(request.POST, instance=category)
 
             if p_form.is_valid() and c_form.is_valid():
+                p_form.instance.slug = slugify(p_form.instance.store_name)
                 new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Product has been updated.')
@@ -272,7 +287,8 @@ def ProductUpdateView(request, pk=None):
         context = {
             'p_form': p_form,
             'c_form': c_form,
-            'title':'Update Product'
+            'title':'Update Product',
+            'is_seller' : True
         }
 
         return render(request, 'admins/products/product_update.html', context)
@@ -288,6 +304,7 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super(ProductDeleteView, self).get_context_data(**kwargs)
         context['title'] = "Product Delete"
+        context['is_seller'] = True
         return context
 
     def form_valid(self, form):
@@ -300,6 +317,109 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Product has been deleted.')
         return reverse('vendors')
+
+@login_required
+def BuyerProductCreateView(request, pk=None):
+    if request.user.groups.filter(name='Admin').exists():
+        if request.method == "POST":
+            p_form = BuyerProductCreateForm(request.POST)
+            c_form = AssignBuyerCategoryForm(request.POST)
+
+            if p_form.is_valid() and c_form.is_valid():
+                buyer = Buyer.objects.get(buyer_id=pk)
+                new_prod = p_form.save(commit=False)
+                new_prod.buyer = buyer
+                new_prod.slug = slugify(new_prod.name)
+                new_prod.save()
+                p_form.save_m2m()
+                c_form.instance.product = new_prod
+                c_form.save()
+
+                messages.success(request, 'New product has been added.')
+                return redirect('buyer-product-detail', new_prod.slug)
+        else:
+            p_form = ProductCreateForm()
+            c_form = AssignCategoryForm()
+        
+        context = {
+            'p_form': p_form,
+            'c_form': c_form,
+            'title':'New Product',
+            'is_seller': False
+        }
+
+        return render(request, 'admins/products/product_form.html', context)
+    else:
+        return redirect('home')
+
+
+class BuyerProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = BuyerProduct
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(BuyerProductDetailView, self).get_context_data(**kwargs)
+        context['products'] = BuyerProduct.objects.filter(buyer=self.object.buyer).order_by('-date_created').exclude(product_id=self.object.product_id)
+        if BuyerProductCategory.objects.get(product=self.object):
+            context['category'] = BuyerProductCategory.objects.get(product=self.object)
+        context['title'] = self.object.name
+        context['is_seller'] = False
+        return context
+
+@login_required
+def BuyerProductUpdateView(request, pk=None):
+    if request.user.groups.filter(name='Admin').exists():
+        product = BuyerProduct.objects.get(product_id=pk)
+        category = BuyerProductCategory.objects.get(product=product)
+        if request.method == "POST":
+            p_form = BuyerProductCreateForm(request.POST, instance=product)
+            c_form = AssignBuyerCategoryForm(request.POST, instance=category)
+
+            if p_form.is_valid() and c_form.is_valid():
+                p_form.instance.slug = slugify(p_form.instance.name)
+                new_prod = p_form.save()
+                c_form.save()
+                messages.success(request, 'Buyer product has been updated.')
+                return redirect('buyer-product-detail', new_prod.slug)
+        else:
+            p_form = ProductCreateForm(instance=product)
+            c_form = AssignCategoryForm(instance=category)
+        
+        context = {
+            'p_form': p_form,
+            'c_form': c_form,
+            'title':'Update Product',
+            'is_seller' : True
+        }
+
+        return render(request, 'admins/products/product_update.html', context)
+    else:
+        return redirect('home')
+
+class BuyerProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = BuyerProduct
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(BuyerProductDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Product Delete"
+        context['is_seller'] = False
+        return context
+
+    def form_valid(self, form):
+        pt = BuyerProductCategory.objects.get(product = self.object)
+        if pt:
+            for i in pt:
+                i.delete()
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Buyer product has been deleted.')
+        return reverse('buyers')
 
 class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = User

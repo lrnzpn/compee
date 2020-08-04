@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    {%include 'partials/_dashboard_nav.html' %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
     <h1>Create New Product</h1>
     <div class="content-section">
         <form method = "POST" enctype = "multipart/form-data">
@@ -10,7 +10,6 @@
                 <legend class = "border-bottom mb-4">New Product</legend>
                 {{ p_form|crispy }}
                 {{ c_form|crispy }}
-                {{ t_form|crispy }}
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-info" type = "submit">Create</button>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    {%include 'partials/_dashboard_nav.html' %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
     <a href="{% url 'buyer-detail' buyer.buyer_id %}" class="btn btn-primary">Back to Buyer</a>
     <a href="{% url 'buyer-delete' buyer.buyer_id %}" class="btn btn-outline-danger">Delete Buyer</a>
     <h3>Edit Buyer Information</h3>

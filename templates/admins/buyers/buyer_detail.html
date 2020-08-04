@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {%include 'partials/_dashboard_nav.html' %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
     <h3>{{ object.store_name }}</h3>
     <div class="row">
         <div class="col-md-8">
@@ -20,4 +20,13 @@
             <a href="{% url 'buyer-delete' object.buyer_id %}" class="btn btn-outline-danger">Delete Buyer</a>
         </div>
     </div>
+
+    <!-- Products here -->
+    <h3>Products Needed:</h3>
+    <a href="{% url 'buyer-product-new' object.buyer_id %}" class="btn btn-primary">Add New Product</a>
+    {% if products %}
+        {%include 'admins/partials/_products.html' %}
+    {% else %}
+        <h4>This store has no products!</h4>
+    {% endif %}
 {% endblock content %}

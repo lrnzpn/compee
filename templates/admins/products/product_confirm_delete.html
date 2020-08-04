@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {%include 'partials/_dashboard_nav.html' %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
     <a href="{% url 'product-detail' object.product_id %}" class="btn btn-primary">Back to Product</a>
     <a href="#" class="btn btn-primary">Edit Vendor Info</a>
     <div class = "content-section">

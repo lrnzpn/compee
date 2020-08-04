@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {%include 'partials/_dashboard_nav.html' %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
     <a href="{% url 'buyer-detail' buyer.buyer_id %}" class="btn btn-primary">Back to Buyer</a>
     <a href="{% url 'buyer-update' buyer.buyer_id %}" class="btn btn-primary">Edit Buyer Info</a>
     <div class = "content-section">
