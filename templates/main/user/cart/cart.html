@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if items %}
+        <table border="1">
+            <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Vendor</th>
+                <th>Quantity</th>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
+                    <td>{{item.product.name}}</td>
+                    <td>{{item.product.price}}</td>
+                    <td>{{item.product.vendor.store_name}}</td>
+                    <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
+                    <td><a href="{% url 'wishlist-remove' item.product.product_id user.id item.id %}">x</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h3>You have nothing in your wishlist!</h3>
+    {% endif %}
+{% endblock content %}

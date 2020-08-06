@@ -4,6 +4,7 @@ from .views import (
     TagProductsListView, CategoryProductsListView,
     VendorListView, VendorDetailView, ProductDetailView,
     BuyerListView, BuyerDetailView, BuyerProductDetailView,
+    AddToWishlist, WishlistView, WishlistItemDeleteView,
 )
 
 urlpatterns = [
@@ -26,4 +27,10 @@ urlpatterns = [
         template_name='main/vendors/vendor_detail.html'), name='vendor-detail-main'),
     path('product/<str:slug>/', ProductDetailView.as_view(
         template_name='main/vendors/vendor_product.html'), name='vendor-product'),
+
+    path('wishlist/add', AddToWishlist, name='wishlist-add'),
+    path('wishlist/', WishlistView.as_view(
+        template_name="main/user/wishlist/wishlist.html"), name='wishlist'),
+    path('wishlist/<int:product_pk>/<int:user_pk>/<int:pk>/remove/', WishlistItemDeleteView.as_view(
+        template_name="main/user/wishlist/wishlist_confirm_delete.html"), name='wishlist-remove')
 ]

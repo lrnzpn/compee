@@ -1,8 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from taggit.models import Tag
+from django.shortcuts import render, get_object_or_404, reverse
+from django.views.generic import ListView, DetailView, DeleteView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
 from users.models import Vendor, Buyer
-from django.views.generic import ListView, DetailView
+from .models import WishlistItem
+from taggit.models import Tag
+from django.http import HttpResponse
+from django.contrib import messages
 
 def Home(request):
     categories = Category.objects.all()
@@ -66,18 +71,19 @@ class VendorDetailView(DetailView):
 
 class ProductDetailView(DetailView):
     model = Product
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
     
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
-        if ProductCategory.objects.get(product=self.object):
-            context['category'] = ProductCategory.objects.get(product=self.object)
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         context['is_seller'] = True
+
+        if ProductCategory.objects.filter(product=self.object).exists():
+            context['category'] = ProductCategory.objects.get(product=self.object)
+
+        if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
+            context['wishlist_item'] = True
         return context
 
 class BuyerListView(ListView):
@@ -94,9 +100,6 @@ class BuyerListView(ListView):
 class BuyerDetailView(DetailView):
     model = Buyer
 
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
-    
     def get_context_data(self, **kwargs):
         context = super(BuyerDetailView, self).get_context_data(**kwargs)
         buyer = Buyer.objects.get(slug=self.kwargs['slug'])
@@ -108,16 +111,50 @@ class BuyerDetailView(DetailView):
 
 class BuyerProductDetailView(DetailView):
     model = BuyerProduct
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
     
     def get_context_data(self, **kwargs):
         context = super(BuyerProductDetailView, self).get_context_data(**kwargs)
         context['products'] = BuyerProduct.objects.filter(buyer=self.object.buyer).order_by('-date_created').exclude(product_id=self.object.product_id)
-        if BuyerProductCategory.objects.get(product=self.object):
+        if BuyerProductCategory.objects.filter(product=self.object).exists():
             context['category'] = BuyerProductCategory.objects.get(product=self.object)
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         context['is_seller'] = False
         return context
+
+@login_required
+def AddToWishlist(request):
+    product_id = request.GET.get('product_id')
+    product = Product.objects.get(product_id=product_id)
+    if WishlistItem.objects.filter(user=request.user, product=product).exists():
+        messages.error(request, 'This item is already in your wishlist!')
+    else:
+        item = WishlistItem(user=request.user, product=product)
+        item.save()
+        messages.success(request, 'Item added to wishlist!')
+    return render(request, 'main/user/wishlist/wishlist.html')
+
+class WishlistView(LoginRequiredMixin, ListView):
+    model = WishlistItem
+    context_object_name = 'items'
+    paginate_by = 6
+    
+    def get_context_data(self, **kwargs):
+        context = super(WishlistView, self).get_context_data(**kwargs)
+        context['title'] = "Wishlist"
+        return context
+
+class WishlistItemDeleteView(LoginRequiredMixin, DeleteView):
+    model = WishlistItem
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Wishlist Item"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Item has been removed from your wishlist')
+        return reverse('wishlist')
