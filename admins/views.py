@@ -275,7 +275,7 @@ def ProductUpdateView(request, pk=None):
             c_form = AssignCategoryForm(request.POST, instance=category)
 
             if p_form.is_valid() and c_form.is_valid():
-                p_form.instance.slug = slugify(p_form.instance.store_name)
+                p_form.instance.slug = slugify(p_form.instance.name)
                 new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Product has been updated.')

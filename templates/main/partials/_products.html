@@ -9,9 +9,11 @@
                         <div class="btn-group">
                             {% if is_seller %}
                                 <a href="{% url 'vendor-product' product.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                <button id="AddCart" class="btn btn-sm btn-outline-secondary" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product_id }}")'>Add to Cart</button>
                             {% else %}
                                 <a href="{% url 'buyer-product' product.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
                             {% endif %}
+                            
                         </div>
                         <small class="text-muted">{{ product.price }}</small>
                     </div>

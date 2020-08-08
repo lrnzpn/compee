@@ -4,12 +4,12 @@
         <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Remove from Wishlist</legend>
-                <h2>Are you sure you want to remove "{{ object.product.name }}" from your wishlist? </h2>
+                <legend class = "border-bottom mb-4">Remove from Cart</legend>
+                <h2>Are you sure you want to remove "{{ object.product.name }}" from your cart? </h2>
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-danger" type = "submit">Yes, Remove</button>
-                <a class = "btn btn-outline-secondary" href = "{% url 'wishlist' %}">Cancel</a>
+                <a class = "btn btn-outline-secondary" href = "{% url 'cart' %}">Cancel</a>
             </div>
         </form>
     </div>

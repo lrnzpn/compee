@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, reverse
-from django.views.generic import ListView, DetailView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
 from users.models import Vendor, Buyer
-from .models import WishlistItem
+from .models import WishlistItem, CartItem
 from taggit.models import Tag
 from django.http import HttpResponse
 from django.contrib import messages
+from django.utils import timezone
 
 def Home(request):
     categories = Category.objects.all()
@@ -136,19 +137,19 @@ def AddToWishlist(request):
 
 class WishlistView(LoginRequiredMixin, ListView):
     model = WishlistItem
-    context_object_name = 'items'
     paginate_by = 6
     
     def get_context_data(self, **kwargs):
         context = super(WishlistView, self).get_context_data(**kwargs)
         context['title'] = "Wishlist"
+        context['items'] = WishlistItem.objects.filter(user=self.request.user)
         return context
 
-class WishlistItemDeleteView(LoginRequiredMixin, DeleteView):
+class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = WishlistItem
 
     def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
+        return self.request.user.id == self.kwargs['user_pk']
 
     def get_context_data(self, **kwargs):
         context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
@@ -158,3 +159,102 @@ class WishlistItemDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Item has been removed from your wishlist')
         return reverse('wishlist')
+
+@login_required
+def AddToCart(request):
+    product_id = request.GET.get('product_id')
+    product = Product.objects.get(product_id=product_id)
+    quantity = int(request.GET.get('quantity'))
+    if CartItem.objects.filter(user=request.user, product=product).exists():
+        item = CartItem.objects.get(user=request.user, product=product)
+        if item.quantity == 5:
+            messages.error(request, 'Product cap reached!')
+            return render(request, 'main/user/cart/cart.html')
+        else:
+            temp = item.quantity + quantity
+            if temp > 5:
+                product.item_stock = product.item_stock-(5-item.quantity)
+                item.quantity = 5
+            else:
+                item.quantity = temp
+                product.item_stock = product.item_stock-quantity
+            date_added = timezone.now()
+    else:
+        if quantity > 5:
+            quantity = 5
+        item = CartItem(user=request.user, product=product, quantity=quantity)
+        product.item_stock = product.item_stock-quantity
+
+    product.save()
+    item.save()
+    messages.success(request, 'Item added to wishlist!')
+    return render(request, 'main/user/cart/cart.html')
+
+class CartView(LoginRequiredMixin, ListView):
+    model = CartItem
+    context_object_name = 'items'
+    paginate_by = 6
+    
+    def get_context_data(self, **kwargs):
+        context = super(CartView, self).get_context_data(**kwargs)
+        context['title'] = "Cart"
+        context['items'] = CartItem.objects.filter(user=self.request.user)
+        return context
+
+class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CartItem
+    fields = ['quantity']
+
+    def test_func(self):
+        return self.request.user.id == self.kwargs['user_pk']
+
+    def get_context_data(self, **kwargs):
+        context = super(CartItemUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Edit Item"
+        return context
+    
+    def form_valid(self, form):
+        new = form.instance.quantity
+        item = CartItem.objects.get(product=self.object.product, user=self.request.user)
+        if new == item.quantity:
+            return super().form_valid(form)
+        elif new > 5:
+            messages.error(self.request, 'Maximum of 5 items per product!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            product = Product.objects.get(product_id=self.object.product.product_id)
+            if item.quantity > new:
+                dec = item.quantity - new
+                product.item_stock = product.item_stock + dec
+            elif item.quantity < new:
+                add = new - item.quantity 
+                product.item_stock = product.item_stock - add
+            form.instance.date_added = timezone.now()
+            product.save()
+            return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Cart item updated!')
+        return reverse("cart")
+
+class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CartItem
+
+    def test_func(self):
+        return self.request.user.id == self.kwargs['user_pk']
+
+    def get_context_data(self, **kwargs):
+        context = super(CartItemDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Cart Item"
+        return context
+    
+    def delete(self, *args, **kwargs):
+        product = Product.objects.get(product_id=self.kwargs['product_pk'])
+        item = CartItem.objects.get(product=product, user=self.request.user)
+        product.item_stock = product.item_stock + item.quantity
+        product.save()
+        return super(CartItemDeleteView, self).delete(*args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Item has been removed from your cart')
+        return reverse('cart')

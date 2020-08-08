@@ -8,6 +8,7 @@
                 <th>Price</th>
                 <th>Vendor</th>
                 <th>Quantity</th>
+
             </thead>
             <tbody>
                 {% for item in items %}
@@ -16,13 +17,15 @@
                     <td>{{item.product.name}}</td>
                     <td>{{item.product.price}}</td>
                     <td>{{item.product.vendor.store_name}}</td>
+                    <td>{{item.quantity}}</td>
                     <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-                    <td><a href="{% url 'wishlist-remove' item.product.product_id user.id item.id %}">x</a></td>
+                    <td><a href="{% url 'cart-edit' item.product.product_id user.id item.id  %}">Edit</a></td>
+                    <td><a href="{% url 'cart-remove' item.product.product_id user.id item.id %}">x</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <h3>You have nothing in your wishlist!</h3>
+        <h3>You have nothing in your cart!</h3>
     {% endif %}
 {% endblock content %}
