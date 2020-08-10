@@ -320,13 +320,14 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def BuyerProductCreateView(request, pk=None):
-    if request.user.groups.filter(name='Admin').exists():
+    buyer = Buyer.objects.get(buyer_id=pk)
+    is_admin = request.user.groups.filter(name='Admin').exists() 
+    if is_admin or buyer.user.id == request.user.id:
         if request.method == "POST":
             p_form = BuyerProductCreateForm(request.POST)
             c_form = AssignBuyerCategoryForm(request.POST)
 
             if p_form.is_valid() and c_form.is_valid():
-                buyer = Buyer.objects.get(buyer_id=pk)
                 new_prod = p_form.save(commit=False)
                 new_prod.buyer = buyer
                 new_prod.slug = slugify(new_prod.name)
@@ -336,7 +337,10 @@ def BuyerProductCreateView(request, pk=None):
                 c_form.save()
 
                 messages.success(request, 'New product has been added.')
-                return redirect('buyer-product-detail', new_prod.slug)
+                if is_admin:
+                    return redirect('buyer-product-detail', new_prod.slug)
+                else:
+                    return redirect('buyer-product', new_prod.slug)
         else:
             p_form = ProductCreateForm()
             c_form = AssignCategoryForm()
@@ -347,8 +351,10 @@ def BuyerProductCreateView(request, pk=None):
             'title':'New Product',
             'is_seller': False
         }
-
-        return render(request, 'admins/products/product_form.html', context)
+        if is_admin:
+            return render(request, 'admins/products/product_form.html', context)
+        else:
+            return render(request,'main/buyers/products/buyer_product_form.html', context)
     else:
         return redirect('home')
 
@@ -370,7 +376,9 @@ class BuyerProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView
 
 @login_required
 def BuyerProductUpdateView(request, pk=None):
-    if request.user.groups.filter(name='Admin').exists():
+    product = BuyerProduct.objects.get(product_id=pk)
+    is_admin = request.user.groups.filter(name='Admin').exists()
+    if is_admin or product.buyer.user.id == request.user.id:
         product = BuyerProduct.objects.get(product_id=pk)
         category = BuyerProductCategory.objects.get(product=product)
         if request.method == "POST":
@@ -382,7 +390,10 @@ def BuyerProductUpdateView(request, pk=None):
                 new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Buyer product has been updated.')
-                return redirect('buyer-product-detail', new_prod.slug)
+                if is_admin:
+                    return redirect('buyer-product-detail', new_prod.slug)
+                else:
+                    return redirect('buyer-product', new_prod.slug)
         else:
             p_form = ProductCreateForm(instance=product)
             c_form = AssignCategoryForm(instance=category)
@@ -393,8 +404,11 @@ def BuyerProductUpdateView(request, pk=None):
             'title':'Update Product',
             'is_seller' : True
         }
-
-        return render(request, 'admins/products/product_update.html', context)
+        if is_admin:
+            return render(request, 'admins/products/product_update.html', context)
+        else:
+            context.update({'is_owner':True})
+            return render(request, 'main/buyers/products/buyer_product_update.html', context)
     else:
         return redirect('home')
 
@@ -402,7 +416,8 @@ class BuyerProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
     model = BuyerProduct
 
     def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
+        product=BuyerProduct.objects.get(product_id=self.kwargs['pk'])
+        return self.request.user.groups.filter(name='Admin').exists() or product.buyer.user.id == self.request.user.id
 
     def get_context_data(self, **kwargs):
         context = super(BuyerProductDeleteView, self).get_context_data(**kwargs)
@@ -419,7 +434,10 @@ class BuyerProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Buyer product has been deleted.')
-        return reverse('buyers')
+        if self.request.user.groups.filter(name='Admin').exists():
+            return reverse('buyers')
+        else:
+            return reverse('buyers-main')
 
 class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = User

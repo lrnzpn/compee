@@ -44,8 +44,8 @@ urlpatterns = [
     path('buyer/<int:pk>/product/new/', BuyerProductCreateView, name='buyer-product-new'),
     path('buyer-product/<str:slug>/', BuyerProductDetailView.as_view(
         template_name='admins/products/product_detail.html'), name='buyer-product-detail'),
-    path('buyer-product/<int:pk>/update', BuyerProductUpdateView, name='buyer-product-update'),
-    path('buyer-product/<int:pk>/delete', BuyerProductDeleteView.as_view(
+    path('buyer-product/<int:pk>/update/', BuyerProductUpdateView, name='buyer-product-update'),
+    path('buyer-product/<int:pk>/delete/', BuyerProductDeleteView.as_view(
         template_name='admins/products/product_confirm_delete.html'), name='buyer-product-delete'),
 
     path('users/', UserListView.as_view(
@@ -54,6 +54,6 @@ urlpatterns = [
         template_name='admins/users/make_seller.html'), name='make-seller'),
     path('buyer/new/<int:pk>/', BuyerCreateView.as_view(
         template_name='admins/users/make_buyer.html'), name='make-buyer'),
-    path('admin/new/<int:pk>', GiveAdmin, name='make-admin'),
-    path('admin/remove/<int:pk>', RemoveAdmin, name='remove-admin')
+    path('admin/new/<int:pk>/', GiveAdmin, name='make-admin'),
+    path('admin/remove/<int:pk>/', RemoveAdmin, name='remove-admin')
 ]

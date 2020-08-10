@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, reverse
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
 from users.models import Vendor, Buyer
-from .models import WishlistItem, CartItem
+from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
 from django.http import HttpResponse
 from django.contrib import messages
@@ -108,6 +108,8 @@ class BuyerDetailView(DetailView):
         context['title'] = buyer.store_name
         context['categories'] = Category.objects.all()
         context['is_seller'] = False
+        if buyer.user == self.request.user:
+            context['is_owner'] = True
         return context
 
 class BuyerProductDetailView(DetailView):
@@ -121,6 +123,7 @@ class BuyerProductDetailView(DetailView):
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         context['is_seller'] = False
+        context['is_owner'] = self.object.buyer.user.id == self.request.user.id
         return context
 
 @login_required
@@ -258,3 +261,70 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Item has been removed from your cart')
         return reverse('cart')
+
+class Checkout(LoginRequiredMixin, CreateView):
+    model = SiteOrder
+    fields = ['address_line', 'city', 'state', 'zip_code', 'payment_method']
+
+    def get_context_data(self, **kwargs):
+        context = super(Checkout, self).get_context_data(**kwargs)
+        context['title'] = "Checkout"
+        context['items'] = CartItem.objects.filter(user=self.request.user)
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        items = CartItem.objects.filter(user=self.request.user)
+        total = 0.00
+        for i in items:
+            total = total + i.product.price * i.quantity
+            item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
+            item.save()
+            i.delete()  
+        order = self.object
+        order.total = total
+        order.save()  
+        messages.success(self.request, 'Your order has been received!')
+        return reverse("home")
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = SiteOrder
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderListView, self).get_context_data(**kwargs)
+        context['title'] = "My Orders"
+        orders = SiteOrder.objects.filter(user=self.request.user).order_by('status')
+        if orders:
+            items = []
+            for i in orders:
+                items.append(OrderItem.objects.filter(order=i))
+            context['orders'] = orders
+            context['items'] = items
+        return context
+
+class CancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = SiteOrder
+    fields = []
+
+    def test_func(self):
+        order = SiteOrder.objects.get(order_id = self.kwargs['pk'])
+        return order.user.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(CancelOrderView, self).get_context_data(**kwargs)
+        context['title'] = "Cancel Order"
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        context['items'] = OrderItem.objects.filter(order=order)
+        return context
+
+    def form_valid(self, form):
+        form.instance.status = "Cancelled"
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Your order has been cancelled')
+        return reverse("my-orders")

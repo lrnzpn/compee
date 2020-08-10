@@ -21,6 +21,10 @@
 
     <!-- Products here -->
     <h3>Store Products</h3>
+    {% if is_owner %}
+        <a href="{% url 'buyer-product-new-main' object.buyer_id %}" class="btn btn-primary">Add Product</a>
+    {% endif %}
+    
     {% if products %}
         {%include 'main/partials/_products.html' %}
     {% else %}
