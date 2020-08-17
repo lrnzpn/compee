@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from admins.models import Product
 from django.utils import timezone
+from django.core.validators import RegexValidator
+
+numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
 
 class WishlistItem(models.Model):
     id = models.AutoField(primary_key=True)
@@ -28,10 +31,10 @@ class CartItem(models.Model):
         unique_together = (('user', 'product'),)
 
 STATUS_CHOICES = (
-    ('Fulfilled','Fulfilled'),
+    ('Received','Received'),
     ('Shipped','Shipped'),
     ('Pending','Pending'),
-    ('Received','Received'),
+    ('Unfulfilled', 'Unfulfilled'),
     ('Cancelled', 'Cancelled')
 )
 PAYMENT_CHOICES = (
@@ -42,8 +45,9 @@ PAYMENT_CHOICES = (
 class SiteOrder(models.Model):
     order_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    contact_no = models.CharField(max_length=15, validators=[numericCheck])
     date_placed = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default = ('Received'))
+    status = models.CharField(max_length=11, choices=STATUS_CHOICES, default = ('Unfulfilled'))
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.CharField(max_length=16, choices=PAYMENT_CHOICES, default=('Cash on Delivery'))
     address_line = models.CharField(max_length=100)

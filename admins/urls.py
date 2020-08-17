@@ -5,8 +5,11 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
     BuyerProductCreateView, BuyerProductDetailView, BuyerProductUpdateView, BuyerProductDeleteView,
-    UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin
+    UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin,
+    get_sort_orders, OrderListView, OrderDetailView, OrderUpdateView, OrderDeleteView,
+    OrderItemCreateView, OrderItemUpdateView, OrderItemDeleteView
 )
+
 
 urlpatterns = [
     path('buyers/', BuyerListView.as_view(
@@ -55,5 +58,23 @@ urlpatterns = [
     path('buyer/new/<int:pk>/', BuyerCreateView.as_view(
         template_name='admins/users/make_buyer.html'), name='make-buyer'),
     path('admin/new/<int:pk>/', GiveAdmin, name='make-admin'),
-    path('admin/remove/<int:pk>/', RemoveAdmin, name='remove-admin')
+    path('admin/remove/<int:pk>/', RemoveAdmin, name='remove-admin'),
+
+    path('get-orders/', get_sort_orders, name='get-sort-orders'),
+    path('orders/', OrderListView.as_view(
+        template_name="admins/orders/orders.html"), name='orders'),
+    path('order/<int:pk>/', OrderDetailView.as_view(
+        template_name="admins/orders/order_detail.html"), name='order-detail'),
+    path('order/<int:pk>/update-info/', OrderUpdateView.as_view(
+        template_name="admins/orders/order_update.html"), name='order-update-info'),
+    path('order/<int:pk>/delete/', OrderDeleteView.as_view(
+        template_name="admins/orders/order_confirm_delete.html"), name="order-delete"),
+
+    path('order/<int:pk>/update-items/', OrderItemCreateView.as_view(
+        template_name="admins/orders/items/items.html"), name='order-update-items'),
+    path('order/<int:product_pk>/<int:order_pk>/<int:pk>/edit/', OrderItemUpdateView.as_view(
+        template_name="admins/orders/items/item_update.html"), name='order-item-edit'),
+    path('order/<int:product_pk>/<int:order_pk>/<int:pk>/delete/', OrderItemDeleteView.as_view(
+        template_name="admins/orders/items/item_confirm_delete.html"), name='order-item-delete'),
+    
 ]

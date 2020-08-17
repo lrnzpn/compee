@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <a href="{% url 'my-orders' %}" class="btn btn-primary">Back to Orders</a>
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Add Product Review</h3>
+            <table border="1">
+                <thead>
+                    <th>Name</th>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td><a href="#">Add</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class='col-md-4'>
+            <h3>Add Vendor Review</h3>
+            <a href="#" class="btn btn-primary">Add Review</a>
+
+        </div>
+    </div>
+{% endblock content %}

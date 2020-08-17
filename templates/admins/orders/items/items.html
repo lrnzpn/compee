@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    {% if is_open %}
+        <a href = "{% url 'order-detail' order.order_id %}" class="btn btn-primary">Back to Order</a>
+        <div class = "content-section">
+            <form method = "POST">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Add Product</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class='content-section'>
+            <h3>Order Items</h3>
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                </tr>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.product.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td><a href="{% url 'order-item-edit' item.product.product_id item.order.order_id item.id %}">Edit</a></td>
+                    <td><a href="{% url 'order-item-delete' item.product.product_id item.order.order_id item.id %}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <h2>Cannot update items of closed order.</h2>
+    {% endif %}
+{% endblock content %}

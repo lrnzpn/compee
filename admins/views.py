@@ -1,6 +1,8 @@
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
+from django.db.models import Q
 from django.template.defaultfilters import slugify
+from main.models import SiteOrder, OrderItem
 from users.models import Vendor, Buyer
 from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory
 from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
@@ -10,6 +12,7 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+import decimal
 
 class BuyerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Buyer
@@ -549,3 +552,219 @@ def RemoveAdmin(request,pk):
     else:
         return redirect('home')
 
+def get_sort_orders(request):
+    option = request.GET.get('option')
+    if option == 'a':
+        context = {'orders': SiteOrder.objects.all().order_by('-date_placed') }
+    elif option == 'u':
+        context = {'orders': SiteOrder.objects.filter(status="Unfulfilled").order_by('-date_placed')  }
+    elif option == 'p':
+        context = {'orders': SiteOrder.objects.filter(status="Pending").order_by('-date_placed')  }
+    elif option == 'o':
+        context = {'orders': SiteOrder.objects.filter( Q(status="Unfulfilled") | Q(status="Pending") | Q(status="Shipped") ).order_by('-date_placed') }
+    elif option == 'c':
+        context = {'orders': SiteOrder.objects.filter( Q(status="Received") | Q(status="Cancelled") ).order_by('-date_placed') }
+    return render(request, 'admins/orders/orders.html', context)
+
+class OrderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = SiteOrder
+    context_object_name = 'orders'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(OrderListView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Orders"
+        return context
+
+class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = SiteOrder
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(OrderDetailView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Order"
+        context['items'] = OrderItem.objects.filter(order=self.object)
+        open_status = ['Unfulfilled', 'Pending']
+        if self.object.status in open_status:
+            context['is_open'] = True
+        return context
+
+class OrderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = SiteOrder
+    fields = ['status', 'contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Order Edit"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Order information updated!')
+        return reverse("order-detail", kwargs={'pk': self.object.pk})
+
+class OrderDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = SiteOrder
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Order"
+        return context
+
+    def delete(self, *args, **kwargs):
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        open_status = ['Unfulfilled', 'Pending', 'Shipped']
+        if order.status in open_status:
+            items = OrderItem.objects.filter(order=order)
+            for i in items:
+                prod = Product.objects.get(product_id=i.product.product_id)
+                prod.item_stock = prod.item_stock + i.quantity
+                prod.save()
+                i.delete()
+        return super(OrderDeleteView, self).delete(*args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Order has been deleted.')
+        return reverse('orders')
+
+class OrderItemCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = OrderItem
+    fields = ['product', 'quantity']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderItemCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Edit Order Items"
+        context['items'] = OrderItem.objects.filter(order_id=self.kwargs['pk'])
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        context['order'] = order
+        open_status = ['Unfulfilled', 'Pending']
+        if order.status in open_status:
+            context['is_open'] = True
+        return context
+
+    def form_valid(self, form):
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        if OrderItem.objects.filter(product=form.instance.product, order=order).exists():
+            messages.error(self.request,'This product has already been added!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            form.instance.order = order
+            quantity = form.instance.quantity
+            prod = Product.objects.get(product_id=form.instance.product.product_id)
+            if prod.item_stock >= quantity:
+                if quantity > 5:
+                    messages.error(self.request,'Maximum of 5 items per product!')
+                    return self.render_to_response(self.get_context_data(form=form))
+                elif quantity < 1:
+                    messages.error(self.request,'Please add at least 1 item of the selected product!')
+                    return self.render_to_response(self.get_context_data(form=form))
+                else:
+                    prod.item_stock = prod.item_stock-quantity
+                    prod.save()
+                    order.total = order.total + prod.price * decimal.Decimal(quantity)
+                    order.save()
+                    return super().form_valid(form)
+            else:
+                messages.error(self.request,'This product does not have enough in stock!')
+                return self.render_to_response(self.get_context_data(form=form))
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Product has been added!')
+        return reverse("order-update-items", kwargs={'pk': self.kwargs['pk']})
+
+class OrderItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = OrderItem
+    fields = ['quantity']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderItemUpdateView, self).get_context_data(**kwargs)
+        context['title'] =  "Dashboard | Edit Order Items"
+        open_status = ['Unfulfilled', 'Pending']
+        if self.object.order.status in open_status:
+            context['is_open'] = True
+        return context
+
+    def form_valid(self, form):
+        closed_status = ['Shipped', 'Received', 'Cancelled']
+        if self.object.order.status in closed_status:
+            messages.error(self.request, 'You can no longer update items from closed orders!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            new = form.instance.quantity
+            item = OrderItem.objects.get(product=self.object.product, order=self.object.order)
+            order = item.order
+            if new == item.quantity:
+                return super().form_valid(form)
+            elif new > 5:
+                messages.error(self.request, 'Maximum of 5 items per product!')
+                return self.render_to_response(self.get_context_data(form=form))
+            else:
+                product = Product.objects.get(product_id=self.object.product.product_id)
+                if item.quantity > new:
+                    dec = item.quantity - new
+                    product.item_stock = product.item_stock + dec
+                    product.save()
+                    order.total = order.total - product.price * decimal.Decimal(dec)
+                    order.save()
+                    return super().form_valid(form)
+                elif item.quantity < new:
+                    add = new - item.quantity
+                    if product.item_stock < add:
+                        messages.error(self.request, 'This product does not have enough items in stock!')
+                        return self.render_to_response(self.get_context_data(form=form))
+                    else:
+                        product.item_stock = product.item_stock - add
+                        product.save()
+                        order.total = order.total + product.price * decimal.Decimal(add)
+                        order.save()
+                        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Product quantity updated!')
+        return reverse("order-update-items", kwargs={'pk': self.kwargs['order_pk']})
+
+class OrderItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = OrderItem
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderItemDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Dashboard | Delete Item"
+        return context
+
+    def delete(self, *args, **kwargs):
+        closed_status = ['Shipped', 'Received', 'Cancelled']
+        order = SiteOrder.objects.get(order_id=self.kwargs['order_pk'])
+        if order in closed_status:
+            messages.error(self.request, 'You can no longer update items from closed orders!')
+            return redirect('orders')
+        else:
+            item = OrderItem.objects.get(product_id=self.kwargs['product_pk'], order_id=self.kwargs['order_pk'])
+            prod = Product.objects.get(product_id=self.kwargs['product_pk'])
+            prod.item_stock = prod.item_stock + item.quantity
+            prod.save()
+            order.total = order.total - prod.price * decimal.Decimal(item.quantity)
+            order.save()
+            return super(OrderItemDeleteView, self).delete(*args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Order item has been deleted.')
+        return reverse('order-detail', kwargs={'pk':self.kwargs['order_pk']})

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h3>Edit Order Item</h3>
+    {% if is_open %}
+        <div class="content-section">
+            <form method = "POST" enctype = "multipart/form-data">
+                {% csrf_token %}
+                <table border="1">
+                    <thead>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Vendor</th>
+                        <th>Quantity</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><img src="{{object.product.image.url}}" width="100%" height="200px"></td>
+                            <td>{{object.product.name}}</td>
+                            <td>{{object.product.price}}</td>
+                            <td>{{object.product.vendor.store_name}}</td>
+                            <td>{{object.quantity}}</td>
+                            <td><a href="{% url 'product-detail' object.product.slug %}">Go to Product</a></td>
+                            <td><a href="{% url 'order-item-delete' object.product.product_id object.order.order_id object.id %}">x</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Order Item Info</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Update</button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <h2>Cannot update items of closed order.</h2>
+    {% endif %}
+{% endblock content %}

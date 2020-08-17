@@ -6,7 +6,8 @@ from .views import (
     BuyerListView, BuyerDetailView, BuyerProductDetailView,
     AddToWishlist, WishlistView, WishlistItemDeleteView,
     AddToCart, CartView, CartItemDeleteView, CartItemUpdateView,
-    Checkout, OrderListView, CancelOrderView
+    Checkout, OrderListView, CancelOrderView, ReceiveOrder, 
+    AddReviewPage
 )
 from admins.views import BuyerProductCreateView, BuyerProductUpdateView, BuyerProductDeleteView
 
@@ -42,7 +43,7 @@ urlpatterns = [
     path('wishlist/<int:product_pk>/<int:user_pk>/<int:pk>/remove/', WishlistItemDeleteView.as_view(
         template_name="main/user/wishlist/wishlist_confirm_delete.html"), name='wishlist-remove'),
 
-    path('cart/add', AddToCart, name='cart-add'),
+    path('cart/add/', AddToCart, name='cart-add'),
     path('cart/', CartView.as_view(
         template_name='main/user/cart/cart.html'), name='cart'),
     path('cart/<int:product_pk>/<int:user_pk>/<int:pk>/remove/', CartItemDeleteView.as_view(
@@ -56,4 +57,7 @@ urlpatterns = [
         template_name='main/orders/orders.html'), name='my-orders'),
     path('order/<int:pk>/cancel', CancelOrderView.as_view(
         template_name='main/orders/order_confirm_cancel.html'), name='cancel-order'),
+    path('order/receive/', ReceiveOrder, name='receive-order' ),
+
+    path('order/<int:pk>/reviews/', AddReviewPage, name='add-review')
 ]

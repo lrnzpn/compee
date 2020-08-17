@@ -3,12 +3,13 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
-from users.models import Vendor, Buyer
+from users.models import Vendor, Buyer, VendorReview
 from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
+import decimal
 
 def Home(request):
     categories = Category.objects.all()
@@ -167,7 +168,11 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 def AddToCart(request):
     product_id = request.GET.get('product_id')
     product = Product.objects.get(product_id=product_id)
-    quantity = int(request.GET.get('quantity'))
+    quantity = request.GET.get('quantity')
+    if quantity == None:
+        quantity = 1
+    else:
+        quantity = int(request.GET.get('quantity'))
     if CartItem.objects.filter(user=request.user, product=product).exists():
         item = CartItem.objects.get(user=request.user, product=product)
         if item.quantity == 5:
@@ -264,7 +269,7 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class Checkout(LoginRequiredMixin, CreateView):
     model = SiteOrder
-    fields = ['address_line', 'city', 'state', 'zip_code', 'payment_method']
+    fields = ['contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
 
     def get_context_data(self, **kwargs):
         context = super(Checkout, self).get_context_data(**kwargs)
@@ -280,7 +285,7 @@ class Checkout(LoginRequiredMixin, CreateView):
         items = CartItem.objects.filter(user=self.request.user)
         total = 0.00
         for i in items:
-            total = total + i.product.price * i.quantity
+            total = decimal.Decimal(total) + i.product.price * decimal.Decimal(i.quantity)
             item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
             item.save()
             i.delete()  
@@ -323,8 +328,45 @@ class CancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.status = "Cancelled"
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        items = OrderItem.objects.filter(order=order)
+        for i in items:
+            product = Product.objects.get(product_id=i.product.product_id)
+            product.quantity = product.quantity + i.quantity
+            product.save()
+
         return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Your order has been cancelled')
         return reverse("my-orders")
+
+@login_required
+def ReceiveOrder(request):
+    order_id = request.GET.get('order_id')
+    order = SiteOrder.objects.get(order_id = order_id)
+    if order.user.id == self.request.user.id:
+        order.status = "Received"
+        order.save()
+    return render(request, 'main/orders/orders.html')
+
+@login_required
+def AddReviewPage(request, pk):
+    order = SiteOrder.objects.get(order_id=pk)
+    if order.user.id == request.user.id:
+        items = OrderItem.objects.filter(order=order)
+        context = {
+            'order':order,
+            'items':items
+        }
+        return render(request, 'main/orders/reviews/add_review.html', context)
+    else:
+        return reverse('home')
+
+
+
+    
+
+    
+
+    

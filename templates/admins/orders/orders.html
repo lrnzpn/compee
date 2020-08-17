@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <hr>
+
+    <form action="" class="form-group">
+        <select class="form-control" id="order-filter">
+            <option value="" selected disabled hidden>Filter table..</option>
+            <option value="a">All</option>
+            <option value="u">Unfulfilled</option>
+            <option value="p">Pending</option>
+            <option value="o">Open</option>
+            <option value="c">Closed</option>
+        </select>
+    </form>
+    <div id="order-table" data-sort-url="{% url 'get-sort-orders' %}">
+        {% if orders %}
+            <table border="1">
+                <thead>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Items</th>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.order_id }}</strong></td>
+                            <td>{{ order.date_placed }}</td>
+                            <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                            <td>{{ order.total }}</td>
+                            <td>{{ order.payment_method }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>insert modal here</td>
+                            <td><a href="{% url 'order-detail' order.order_id %}">Details</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h3>There are no orders to display.</h3>
+        {% endif %}
+    </div>
+    <div class="order-sort"></div>
+{% endblock content %}
