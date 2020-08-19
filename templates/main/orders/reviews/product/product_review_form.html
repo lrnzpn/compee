@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <a href="{% url 'add-review' order.order_id %}" class="btn btn-primary">Back</a>
+    {% if review %}
+        <h3>You have already created a review for this product</h3>
+        <a href="#" class="btn btn-primary">Edit Review</a>
+    {% elif received %}
+        <h1>Create Product Review</h1>
+        <div class="content-section">
+            <form method = "POST" enctype = "multipart/form-data">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">{{product.name}} Review</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Post</button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <h3>This order has not yet been received!</h3>
+    {% endif %}
+{% endblock content %}

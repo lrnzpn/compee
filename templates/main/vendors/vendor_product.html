@@ -38,6 +38,23 @@
         </div>
     </div>
 
+    {% if reviews %}
+        <h3>Reviews</h3>
+        {% for r in reviews %}
+            <ul>
+                <li>{{ r.author.username}}</li>
+                <li>Rating: {{ r.rating }}/5</li>
+                {% if r.description %}
+                <li>"{{r.description}}"</li>
+                {% endif %}
+                {% if r.author == request.user %}
+                    <a href='{% url "product-review-edit" r.review_id %}'>Edit</a>
+                    <a href='{% url "product-review-delete" r.review_id %}'>Delete</a>
+                {% endif %}
+            </ul>
+        {% endfor %}
+    {% endif %}
+
     <!-- Products here -->
     <h3>Other Products</h3>
     {% if products %}

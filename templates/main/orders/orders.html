@@ -13,14 +13,17 @@
             </thead>
             <tbody>
                 {% for order in orders %}
-                    {% for set in items %}
                     <tr>
                         <td><strong>#{{ order.order_id }}</strong></td>
                         <td>
                             <ul>
-                                {% for item in set %}
-                                    <li>{{ item.product.name }} x{{ item.quantity }}</li>
-                                {% endfor %}
+                                {% for set in items %}
+                                    {% for item in set %}
+                                        {% if item.order.order_id == order.order_id %}
+                                            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {%endfor%}
                             </ul>
                         </td>
                         <td>{{ order.total }}</td>
@@ -36,7 +39,6 @@
                             <td><button id="recOrder" class="btn btn-primary" value='{% url "receive-order" %}' onclick='receiveOrder({{ order.order_id }})'>Mark as Received</button></td>
                         {% endif %}
                     </tr>
-                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>

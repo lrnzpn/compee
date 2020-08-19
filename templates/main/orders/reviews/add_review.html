@@ -1,9 +1,11 @@
 {% extends "base.html" %}
+{% load check_prod_review %}
+{% load find_prod_review_id %}
 {% block content %}
     <a href="{% url 'my-orders' %}" class="btn btn-primary">Back to Orders</a>
     <div class="row">
         <div class="col-md-8">
-            <h3>Add Product Review</h3>
+            <h3>Product Review</h3>
             <table border="1">
                 <thead>
                     <th>Name</th>
@@ -12,7 +14,11 @@
                     {% for item in items %}
                         <tr>
                             <td>{{ item.product.name }}</td>
-                            <td><a href="#">Add</a></td>
+                            {% if item.product.product_id|check_prod_review:user %}
+                            <td><a href="{% url 'product-review-edit' item.product.product_id|find_prod_review_id:user %}">Edit Review</a></td>
+                            {% else %}
+                            <td><a href="{% url 'product-review' order.order_id item.product.product_id %}">Add Review</a></td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tr>
@@ -20,9 +26,13 @@
             </table>
         </div>
         <div class='col-md-4'>
-            <h3>Add Vendor Review</h3>
-            <a href="#" class="btn btn-primary">Add Review</a>
-
+            <h3>Vendor Review</h3>
+            {% if review %}
+                <p>You have already created a review for this vendor.</p>
+                <a href="{% url 'vendor-review-edit' review.review_id  %}" class="btn btn-primary">Edit Review</a>
+            {% else %}
+                <a href="{% url 'vendor-review' order.order_id  %}" class="btn btn-primary">Add Review</a>
+            {% endif %}
         </div>
     </div>
 {% endblock content %}

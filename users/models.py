@@ -64,6 +64,7 @@ class VendorReview(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     rating = models.CharField(max_length=1, choices=RATING_CHOICES, default=('3'))
     description = models.TextField(blank=True, null=True)
+    order = models.ForeignKey('main.SiteOrder', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.author.username}'

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory
+from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview
 from users.models import Vendor, Buyer, VendorReview
 from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
@@ -69,6 +69,7 @@ class VendorDetailView(DetailView):
         context['title'] = vendor.store_name
         context['categories'] = Category.objects.all()
         context['is_seller'] = True
+        context['reviews'] = VendorReview.objects.filter(vendor=self.object)
         return context
 
 class ProductDetailView(DetailView):
@@ -86,6 +87,8 @@ class ProductDetailView(DetailView):
 
         if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
             context['wishlist_item'] = True
+        
+        context['reviews'] = ProductReview.objects.filter(product=self.object)
         return context
 
 class BuyerListView(ListView):
@@ -278,20 +281,68 @@ class Checkout(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        items = CartItem.objects.filter(user=self.request.user)
+        order_list = []
+        for i in items:
+            order = {
+                'vendor_id': None,
+                'items' : [],
+                'total' : 0.00
+            }
+            product = {
+                'product_id': None,
+                'quantity': 0
+            }
+
+            vendor = i.product.vendor.vendor_id
+            if order_list == [] or not any(d['vendor_id'] == vendor for d in order_list):
+                order['vendor_id'] = vendor
+                product['product_id'] = i.product.product_id
+                product['quantity'] = i.quantity
+                order['items'] = [product]
+                order['total'] = i.product.price * decimal.Decimal(i.quantity)
+                order_list.append(order)
+            else:
+                for d in order_list:
+                    if d['vendor_id'] == vendor:
+                        product['product_id'] = i.product.product_id
+                        product['quantity'] = i.quantity
+                        d['items'].append(product)
+                        d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
+        first = True
+        for d in order_list:
+            if first:
+                form.instance.user = self.request.user
+                form.instance.total = d['total']
+                first = False
+            else:
+                order = SiteOrder(
+                    user=self.request.user, 
+                    contact_no=form.instance.contact_no,
+                    total= d['total'],
+                    payment_method= form.instance.payment_method,
+                    address_line=form.instance.address_line,
+                    city=form.instance.city,
+                    state=form.instance.state,
+                    zip_code= form.instance.zip_code
+                )
+                order.save()
+
+                for i in d['items']:
+                    prod = Product.objects.get(product_id=i['product_id'])
+                    item = OrderItem(order=order, product=prod, quantity=i['quantity'])
+                    item.save()
+                    c_item = CartItem.objects.get(product=prod, user=self.request.user)
+                    c_item.delete()
+
         return super().form_valid(form)
     
     def get_success_url(self, **kwargs):
         items = CartItem.objects.filter(user=self.request.user)
-        total = 0.00
         for i in items:
-            total = decimal.Decimal(total) + i.product.price * decimal.Decimal(i.quantity)
             item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
             item.save()
             i.delete()  
-        order = self.object
-        order.total = total
-        order.save()  
         messages.success(self.request, 'Your order has been received!')
         return reverse("home")
 
@@ -345,7 +396,7 @@ class CancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 def ReceiveOrder(request):
     order_id = request.GET.get('order_id')
     order = SiteOrder.objects.get(order_id = order_id)
-    if order.user.id == self.request.user.id:
+    if order.user.id == request.user.id:
         order.status = "Received"
         order.save()
     return render(request, 'main/orders/orders.html')
@@ -354,14 +405,168 @@ def ReceiveOrder(request):
 def AddReviewPage(request, pk):
     order = SiteOrder.objects.get(order_id=pk)
     if order.user.id == request.user.id:
-        items = OrderItem.objects.filter(order=order)
-        context = {
-            'order':order,
-            'items':items
-        }
-        return render(request, 'main/orders/reviews/add_review.html', context)
+        if order.status == "Received":
+            items = OrderItem.objects.filter(order=order)
+            context = {
+                'order':order,
+                'items':items,
+            }
+            vendor = VendorReview.objects.filter(author=request.user, vendor=items[0].product.vendor)
+            if vendor:
+                context.update({'review':vendor.first()})
+            return render(request, 'main/orders/reviews/add_review.html', context)
+        else:
+            messages.error(request, 'This order has not yet been received!')
+            return redirect('home')
     else:
         return reverse('home')
+
+class VendorReviewCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = VendorReview
+    fields = ['rating', 'description']
+
+    def test_func(self):
+        order = SiteOrder.objects.get(order_id = self.kwargs['pk'])
+        return order.user.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(VendorReviewCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Vendor Review"
+        order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
+        if order.status == "Received":
+            context['received'] = True
+        item = OrderItem.objects.filter(order=order).first()
+        if VendorReview.objects.filter(author=self.request.user, vendor=item.product.vendor).exists():
+            context['review'] = VendorReview.objects.get(author=self.request.user, vendor=item.product.vendor)
+        context['order'] = order
+        return context
+
+    def form_valid(self, form):
+        order = SiteOrder.objects.get(order_id = self.kwargs['pk'])
+        if order.status == "Received":
+            item = OrderItem.objects.filter(order=order).first()
+            vendor = item.product.vendor
+            if VendorReview.objects.filter(author=self.request.user, vendor=vendor).exists():
+                messages.error(request, 'Vendor review already exists!')
+                return redirect('home')
+            else:
+                form.instance.author = self.request.user
+                form.instance.vendor = vendor
+                form.instance.order = order
+                return super().form_valid(form)
+        else:
+            messages.error(request, 'This order has not yet been received!')
+            return redirect('home')
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Vendor review added!')
+        return reverse("vendor-detail-main", kwargs={'slug':self.object.vendor.slug})
+
+class VendorReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = VendorReview
+    fields = ['rating', 'description']
+
+    def test_func(self):
+        review = VendorReview.objects.get(review_id=self.kwargs['pk'])
+        return review.author.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(VendorReviewUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Edit Vendor Review"
+        return context
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Review updated!')
+        return reverse("vendor-detail-main", kwargs={'slug':self.object.vendor.slug})
+
+class VendorReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = VendorReview
+
+    def test_func(self):
+        review = VendorReview.objects.get(review_id=self.kwargs['pk'])
+        return review.author.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(VendorReviewDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Vendor Review"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Vendor review has been deleted')
+        return reverse('home')
+
+class ProductReviewCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ProductReview
+    fields = ['rating', 'description']
+
+    def test_func(self):
+        order = SiteOrder.objects.get(order_id = self.kwargs['order_pk'])
+        return order.user.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductReviewCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Product Review"
+        order = SiteOrder.objects.get(order_id=self.kwargs['order_pk'])
+        if order.status == "Received":
+            context['received'] = True
+        if ProductReview.objects.filter(author=self.request.user, product_id=self.kwargs['pk']).exists():
+            context['review'] = ProductReview.objects.get(author=self.request.user, product_id=self.kwargs['pk'])
+        context['order'] = order
+        return context
+
+    def form_valid(self, form):
+        order = SiteOrder.objects.get(order_id = self.kwargs['order_pk'])
+        if order.status == "Received":
+            product = Product.objects.get(product_id=self.kwargs['pk'])
+            if ProductReview.objects.filter(author=self.request.user, product=product).exists():
+                messages.error(request, 'Product review already exists!')
+                return redirect('home')
+            else:
+                form.instance.author = self.request.user
+                form.instance.product = product
+                form.instance.order = order
+                return super().form_valid(form)
+        else:
+            messages.error(request, 'This order has not yet been received!')
+            return redirect('home')
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Product review added!')
+        return reverse("vendor-product", kwargs={'slug':self.object.product.slug})
+
+class ProductReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ProductReview
+    fields = ['rating', 'description']
+
+    def test_func(self):
+        review = ProductReview.objects.get(review_id=self.kwargs['pk'])
+        return review.author.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductReviewUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Edit Product Review"
+        return context
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Review updated!')
+        return reverse("vendor-product", kwargs={'slug':self.object.product.slug})
+
+class ProductReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ProductReview
+
+    def test_func(self):
+        review = ProductReview.objects.get(review_id=self.kwargs['pk'])
+        return review.author.id == self.request.user.id
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductReviewDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Product Review"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Product review has been deleted')
+        return reverse('home')
+
 
 
 

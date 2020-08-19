@@ -7,7 +7,8 @@ from .views import (
     AddToWishlist, WishlistView, WishlistItemDeleteView,
     AddToCart, CartView, CartItemDeleteView, CartItemUpdateView,
     Checkout, OrderListView, CancelOrderView, ReceiveOrder, 
-    AddReviewPage
+    AddReviewPage, VendorReviewCreateView, VendorReviewUpdateView, VendorReviewDeleteView,
+    ProductReviewCreateView, ProductReviewUpdateView, ProductReviewDeleteView
 )
 from admins.views import BuyerProductCreateView, BuyerProductUpdateView, BuyerProductDeleteView
 
@@ -59,5 +60,19 @@ urlpatterns = [
         template_name='main/orders/order_confirm_cancel.html'), name='cancel-order'),
     path('order/receive/', ReceiveOrder, name='receive-order' ),
 
-    path('order/<int:pk>/reviews/', AddReviewPage, name='add-review')
+    path('order/<int:pk>/reviews/', AddReviewPage, name='add-review'),
+
+    path('order/<int:pk>/reviews/vendor/new/', VendorReviewCreateView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_form.html"), name='vendor-review'),
+    path('reviews/vendor/<int:pk>/edit/', VendorReviewUpdateView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_form_edit.html"), name='vendor-review-edit'),
+    path('reviews/vendor/<int:pk>/delete/', VendorReviewDeleteView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_confirm_delete.html"), name='vendor-review-delete'),
+
+    path('order/<int:order_pk>/reviews/product/<int:pk>/new/', ProductReviewCreateView.as_view(
+        template_name="main/orders/reviews/product/product_review_form.html"), name='product-review'),
+    path('reviews/product/<int:pk>/edit/', ProductReviewUpdateView.as_view(
+        template_name='main/orders/reviews/product/product_review_form_edit.html'), name='product-review-edit'),
+    path('reviews/product/<int:pk>/delete/', ProductReviewDeleteView.as_view(
+        template_name="main/orders/reviews/product/product_review_confirm_delete.html"), name='product-review-delete'),
 ]
