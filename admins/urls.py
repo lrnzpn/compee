@@ -6,8 +6,9 @@ from .views import (
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
     BuyerProductCreateView, BuyerProductDetailView, BuyerProductUpdateView, BuyerProductDeleteView,
     UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin,
+    WishlistView, CartView,
     get_sort_orders, OrderListView, OrderDetailView, OrderUpdateView, OrderDeleteView,
-    OrderItemCreateView, OrderItemUpdateView, OrderItemDeleteView
+    OrderItemCreateView, OrderItemUpdateView, OrderItemDeleteView, 
 )
 
 
@@ -54,11 +55,16 @@ urlpatterns = [
     path('users/', UserListView.as_view(
         template_name='admins/users/users.html'), name='users'),
     path('vendor/new/<int:pk>/', VendorCreateView.as_view(
-        template_name='admins/users/make_seller.html'), name='make-seller'),
+        template_name='admins/users/roles/make_seller.html'), name='make-seller'),
     path('buyer/new/<int:pk>/', BuyerCreateView.as_view(
-        template_name='admins/users/make_buyer.html'), name='make-buyer'),
+        template_name='admins/users/roles/make_buyer.html'), name='make-buyer'),
     path('admin/new/<int:pk>/', GiveAdmin, name='make-admin'),
     path('admin/remove/<int:pk>/', RemoveAdmin, name='remove-admin'),
+
+    path('users/<int:pk>/wishlist/', WishlistView.as_view(
+        template_name='admins/users/wishlist.html'), name='user-wishlist'),
+    path('users/<int:pk>/cart/', CartView.as_view(
+        template_name='admins/users/cart.html'), name='user-cart'),
 
     path('get-orders/', get_sort_orders, name='get-sort-orders'),
     path('orders/', OrderListView.as_view(

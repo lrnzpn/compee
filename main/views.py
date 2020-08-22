@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview
 from users.models import Vendor, Buyer, VendorReview
 from .models import WishlistItem, CartItem, SiteOrder, OrderItem
@@ -156,7 +157,7 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
     model = WishlistItem
 
     def test_func(self):
-        return self.request.user.id == self.kwargs['user_pk']
+        return self.request.user.id == self.kwargs['user_pk'] or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
@@ -164,8 +165,12 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return context
 
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Item has been removed from your wishlist')
-        return reverse('wishlist')
+        if self.request.user.groups.filter(name='Admin').exists():
+            messages.success(self.request, 'Item has been removed from their wishlist')
+            return reverse("user-wishlist", kwargs={'pk':self.kwargs['user_pk']})
+        else:
+            messages.success(self.request, 'Item has been removed from your wishlist')
+            return reverse('wishlist')
 
 @login_required
 def AddToCart(request):
@@ -176,30 +181,35 @@ def AddToCart(request):
         quantity = 1
     else:
         quantity = int(request.GET.get('quantity'))
-    if CartItem.objects.filter(user=request.user, product=product).exists():
-        item = CartItem.objects.get(user=request.user, product=product)
-        if item.quantity == 5:
-            messages.error(request, 'Product cap reached!')
-            return render(request, 'main/user/cart/cart.html')
-        else:
-            temp = item.quantity + quantity
-            if temp > 5:
-                product.item_stock = product.item_stock-(5-item.quantity)
-                item.quantity = 5
-            else:
-                item.quantity = temp
-                product.item_stock = product.item_stock-quantity
-            date_added = timezone.now()
-    else:
-        if quantity > 5:
-            quantity = 5
-        item = CartItem(user=request.user, product=product, quantity=quantity)
-        product.item_stock = product.item_stock-quantity
 
-    product.save()
-    item.save()
-    messages.success(request, 'Item added to wishlist!')
-    return render(request, 'main/user/cart/cart.html')
+    if product.item_stock < quantity:
+        messages.error(request, 'Item is out of stock!')
+        return render(request, 'main/user/cart/cart.html')
+    else:
+        if CartItem.objects.filter(user=request.user, product=product).exists():
+            item = CartItem.objects.get(user=request.user, product=product)
+            if item.quantity == 5:
+                messages.error(request, 'Product cap reached!')
+                return render(request, 'main/user/cart/cart.html')
+            else:
+                temp = item.quantity + quantity
+                if temp > 5:
+                    product.item_stock = product.item_stock-(5-item.quantity)
+                    item.quantity = 5
+                else:
+                    item.quantity = temp
+                    product.item_stock = product.item_stock-quantity
+                date_added = timezone.now()
+        else:
+            if quantity > 5:
+                quantity = 5
+            item = CartItem(user=request.user, product=product, quantity=quantity)
+            product.item_stock = product.item_stock-quantity
+
+        product.save()
+        item.save()
+        messages.success(request, 'Item added to wishlist!')
+        return render(request, 'main/user/cart/cart.html')
 
 class CartView(LoginRequiredMixin, ListView):
     model = CartItem
@@ -252,7 +262,7 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = CartItem
 
     def test_func(self):
-        return self.request.user.id == self.kwargs['user_pk']
+        return self.request.user.id == self.kwargs['user_pk'] or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(CartItemDeleteView, self).get_context_data(**kwargs)
@@ -261,14 +271,19 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def delete(self, *args, **kwargs):
         product = Product.objects.get(product_id=self.kwargs['product_pk'])
-        item = CartItem.objects.get(product=product, user=self.request.user)
+        user = User.objects.get(id=self.kwargs['user_pk'])
+        item = CartItem.objects.get(product=product, user=user)
         product.item_stock = product.item_stock + item.quantity
         product.save()
         return super(CartItemDeleteView, self).delete(*args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Item has been removed from your cart')
-        return reverse('cart')
+        if self.request.user.groups.filter(name='Admin').exists():
+            messages.success(self.request, 'Item has been removed from their cart')
+            return reverse("user-cart", kwargs={'pk':self.kwargs['user_pk']})
+        else:
+            messages.success(self.request, 'Item has been removed from your cart')
+            return reverse('cart')
 
 class Checkout(LoginRequiredMixin, CreateView):
     model = SiteOrder
@@ -468,7 +483,7 @@ class VendorReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
 
     def test_func(self):
         review = VendorReview.objects.get(review_id=self.kwargs['pk'])
-        return review.author.id == self.request.user.id
+        return review.author.id == self.request.user.id or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(VendorReviewUpdateView, self).get_context_data(**kwargs)
@@ -484,7 +499,7 @@ class VendorReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
     def test_func(self):
         review = VendorReview.objects.get(review_id=self.kwargs['pk'])
-        return review.author.id == self.request.user.id
+        return review.author.id == self.request.user.id or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(VendorReviewDeleteView, self).get_context_data(**kwargs)
@@ -540,7 +555,7 @@ class ProductReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
 
     def test_func(self):
         review = ProductReview.objects.get(review_id=self.kwargs['pk'])
-        return review.author.id == self.request.user.id
+        return review.author.id == self.request.user.id or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(ProductReviewUpdateView, self).get_context_data(**kwargs)
@@ -556,7 +571,7 @@ class ProductReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
 
     def test_func(self):
         review = ProductReview.objects.get(review_id=self.kwargs['pk'])
-        return review.author.id == self.request.user.id
+        return review.author.id == self.request.user.id or self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(ProductReviewDeleteView, self).get_context_data(**kwargs)

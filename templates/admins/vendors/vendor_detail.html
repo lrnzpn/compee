@@ -21,6 +21,21 @@
         </div>
     </div>
 
+    {% if reviews %}
+        <h3>Reviews</h3>
+        {% for r in reviews %}
+            <ul>
+                <li>{{ r.author.username}}</li>
+                <li>Rating: {{ r.rating }}/5</li>
+                {% if r.description %}
+                <li>"{{r.description}}"</li>
+                {% endif %}
+                <a href='{% url "vendor-review-edit" r.review_id %}'>Edit</a>
+                <a href='{% url "vendor-review-delete" r.review_id %}'>Delete</a>
+            </ul>
+        {% endfor %}
+    {% endif %}
+
     <!-- Products here -->
     <h3>Store Products</h3>
     <a href="{% url 'product-new' object.vendor_id %}" class="btn btn-primary">Add New Product</a>

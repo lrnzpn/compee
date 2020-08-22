@@ -1,18 +1,21 @@
+import decimal
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from django.db.models import Q
 from django.template.defaultfilters import slugify
-from main.models import SiteOrder, OrderItem
-from users.models import Vendor, Buyer
-from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory
-from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
-from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
-from django.contrib.auth.models import User, Group
-from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-import decimal
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
+
+from django.contrib.auth.models import User, Group
+from main.models import SiteOrder, OrderItem, WishlistItem, CartItem
+from users.models import Vendor, Buyer, VendorReview
+from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory, ProductReview
+
+from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
+from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
+
 
 class BuyerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Buyer
@@ -110,6 +113,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
         context['title'] = vendor.store_name
         context['is_seller'] = True
+        context['reviews'] = VendorReview.objects.filter(vendor=self.object)
         return context
 
 class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -266,6 +270,7 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             context['category'] = ProductCategory.objects.get(product=self.object)
         context['title'] = self.object.name
         context['is_seller'] = True
+        context['reviews'] = ProductReview.objects.filter(product=self.object)
         return context
 
 @login_required
@@ -524,7 +529,7 @@ def GiveAdmin(request,pk):
             'title': 'Give Admin',
             'user' : user
         }
-        return render(request, 'admins/users/make_admin.html', context)
+        return render(request, 'admins/users/roles/make_admin.html', context)
     else:
         return redirect('home')
 
@@ -548,9 +553,40 @@ def RemoveAdmin(request,pk):
             'title': 'Remove Admin',
             'user' : user
         }
-        return render(request, 'admins/users/remove_admin.html', context)
+        return render(request, 'admins/users/roles/remove_admin.html', context)
     else:
         return redirect('home')
+
+class WishlistView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = WishlistItem
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(WishlistView, self).get_context_data(**kwargs)
+        user = User.objects.get(id=self.kwargs['pk'])
+        context['user'] = user
+        context['title'] = user.username + "'s Wishlist"
+        context['items'] = WishlistItem.objects.filter(user=user)
+        return context
+
+class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = CartItem
+    context_object_name = 'items'
+    paginate_by = 6
+    
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(CartView, self).get_context_data(**kwargs)
+        user = User.objects.get(id=self.kwargs['pk'])
+        context['user'] = user
+        context['title'] = user.username + "'s Cart"
+        context['items'] = CartItem.objects.filter(user=user)
+        return context
 
 def get_sort_orders(request):
     option = request.GET.get('option')

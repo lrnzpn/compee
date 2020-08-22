@@ -9,6 +9,8 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Wishlist</th>
+            <th>Cart</th>
             <th>Seller</th>
             <th>Buyer</th>
             <th>Admin</th>
@@ -19,6 +21,8 @@
                 <td>{{user.id}}</td>
                 <td>{{user.username}}</td>
                 <td>{{user.email}}</td>
+                <td><a href='{% url "user-wishlist" user.id %}'>View</a></td>
+                <td><a href='{% url "user-cart" user.id %}'>View</a></td>
                 {% if user|has_group:"Vendor" %}
                 <td><a href='{% url "vendor-detail" user.id|find_store:"Vendor"%}'>Store</a></td>
                 {% else %}
