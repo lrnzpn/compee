@@ -345,8 +345,8 @@ def BuyerProductCreateView(request, pk=None):
                 else:
                     return redirect('buyer-product', new_prod.slug)
         else:
-            p_form = ProductCreateForm()
-            c_form = AssignCategoryForm()
+            p_form = BuyerProductCreateForm()
+            c_form = AssignBuyerCategoryForm()
         
         context = {
             'p_form': p_form,

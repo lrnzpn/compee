@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    Home, About, Contact,
+    Home, About, Contact, SearchBar,
     TagProductsListView, CategoryProductsListView,
     VendorListView, VendorDetailView, ProductDetailView,
     BuyerListView, BuyerDetailView, BuyerProductDetailView,
@@ -18,6 +18,7 @@ urlpatterns = [
     path('contact/', Contact, name='contact'),
     path('tag/<str:name>/', TagProductsListView, name='tag-filter'),
     path('category/<str:name>/', CategoryProductsListView, name='category-filter'),
+    path('search/', SearchBar, name='search-bar'),
 
     path('buyers/', BuyerListView.as_view(
         template_name="main/buyers/buyers.html"), name='buyers-main'),

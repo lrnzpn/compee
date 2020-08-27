@@ -6,6 +6,7 @@ from admins.models import Product, ProductCategory, Category, BuyerProduct, Buye
 from users.models import Vendor, Buyer, VendorReview
 from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
+from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
@@ -25,13 +26,42 @@ def About(request):
 def Contact(request):
     return render(request, 'main/pages/contact.html')
 
+def SearchBar(request):
+    if request.method == 'GET':
+        query = request.GET.get('search')
+        context = {
+            'title':"Search results for " + query,
+            'is_seller': True,
+            'query':query
+        }
+        queries = query.split(" ")
+        products = []
+        vendors = []
+        for q in queries:
+            prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            if prods:
+                for prod in prods:
+                    products.append(prod)
+
+            sellers = Vendor.objects.filter(Q(store_name__icontains=q) | Q(store_info__icontains=q)).distinct()
+            if sellers:
+                for vendor in sellers:
+                    vendors.append(vendor)
+        
+        if products:
+            context.update({'products':list(set(products))})
+        if vendors:
+            context.update({'vendors':list(set(vendors))})
+        return render(request, 'main/filters/search_result.html', context )
+
 def TagProductsListView(request, name):
     tag = get_object_or_404(Tag, name=name)
     products = Product.objects.filter(tags=tag)
     context = {
         'products' : products,
         'tag' : tag,
-        'title' : f"Search for '{tag}'"
+        'title' : f"Search for '{tag}'",
+        'is_seller': True
     }
     return render(request, 'main/filters/tag_detail.html', context )
 
@@ -44,7 +74,8 @@ def CategoryProductsListView(request, name):
     context = {
         'products' : products,
         'category' : category,
-        'title' : f"Search for '{category}'"
+        'title' : f"Search for '{category}'",
+        'is_seller': True
     }
     return render(request, 'main/filters/category_detail.html', context )
 
