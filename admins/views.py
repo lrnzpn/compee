@@ -7,12 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
-
 from django.contrib.auth.models import User, Group
-from main.models import SiteOrder, OrderItem, WishlistItem, CartItem
+from main.models import SiteOrder, OrderItem, WishlistItem, CartItem, PaymentMethod
 from users.models import Vendor, Buyer, VendorReview
 from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory, ProductReview
-
 from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
 from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
 
@@ -159,68 +157,6 @@ class VendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Vendor has been removed.')
         return reverse('vendors')
-
-class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = Category
-    fields = ['name']
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
-
-    def get_context_data(self, **kwargs):
-        context = super(CategoryCreateView, self).get_context_data(**kwargs)
-        context['title'] = "New Category"
-        context['categories'] = Category.objects.all()
-        return context
-
-    def form_valid(self, form):
-        if Category.objects.filter(name=form.cleaned_data['name']).exists():
-            messages.error(self.request,'This category already exists!')
-            return self.render_to_response(self.get_context_data(form=form))
-        else:
-            return super().form_valid(form)
-    
-    def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Category created!')
-        return reverse("category-create")
-
-class CategoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Category
-    fields = ['name']
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
-
-    def get_context_data(self, **kwargs):
-        context = super(CategoryUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Update Category"
-        return context
-
-    def form_valid(self, form):
-        if Category.objects.filter(name=form.cleaned_data['name']).exists():
-            messages.error(self.request,'This category already exists!')
-            return self.render_to_response(self.get_context_data(form=form))
-        else:
-            return super().form_valid(form)
-    
-    def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Category updated!')
-        return reverse("category-create")
-
-class CategoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Category
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin').exists()
-
-    def get_context_data(self, **kwargs):
-        context = super(CategoryDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Category Delete"
-        return context
-
-    def get_success_url(self, **kwargs):
-        messages.success(self.request, 'Category has been deleted.')
-        return reverse('category-create')
 
 @login_required
 def ProductCreateView(request, pk=None):
@@ -804,3 +740,132 @@ class OrderItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Order item has been deleted.')
         return reverse('order-detail', kwargs={'pk':self.kwargs['order_pk']})
+
+def Settings(request):
+    return render(request, 'admins/settings/settings.html', {'title':"Settings | Dashboard"})
+
+class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Category
+    fields = ['name']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryCreateView, self).get_context_data(**kwargs)
+        context['title'] = "New Category"
+        context['categories'] = Category.objects.all()
+        return context
+
+    def form_valid(self, form):
+        if Category.objects.filter(name=form.cleaned_data['name']).exists():
+            messages.error(self.request,'This category already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Category created!')
+        return reverse("category-create")
+
+class CategoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Category
+    fields = ['name']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Update Category"
+        return context
+
+    def form_valid(self, form):
+        category = Category.objects.get(name=form.cleaned_data['name'])
+        if category and category != self.object:
+            messages.error(self.request,'This category already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Category updated!')
+        return reverse("category-create")
+
+class CategoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Category
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Category Delete"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Category has been deleted.')
+        return reverse('category-create')
+
+class PaymentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = PaymentMethod
+    fields = ['title', 'details']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(PaymentCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Edit Payment Methods"
+        context['payments'] = PaymentMethod.objects.all()
+        return context
+
+    def form_valid(self, form):
+        if PaymentMethod.objects.filter(title=form.cleaned_data['title']).exists():
+            messages.error(self.request,'This payment method already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Payment method added!')
+        return reverse("payment-methods")
+
+class PaymentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = PaymentMethod
+    fields = ['title', 'details']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(PaymentUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Update Payment Method"
+        return context
+
+    def form_valid(self, form):
+        payment = PaymentMethod.objects.get(title=form.cleaned_data['title'])
+        if payment and payment != self.object:
+            messages.error(self.request,'This payment method already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Payment method updated!')
+        return reverse("payment-methods")
+
+class PaymentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = PaymentMethod
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(PaymentDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Payment Method"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Payment method has been deleted.')
+        return reverse('payment-methods')

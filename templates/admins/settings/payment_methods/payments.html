@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">New Payment Method</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-info" type = "submit">Create</button>
+            </div>
+        </form>
+    </div>
+    <div class='content-section'>
+        <table>
+            <tr>
+                <td>Title</td>
+                <td>Details</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p.title }}</td>
+                {% if p.details %}
+                    <td>{{ p.details }}</td>
+                {% else %}
+                    <td>--</td>
+                {% endif %}
+                <td><a href="{% url 'payment-update' p.id %}">Edit</a></td>
+                <td><a href="{% url 'payment-delete' p.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock content %}

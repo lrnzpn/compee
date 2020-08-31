@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <hr>
+    <a href="{% url 'category-create' %}" class="btn btn-primary">Category List</a>
+    <a href="{% url 'payment-methods' %}" class="btn btn-primary">Payment Methods</a>
+
+{% endblock content %}

@@ -2,13 +2,15 @@ from django.urls import path
 from .views import (
     BuyerListView, BuyerDetailView, BuyerUpdateView, BuyerDeleteView,
     VendorListView, VendorDetailView, VendorUpdateView, VendorDeleteView,
-    CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
     ProductCreateView, ProductDetailView, ProductUpdateView, ProductDeleteView,
     BuyerProductCreateView, BuyerProductDetailView, BuyerProductUpdateView, BuyerProductDeleteView,
     UserListView, VendorCreateView, BuyerCreateView, GiveAdmin, RemoveAdmin,
     WishlistView, CartView,
     get_sort_orders, OrderListView, OrderDetailView, OrderUpdateView, OrderDeleteView,
     OrderItemCreateView, OrderItemUpdateView, OrderItemDeleteView, 
+    Settings, 
+    CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
+    PaymentCreateView, PaymentUpdateView, PaymentDeleteView
 )
 
 
@@ -30,13 +32,6 @@ urlpatterns = [
         template_name='admins/vendors/vendor_update.html'), name='vendor-update'),
     path('vendor/<int:pk>/delete/', VendorDeleteView.as_view(
         template_name='admins/vendors/vendor_confirm_delete.html'), name='vendor-delete'),
-
-    path('category/new/', CategoryCreateView.as_view(
-        template_name='admins/products/categories/categories.html'), name='category-create'),
-    path('category/<int:pk>/update/', CategoryUpdateView.as_view(
-        template_name='admins/products/categories/category_update.html'), name='category-update'),
-    path('category/<int:pk>/delete/', CategoryDeleteView.as_view(
-        template_name='admins/products/categories/category_confirm_delete.html'), name='category-delete'),
 
     path('vendor/<int:pk>/product/new/', ProductCreateView, name='product-new'),
     path('product/<str:slug>/', ProductDetailView.as_view(
@@ -82,5 +77,20 @@ urlpatterns = [
         template_name="admins/orders/items/item_update.html"), name='order-item-edit'),
     path('order/<int:product_pk>/<int:order_pk>/<int:pk>/delete/', OrderItemDeleteView.as_view(
         template_name="admins/orders/items/item_confirm_delete.html"), name='order-item-delete'),
+
+    path('settings/', Settings, name="settings"),
     
+    path('category/new/', CategoryCreateView.as_view(
+        template_name='admins/settings/categories/categories.html'), name='category-create'),
+    path('category/<int:pk>/update/', CategoryUpdateView.as_view(
+        template_name='admins/settings/categories/category_update.html'), name='category-update'),
+    path('category/<int:pk>/delete/', CategoryDeleteView.as_view(
+        template_name='admins/settings/categories/category_confirm_delete.html'), name='category-delete'),
+
+    path('payment/new/', PaymentCreateView.as_view(
+        template_name='admins/settings/payment_methods/payments.html'), name='payment-methods'),
+    path('payment/<int:pk>/update/', PaymentUpdateView.as_view(
+        template_name='admins/settings/payment_methods/payment_update.html'), name='payment-update'),
+    path('payment/<int:pk>/delete/', PaymentDeleteView.as_view(
+        template_name='admins/settings/payment_methods/payment_confirm_delete.html'), name='payment-delete'),
 ]
