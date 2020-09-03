@@ -9,6 +9,7 @@
                 <li>Status: {{object.status }} </li>
                 <li>Date Placed: {{object.date_placed }}</li>
                 <li>Shipping Address: {{ object.address_line }}, {{ object.city }}, {{ object.state }} {{ object.zip_code }}</li>
+                <li>Shipping Fee: {{ object.shipping_fee.name }} - {{ object.shipping_fee.rate }}</li>
             </ul>
             <a href='{% url "order-update-info" object.order_id %}' class="btn btn-primary">Edit Info</a>
             <h5>Items</h5>

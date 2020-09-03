@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404, reverse
+from django.shortcuts import render, get_object_or_404, reverse, redirect
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from admins.models import Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview
+from admins.models import (
+    Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview, VendorShipping ) 
 from users.models import Vendor, Buyer, VendorReview
 from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
@@ -113,15 +114,28 @@ class ProductDetailView(DetailView):
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         context['is_seller'] = True
+        context['reviews'] = ProductReview.objects.filter(product=self.object)
 
         if ProductCategory.objects.filter(product=self.object).exists():
             context['category'] = ProductCategory.objects.get(product=self.object)
 
         if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
             context['wishlist_item'] = True
-        
-        context['reviews'] = ProductReview.objects.filter(product=self.object)
+
+        similar = Product.objects.filter(name=self.object.name).exclude(product_id=self.object.product_id)
+        if similar:
+            context['similar'] = True
         return context
+
+def PriceComparison(request, name):
+    products = Product.objects.filter(name=name)
+    context = {
+        'products' : products,
+        'name' : name,
+        'title' : f"Prices for '{name}'",
+        'is_seller': True
+    }
+    return render(request, 'main/filters/price_comparison.html', context)
 
 class BuyerListView(ListView):
     model = Buyer
@@ -251,6 +265,19 @@ class CartView(LoginRequiredMixin, ListView):
         context = super(CartView, self).get_context_data(**kwargs)
         context['title'] = "Cart"
         context['items'] = CartItem.objects.filter(user=self.request.user)
+        vendors = []
+        fees = []
+        for i in CartItem.objects.filter(user=self.request.user):
+            if i.product.vendor.vendor_id not in vendors:
+                vendor = Vendor.objects.get(vendor_id=i.product.vendor.vendor_id)
+                if VendorShipping.objects.filter(vendor=vendor).exists():
+                    fees.append(VendorShipping.objects.get(vendor=vendor))
+                vendors.append(i.product.vendor.vendor_id)
+
+        if len(vendors) == len(fees):
+            context['fees'] = fees
+        else:
+            messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
         return context
 
 class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -324,6 +351,19 @@ class Checkout(LoginRequiredMixin, CreateView):
         context = super(Checkout, self).get_context_data(**kwargs)
         context['title'] = "Checkout"
         context['items'] = CartItem.objects.filter(user=self.request.user)
+        vendors = []
+        fees = []
+        for i in CartItem.objects.filter(user=self.request.user):
+            if i.product.vendor.vendor_id not in vendors:
+                vendor = Vendor.objects.get(vendor_id=i.product.vendor.vendor_id)
+                if VendorShipping.objects.filter(vendor=vendor).exists():
+                    fees.append(VendorShipping.objects.get(vendor=vendor))
+                vendors.append(i.product.vendor.vendor_id)
+
+        if len(vendors) == len(fees):
+            context['fees'] = fees
+        else:
+            messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
         return context
 
     def form_valid(self, form):
@@ -357,20 +397,24 @@ class Checkout(LoginRequiredMixin, CreateView):
                         d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
         first = True
         for d in order_list:
+            vendor = Vendor.objects.get(vendor_id=d['vendor_id'])
+            fee = VendorShipping.objects.get(vendor=vendor)
             if first:
                 form.instance.user = self.request.user
-                form.instance.total = d['total']
+                form.instance.total = d['total'] + fee.rate.rate
+                form.instance.shipping_fee = fee.rate
                 first = False
             else:
                 order = SiteOrder(
                     user=self.request.user, 
                     contact_no=form.instance.contact_no,
-                    total= d['total'],
+                    total= d['total'] + fee.rate.rate,
                     payment_method= form.instance.payment_method,
                     address_line=form.instance.address_line,
                     city=form.instance.city,
                     state=form.instance.state,
-                    zip_code= form.instance.zip_code
+                    zip_code= form.instance.zip_code,
+                    shipping_fee= fee.rate
                 )
                 order.save()
 

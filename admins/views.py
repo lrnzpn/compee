@@ -2,7 +2,6 @@ import decimal
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from django.db.models import Q
-from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -10,10 +9,12 @@ from django.views.generic import (
 from django.contrib.auth.models import User, Group
 from main.models import SiteOrder, OrderItem, WishlistItem, CartItem, PaymentMethod
 from users.models import Vendor, Buyer, VendorReview
-from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory, ProductReview
+from .models import (
+    Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory, 
+    ProductReview, ShippingRate, VendorShipping)
 from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
 from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
-
+from .slugify import unique_product_slug_generator, unique_store_slug_generator
 
 class BuyerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Buyer
@@ -56,7 +57,7 @@ class BuyerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        form.instance.slug = slugify(form.instance.store_name)
+        form.instance.slug = unique_store_slug_generator(form.instance)
         return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
@@ -128,7 +129,7 @@ class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        form.instance.slug = slugify(form.instance.store_name)
+        form.instance.slug = unique_store_slug_generator(form.instance)
         return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
@@ -169,7 +170,7 @@ def ProductCreateView(request, pk=None):
                 vendor = Vendor.objects.get(vendor_id=pk)
                 new_prod = p_form.save(commit=False)
                 new_prod.vendor = vendor
-                new_prod.slug = slugify(new_prod.name)
+                new_prod.slug = unique_product_slug_generator(new_prod)
                 new_prod.save()
                 p_form.save_m2m()
                 c_form.instance.product = new_prod
@@ -219,7 +220,7 @@ def ProductUpdateView(request, pk=None):
             c_form = AssignCategoryForm(request.POST, instance=category)
 
             if p_form.is_valid() and c_form.is_valid():
-                p_form.instance.slug = slugify(p_form.instance.name)
+                p_form.instance.slug = unique_product_slug_generator(p_form.instance)
                 new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Product has been updated.')
@@ -274,7 +275,7 @@ def BuyerProductCreateView(request, pk=None):
             if p_form.is_valid() and c_form.is_valid():
                 new_prod = p_form.save(commit=False)
                 new_prod.buyer = buyer
-                new_prod.slug = slugify(new_prod.name)
+                new_prod.slug = unique_product_slug_generator(new_prod)
                 new_prod.save()
                 p_form.save_m2m()
                 c_form.instance.product = new_prod
@@ -330,7 +331,7 @@ def BuyerProductUpdateView(request, pk=None):
             c_form = AssignBuyerCategoryForm(request.POST, instance=category)
 
             if p_form.is_valid() and c_form.is_valid():
-                p_form.instance.slug = slugify(p_form.instance.name)
+                p_form.instance.slug = unique_product_slug_generator(p_form.instance)
                 new_prod = p_form.save()
                 c_form.save()
                 messages.success(request, 'Buyer product has been updated.')
@@ -412,7 +413,7 @@ class VendorCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         user = User.objects.get(id = self.kwargs['pk'])
         form.instance.user = user
-        form.instance.slug = slugify(form.instance.store_name)
+        form.instance.slug = unique_store_slug_generator(form.instance)
         v_group = Group.objects.get(name='Vendor')
         v_group.user_set.add(user)
         return super().form_valid(form)
@@ -436,7 +437,7 @@ class BuyerCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         user = User.objects.get(id = self.kwargs['pk'])
         form.instance.user = user
-        form.instance.slug = slugify(form.instance.store_name)
+        form.instance.slug = unique_store_slug_generator(form.instance)
         v_group = Group.objects.get(name='Buyer')
         v_group.user_set.add(user)
         return super().form_valid(form)
@@ -568,7 +569,7 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class OrderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = SiteOrder
-    fields = ['status', 'contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
+    fields = ['status', 'contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method', 'shipping_fee']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -577,6 +578,12 @@ class OrderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super(OrderUpdateView, self).get_context_data(**kwargs)
         context['title'] = "Order Edit"
         return context
+
+    def form_valid(self, form):
+        order = SiteOrder.objects.get(order_id=self.object.order_id)
+        form.instance.total = form.instance.total - order.shipping_fee.rate
+        form.instance.total = form.instance.total + form.instance.shipping_fee.rate
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Order information updated!')
@@ -869,3 +876,137 @@ class PaymentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Payment method has been deleted.')
         return reverse('payment-methods')
+
+class ShippingRateCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ShippingRate
+    fields = ['name', 'rate']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ShippingRateCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Edit Shipping Rates"
+        context['rates'] = ShippingRate.objects.all()
+        vendors = Vendor.objects.all()
+        for v in vendors:
+            if VendorShipping.objects.filter(vendor=v).exists():
+                vendors = vendors.exclude(vendor_id=v.vendor_id)
+        context['u_vendors'] = vendors
+        return context
+
+    def form_valid(self, form):
+        if ShippingRate.objects.filter(name=form.cleaned_data['name'], rate=form.cleaned_data['rate']).exists():
+            messages.error(self.request,'This shipping rate already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Shipping rate added!')
+        return reverse("shipping-rates")
+
+class ShippingRateUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ShippingRate
+    fields = ['name','rate']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ShippingRateUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Update Shipping Rate"
+        return context
+
+    def form_valid(self, form):
+        rate = ShippingRate.objects.get(name=form.cleaned_data['name'], rate=form.cleaned_data['rate'])
+        if rate and rate != self.object:
+            messages.error(self.request,'This shipping rate already exists!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Shipping rate updated!')
+        return reverse("shipping-rates")
+
+class ShippingRateDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ShippingRate
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ShippingRateDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Shipping Rate"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Shipping rate has been deleted.')
+        return reverse('shipping-rates')
+
+class ShippingVendorsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = VendorShipping
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(ShippingVendorsListView, self).get_context_data(**kwargs)
+        context['title'] = "Shipping Rate Vendors | Dashboard"
+        rate = ShippingRate.objects.get(id=self.kwargs['pk'])
+        context['rate'] = ShippingRate.objects.get(id=self.kwargs['pk'])
+        r_vendors = VendorShipping.objects.filter(rate=rate)
+        context['r_vendors'] = r_vendors
+        vendors = Vendor.objects.all()
+        for i in r_vendors:
+            vendors = vendors.exclude(vendor_id=i.vendor.vendor_id)
+        for i in vendors:
+            if VendorShipping.objects.filter(vendor=i).exists():
+                vendors = vendors.exclude(vendor_id=i.vendor_id)
+        context['vendors'] = vendors
+        return context
+
+class AssignVendortoRate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = VendorShipping
+    fields = []
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(AssignVendortoRate, self).get_context_data(**kwargs)
+        context['title'] = "Add Vendor to Rate"
+        context['rate'] = ShippingRate.objects.get(id=self.kwargs['pk'])
+        context['vendor'] = Vendor.objects.get(vendor_id=self.kwargs['vendor_pk'])
+        return context
+
+    def form_valid(self, form):
+        vendor = Vendor.objects.get(vendor_id=self.kwargs['vendor_pk'])
+        rate = ShippingRate.objects.get(id=self.kwargs['pk'])
+        if VendorShipping.objects.filter(vendor=vendor).exists():
+            messages.error(self.request,'This vendor is already assigned to a rate!')
+            return self.render_to_response(self.get_context_data(form=form))
+        else:
+            form.instance.vendor = vendor
+            form.instance.rate = rate
+            return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Vendor added to rate!')
+        return reverse("rate-vendors", kwargs={'pk': self.object.rate.id} )
+
+class ShippingVendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = VendorShipping
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ShippingVendorDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Remove Vendor from Rate"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'This vendor will no longer use this rate.')
+        return reverse('rate-vendors',kwargs={'pk':self.kwargs['rate_pk']})

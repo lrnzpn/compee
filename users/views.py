@@ -9,9 +9,9 @@ from .models import Vendor, Buyer
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import login_required
-from django.template.defaultfilters import slugify
 from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from admins.slugify import unique_store_slug_generator
 
 def Register(request): 
     if request.user.is_authenticated:
@@ -42,7 +42,7 @@ def BecomeBuyer(request):
             form = BuyerCreateForm(request.POST)
             if form.is_valid():
                 form.instance.user = request.user
-                form.instance.slug = slugify(form.instance.store_name)
+                form.instance.slug = unique_store_slug_generator(form.instance)
                 b_group = Group.objects.get(name='Buyer')
                 b_group.user_set.add(request.user)
                 form.save()
@@ -64,7 +64,7 @@ def ManageBuyer(request):
         if request.method == "POST":
             b_form = BuyerUpdateForm(request.POST, instance=user)
             if b_form.is_valid():
-                b_form.instance.slug = slugify(b_form.instance.store_name)
+                b_form.instance.slug = unique_store_slug_generator(b_form.instance)
                 b_form.save()
                 messages.success(request, f'Your store details have been updated!')
                 return redirect('manage-buyer')
@@ -108,7 +108,7 @@ def ManageVendor(request):
         if request.method == "POST":
             s_form = VendorUpdateForm(request.POST, instance=user)
             if s_form.is_valid():
-                s_form.instance.slug = slugify(s_form.instance.store_name)
+                s_form.instance.slug = unique_store_slug_generator(s_form.instance)
                 s_form.save()
                 messages.success(request, f'Your store details have been updated!')
                 return redirect('manage-vendor')

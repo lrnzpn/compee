@@ -26,7 +26,23 @@
                 {% endfor %}
             </tbody>
         </table>
-        
+        {% if fees %}
+        <h4>Included shipping fees:</h4>
+        <table border='1'>
+            <thead>
+                <th>Store</th>
+                <th>Fee</th>
+            </thead>
+            <tbody>
+                {% for f in fees %}
+                    <tr>
+                        <td>{{ f.vendor.store_name }}</td>
+                        <td>{{ f.rate.rate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <div class="content-section">
             <form method = "POST" enctype = "multipart/form-data">
                 {% csrf_token %}
@@ -39,6 +55,7 @@
                 </div>
             </form>
         </div>
+        {% endif %}
     {% else %}
         <h2>Your cart is empty!</h2>
     {% endif %}

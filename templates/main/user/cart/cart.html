@@ -24,8 +24,9 @@
                 {% endfor %}
             </tbody>
         </table>
-
+        {% if fees %}
         <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
+        {% endif %}
     {% else %}
         <h3>You have nothing in your cart!</h3>
     {% endif %}

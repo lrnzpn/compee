@@ -100,3 +100,22 @@ class ProductReview(models.Model):
     
     def __str__(self):
         return f'{self.author.username}'
+
+class ShippingRate(models.Model):
+    id = models.AutoField(primary_key=True)
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.name}'
+
+class VendorShipping(models.Model):
+    id = models.AutoField(primary_key=True)
+    rate = models.ForeignKey(ShippingRate, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.vendor.store_name} {self.rate.rate}'
+
+    class Meta:
+        unique_together = (('rate', 'vendor'),)

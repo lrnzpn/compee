@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from admins.models import Product
+from admins.models import Product, ShippingRate
 from django.utils import timezone
 from django.core.validators import RegexValidator
 
@@ -59,6 +59,7 @@ class SiteOrder(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     zip_code = models.PositiveSmallIntegerField()
+    shipping_fee = models.ForeignKey(ShippingRate, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.user.username}'
