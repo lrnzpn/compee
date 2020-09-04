@@ -13,6 +13,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 import decimal
+from admins.funcs import updateVendorStatus
 
 def Home(request):
     categories = Category.objects.all()
@@ -43,7 +44,8 @@ def SearchBar(request):
             prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
             if prods:
                 for prod in prods:
-                    products.append(prod)
+                    if prod.vendor.status == "Active":
+                        products.append(prod)
 
             sellers = Vendor.objects.filter(Q(store_name__icontains=q) | Q(store_info__icontains=q)).distinct()
             if sellers:
@@ -59,6 +61,9 @@ def SearchBar(request):
 def TagProductsListView(request, name):
     tag = get_object_or_404(Tag, name=name)
     products = Product.objects.filter(tags=tag)
+    for p in products:
+        if p.vendor.status == "Inactive":
+            products = products.exclude(product_id=p.product_id)
     context = {
         'products' : products,
         'tag' : tag,
@@ -70,6 +75,9 @@ def TagProductsListView(request, name):
 def CategoryProductsListView(request, name):
     category = Category.objects.get(name=name)
     product_cats = ProductCategory.objects.filter(category=category)
+    for p in product_cats:
+        if p.product.vendor.status == "Inactive":
+            product_cats = product_cats.exclude(product=p.product)
     products = []
     for i in product_cats:
         products.append(i.product)
@@ -84,10 +92,14 @@ def CategoryProductsListView(request, name):
 class VendorListView(ListView):
     model = Vendor
     context_object_name = 'vendors'
-    paginate_by = 6
+    paginate_by = 12
+
+    def get_queryset(self):
+        return Vendor.objects.filter(status="Active")
 
     def get_context_data(self, **kwargs):
         context = super(VendorListView, self).get_context_data(**kwargs)
+        updateVendorStatus()
         context['title'] = "Vendors"
         context['categories'] = Category.objects.all()
         return context
@@ -103,6 +115,8 @@ class VendorDetailView(DetailView):
         context['categories'] = Category.objects.all()
         context['is_seller'] = True
         context['reviews'] = VendorReview.objects.filter(vendor=self.object)
+        if self.object.status == "Inactive":
+            context['inactive'] = True
         return context
 
 class ProductDetailView(DetailView):
@@ -110,25 +124,31 @@ class ProductDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
-        context['is_seller'] = True
-        context['reviews'] = ProductReview.objects.filter(product=self.object)
+        if self.object.vendor.status == "Inactive":
+            context['inactive'] = True
+        else:
+            context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
+            context['is_seller'] = True
+            context['reviews'] = ProductReview.objects.filter(product=self.object)
 
-        if ProductCategory.objects.filter(product=self.object).exists():
-            context['category'] = ProductCategory.objects.get(product=self.object)
+            if ProductCategory.objects.filter(product=self.object).exists():
+                context['category'] = ProductCategory.objects.get(product=self.object)
 
-        if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
-            context['wishlist_item'] = True
+            if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
+                context['wishlist_item'] = True
 
-        similar = Product.objects.filter(name=self.object.name).exclude(product_id=self.object.product_id)
-        if similar:
-            context['similar'] = True
+            similar = Product.objects.filter(name=self.object.name).exclude(product_id=self.object.product_id)
+            if similar:
+                context['similar'] = True
         return context
 
 def PriceComparison(request, name):
     products = Product.objects.filter(name=name)
+    for p in products:
+        if p.vendor.status == "Inactive":
+            products = products.exclude(product_id=p.product_id)
     context = {
         'products' : products,
         'name' : name,
@@ -140,7 +160,7 @@ def PriceComparison(request, name):
 class BuyerListView(ListView):
     model = Buyer
     context_object_name = 'buyers'
-    paginate_by = 6
+    paginate_by = 12
     
     def get_context_data(self, **kwargs):
         context = super(BuyerListView, self).get_context_data(**kwargs)
@@ -190,12 +210,15 @@ def AddToWishlist(request):
 
 class WishlistView(LoginRequiredMixin, ListView):
     model = WishlistItem
+    context_object_name = 'items'
     paginate_by = 6
+
+    def get_queryset(self):
+        return WishlistItem.objects.filter(user=self.request.user)
     
     def get_context_data(self, **kwargs):
         context = super(WishlistView, self).get_context_data(**kwargs)
         context['title'] = "Wishlist"
-        context['items'] = WishlistItem.objects.filter(user=self.request.user)
         return context
 
 class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -261,10 +284,12 @@ class CartView(LoginRequiredMixin, ListView):
     context_object_name = 'items'
     paginate_by = 6
     
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super(CartView, self).get_context_data(**kwargs)
         context['title'] = "Cart"
-        context['items'] = CartItem.objects.filter(user=self.request.user)
         vendors = []
         fees = []
         for i in CartItem.objects.filter(user=self.request.user):
@@ -438,7 +463,6 @@ class Checkout(LoginRequiredMixin, CreateView):
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = SiteOrder
-    paginate_by = 6
 
     def get_context_data(self, **kwargs):
         context = super(OrderListView, self).get_context_data(**kwargs)

@@ -23,6 +23,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        {%include 'admins/partials/_paginate.html' %}
     {% else %}
         <h3>This user has nothing in his/her cart!</h3>
     {% endif %}

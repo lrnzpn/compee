@@ -21,6 +21,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        {%include 'admins/partials/_paginate.html' %}
     {% else %}
         <h3>This user has nothing in his/her wishlist!</h3>
     {% endif %}

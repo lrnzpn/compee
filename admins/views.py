@@ -14,12 +14,12 @@ from .models import (
     ProductReview, ShippingRate, VendorShipping)
 from .forms import ProductCreateForm, AssignCategoryForm, BuyerProductCreateForm, AssignBuyerCategoryForm
 from users.forms import VendorUpdateForm, BuyerCreateForm, AdminForm
-from .slugify import unique_product_slug_generator, unique_store_slug_generator
+from .funcs import unique_product_slug_generator, unique_store_slug_generator, updateVendorStatus
 
 class BuyerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Buyer
     context_object_name = 'buyers'
-    paginate_by = 6
+    paginate_by = 9
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -90,13 +90,14 @@ class BuyerDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class VendorListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Vendor
     context_object_name = 'vendors'
-    paginate_by = 6
+    paginate_by = 9
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
     
     def get_context_data(self, **kwargs):
         context = super(VendorListView, self).get_context_data(**kwargs)
+        updateVendorStatus()
         context['title'] = "Dashboard | Vendor"
         return context
 
@@ -118,7 +119,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Vendor
     fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
-                'zip_code', 'contact_no', 'secondary_no', 'image', 'user']
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'user', 'status']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -387,7 +388,7 @@ class BuyerProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = User
     context_object_name = 'users'
-    paginate_by = 6
+    paginate_by = 15
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -496,7 +497,12 @@ def RemoveAdmin(request,pk):
 
 class WishlistView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = WishlistItem
+    context_object_name = 'items'
     paginate_by = 6
+
+    def get_queryset(self):
+        user = User.objects.get(id=self.kwargs['pk'])
+        return WishlistItem.objects.filter(user=user)
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -506,13 +512,16 @@ class WishlistView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         user = User.objects.get(id=self.kwargs['pk'])
         context['user'] = user
         context['title'] = user.username + "'s Wishlist"
-        context['items'] = WishlistItem.objects.filter(user=user)
         return context
 
 class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CartItem
     context_object_name = 'items'
     paginate_by = 6
+
+    def get_queryset(self):
+        user = User.objects.get(id=self.kwargs['pk'])
+        return CartItem.objects.filter(user=user)
     
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -522,7 +531,6 @@ class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         user = User.objects.get(id=self.kwargs['pk'])
         context['user'] = user
         context['title'] = user.username + "'s Cart"
-        context['items'] = CartItem.objects.filter(user=user)
         return context
 
 def get_sort_orders(request):
@@ -947,7 +955,12 @@ class ShippingRateDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
 class ShippingVendorsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = VendorShipping
+    context_object_name = 'r_vendors'
     paginate_by = 6
+
+    def get_queryset(self):
+        rate = ShippingRate.objects.get(id=self.kwargs['pk'])
+        return VendorShipping.objects.filter(rate=rate)
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -956,9 +969,8 @@ class ShippingVendorsListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context = super(ShippingVendorsListView, self).get_context_data(**kwargs)
         context['title'] = "Shipping Rate Vendors | Dashboard"
         rate = ShippingRate.objects.get(id=self.kwargs['pk'])
-        context['rate'] = ShippingRate.objects.get(id=self.kwargs['pk'])
+        context['rate'] = rate
         r_vendors = VendorShipping.objects.filter(rate=rate)
-        context['r_vendors'] = r_vendors
         vendors = Vendor.objects.all()
         for i in r_vendors:
             vendors = vendors.exclude(vendor_id=i.vendor.vendor_id)

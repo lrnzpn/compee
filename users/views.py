@@ -11,7 +11,7 @@ from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from admins.slugify import unique_store_slug_generator
+from admins.funcs import unique_store_slug_generator
 
 def Register(request): 
     if request.user.is_authenticated:

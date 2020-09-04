@@ -1,5 +1,7 @@
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
+from users.models import Vendor
+from admins.models import VendorShipping
 
 def unique_product_slug_generator(instance, new_slug=None):
     if new_slug is not None:
@@ -32,3 +34,10 @@ def unique_store_slug_generator(instance, new_slug=None):
                 )
         return unique_product_slug_generator(instance, new_slug=new_slug)
     return slug
+
+def updateVendorStatus():
+    vendors = Vendor.objects.all()
+    for v in vendors:
+        if v.status == "Active" and not VendorShipping.objects.filter(vendor=v).exists():
+            v.status = "Inactive"
+            v.save()

@@ -6,6 +6,11 @@ from PIL import Image
 
 numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
 
+STATUS_CHOICES = (
+    ('Active', 'Active'),
+    ('Inactive', 'Inactive'),
+)
+
 class Vendor(models.Model):
     vendor_id = models.AutoField(primary_key=True)
     store_name = models.CharField(max_length=100)
@@ -20,6 +25,7 @@ class Vendor(models.Model):
     secondary_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
     image = models.ImageField(default='default.jpg', upload_to='store_pics')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default = ('Inactive'))
 
     def __str__(self):
         return f'{self.store_name}' 

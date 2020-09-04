@@ -16,6 +16,7 @@
                     <li>{{ v.vendor.store_name }} <a href="{% url 'rate-vendor-remove' rate.id v.id %}">x</a></li>
                 {% endfor %}
             </ul>
+            {%include 'admins/partials/_paginate.html' %}
         {% else %}
             <h4>There are no vendors assigned to this rate.</h4>
         {% endif %}

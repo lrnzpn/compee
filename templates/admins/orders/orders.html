@@ -40,6 +40,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {%include 'admins/partials/_paginate.html' %}
         {% else %}
             <h3>There are no orders to display.</h3>
         {% endif %}
