@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="main checkout">
+    <div class="modified section">
+        <div class="text"><a onclick="javascript:window.history.back();">← go back</a></div>
+        <h1 class="big-header">Payment</h1>
+        <div class="checkout-sections flex-row">
+            <div class="checkout-deets flex-col">
+                <h3 class="small-header">All transactions are secure and encrypted.</h3>
+                <div class="small section ffcontainer">
+                    <div class="payment-opt flex-row">
+                        <div id="add-card" class="add-card">
+                            <div>  
+                                <div class="card-deet">
+                                    <div class="small-header visa-mastercard"><span class="visa-mastercard-text">Credit & Debit Card</span> <img src="{% static 'images/visa.png' %}"><img src="{% static 'images/mastercard.png' %}"></div>
+                                </div>
+                                <div class="card-deet">
+                                    <div class="small-header">Cardholder's Name</div>
+                                    <div class="smaller-text">Enter your complete name written on the card.</div>
+                                    <input type="text" class="checkcardinput standard" name="cardholder">
+                                </div>
+                                <div class="card-deet">
+                                    <div class="small-header">Card Number</div>
+                                    <div class="smaller-text">Enter your 16-digit card number.</div>
+                                    <input type="tel" class="checkcardinput standard cardnum" name="card_num">
+                                </div>
+                                <div class="card-split flex-row">
+                                    <div class="card-deet">
+                                        <div class="small-header" >Expiry Date</div>
+                                        <input type="tel" class="checkcardinput standard expdate" name="exp_date">
+                                    </div>
+                                    <div class="card-deet" style="margin-bottom: 5%!important;">
+                                        <div class="small-header">CVV/CSC</div>
+                                        <input type="tel" class="checkcardinput standard" maxlength="4" name="cvv">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terms-use on-mobile ffcontainer">
+                    <a href="/policies"><h4 class="smallest-header">I AGREE TO THE TERMS OF USE AND CANCELLATION POLICY</h4></a>
+                    <p class="applied small-text">
+                        Compee does not have a contractual relationship with the Merchant in providing or supplying the product.<br><br>
+                        Any decision by the Customer to inquire and avail of the food products is Customer’s sole discretion.
+                    </p>
+                </div>
+                <button class="colored-button on-mobile payment-confirm-order">Confirm order</button>
+            </div>
+            <div class="order-forms flex-col">
+                <div class="order-form flex-col ffcontainer">
+                    <h3 class="med-header">Review Order</h3>
+                    <div class="order-defaults orders flex-col checkout-payments-summary">
+                        <h4 class="order-defaults small-text">ORDER SUMMARY</h4>
+                        <div class="scrollable flex-col orders-list">
+                            <div class="order flex-row">
+                                <h4>Placeholder</h4>
+                                <h4>PHP 00.00</h4>
+                            </div>
+                        </div>
+                        <div class="order total flex-row">
+                            <h4>TOTAL: </h4>
+                            <h4>PHP 00.00</h4>
+                        </div>
+                        <div class="order flex-row processing-fee-note">
+                            <h4><strong>NOTE: </strong>Processing Fee is non-refundable</h4>
+                        </div>
+                    </div>
+                    <div class="order-defaults order-notes">
+                        <h4 class="small-text">ADDITIONAL NOTES</h4>
+                        <p class="small-text checkout-additional-notes">NOTES HERE</p>
+                    </div>
+                    <div class="order-defaults">
+                        <h4 class="small-text">REQUESTED ORDER SCHEDULE</h4>
+                        <p class="small-text payment-delivery-sched">Delivery on DATE HERE</p>
+                        <p class="small-text">
+                            <br>
+                            <span><strong>NOTE:</strong> The merchant will do their best to accommodate this date and time. It may not be guaranteed.</span>
+                        </p>
+                    </div>
+
+                </div>
+                <div class="terms-use on-desktop ffcontainer">
+                    <a href="/policies"><h4 class="smallest-header">I AGREE TO THE TERMS OF USE AND CANCELLATION POLICY</h4></a>
+                    <p class="applied small-text">
+                        Ventii Eats does not have a contractual relationship with the Merchant in providing or supplying the product.<br><br>
+                        Any decision by the Customer to inquire and avail of the food products is Customer’s sole discretion.
+                    </p>
+                </div>
+                <button class="colored-button on-desktop payment-confirm-order">Confirm order</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var data = "{{order}}";
+    var csrftoken = $('{% csrf_token %}').val();
+</script>
+<script src="{% static 'js/order.js' %}"></script>
+<script>
+    $(".card-details-label-group").attr("style", "display:none");
+    $(".checkcardinput").keyup(function(){
+        var empty = $(this).parent().parent().parent().find(".checkcardinput").filter(function() {
+            return this.value === "";
+        });
+        if(!empty.length) {
+            $(".send-card-details").removeClass("disabled");
+            $(".send-card-details").removeAttr("disabled");
+        }else{
+            $(".send-card-details").addClass("disabled");
+            $(".send-card-details").attr("disabled");
+            $(".send-card-details").prop("disabled", false);
+        }
+    });
+</script>
+{% endblock %}
