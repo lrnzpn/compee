@@ -62,7 +62,7 @@
                         </div>
                         <div class="order total flex-row">
                             <h4>TOTAL: </h4>
-                            <h4>PHP 00.00</h4>
+                            <h4>PHP {{ order.total }}</h4>
                         </div>
                         <div class="order flex-row processing-fee-note">
                             <h4><strong>NOTE: </strong>Processing Fee is non-refundable</h4>
@@ -71,14 +71,6 @@
                     <div class="order-defaults order-notes">
                         <h4 class="small-text">ADDITIONAL NOTES</h4>
                         <p class="small-text checkout-additional-notes">NOTES HERE</p>
-                    </div>
-                    <div class="order-defaults">
-                        <h4 class="small-text">REQUESTED ORDER SCHEDULE</h4>
-                        <p class="small-text payment-delivery-sched">Delivery on DATE HERE</p>
-                        <p class="small-text">
-                            <br>
-                            <span><strong>NOTE:</strong> The merchant will do their best to accommodate this date and time. It may not be guaranteed.</span>
-                        </p>
                     </div>
 
                 </div>

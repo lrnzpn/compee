@@ -2,5 +2,5 @@ from django.urls import path
 import payments.views as v
 
 urlpatterns = [
-    path('p', v.Payment, name="payment")
+    path('checkout/payment/<str:pk>/', v.Payment, name="payment")
 ]

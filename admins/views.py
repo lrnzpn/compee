@@ -859,7 +859,7 @@ class PaymentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        payment = PaymentMethod.objects.get(title=form.cleaned_data['title'])
+        payment = PaymentMethod.objects.filter(title=form.cleaned_data['title'])
         if payment and payment != self.object:
             messages.error(self.request,'This payment method already exists!')
             return self.render_to_response(self.get_context_data(form=form))

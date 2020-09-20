@@ -1,5 +1,4 @@
 function receiveOrder(pk) {
-    console.log("HELO");
     var order_id = pk;
     var button = document.getElementById("recOrder");
     var url = button.value;

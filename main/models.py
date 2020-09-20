@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from admins.models import Product, ShippingRate
 from django.utils import timezone
+import datetime
+import uuid
 from django.core.validators import RegexValidator
 
 numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
@@ -55,11 +57,17 @@ class SiteOrder(models.Model):
     status = models.CharField(max_length=11, choices=STATUS_CHOICES, default = ('Unfulfilled'))
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, blank=True, null=True, on_delete=models.SET_NULL)
-    address_line = models.CharField(max_length=100)
+    address_line = models.CharField(max_length=200)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     zip_code = models.PositiveSmallIntegerField()
     shipping_fee = models.ForeignKey(ShippingRate, blank=True, null=True, on_delete=models.SET_NULL)
+
+    def get_ref_id():
+        ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
+        return ref_id
+
+    ref_id = models.CharField(max_length=100, blank=True, unique=True, default=get_ref_id())
 
     def __str__(self):
         return f'{self.user.username}'
@@ -75,3 +83,18 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = (('order', 'product'),)
+
+TRANSACTION_STATUS = [
+    ("Paid", "Paid"),
+    ("Refund","Refund"),
+    ("Incomplete","Incomplete"),
+    ("Pending","Pending" )
+]
+
+class Transaction(models.Model):
+    order = models.OneToOneField(SiteOrder, on_delete=models.CASCADE)    
+    transaction_id = models.CharField(max_length=100, blank=True, unique=True, default=uuid.uuid4)
+    method = models.CharField(max_length=100, blank=True, default='')
+    status = models.CharField(choices = TRANSACTION_STATUS, max_length=50, null=True, blank=True)
+    pi = models.CharField(max_length=120, blank=True, null=True, default="")
+    pm = models.CharField(max_length=120, blank=True, null=True, default="")

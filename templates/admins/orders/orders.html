@@ -28,7 +28,7 @@
                 <tbody>
                     {% for order in orders %}
                         <tr>
-                            <td><strong>#{{ order.order_id }}</strong></td>
+                            <td><strong>#{{ order.ref_id }}</strong></td>
                             <td>{{ order.date_placed }}</td>
                             <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
                             <td>{{ order.total }}</td>

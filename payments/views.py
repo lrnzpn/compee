@@ -1,18 +1,11 @@
 from django.shortcuts import render
-from main.models import SiteOrder
+from main.models import SiteOrder, Transaction
 
-def Payment(request, transaction_id):
-    transaction = Transaction.objects.get(transaction_id = transaction_id)
-    order = model_to_dict(transaction.order)
-    
-    total = transaction.order.price + transaction.order.delivery_fee + transaction.order.convenience_fee
-    total = str('{0:.2f}'.format(round(float(total), 2))).replace('.','')
+def Payment(request, pk):
+    transaction = Transaction.objects.get(transaction_id = pk)
+    order = transaction.order
+    total = order.total
 
-    if order['schedule']:
-        order['schedule'] = order['schedule'].astimezone().strftime('%d/%m/%Y %I:%M %p')
-        print(order['schedule'])
-
-    order = json.dumps(order)
     # PAYMENTS API METHOD HERE: Create Payments Token    
     import re
     if request.method == "POST":
@@ -73,7 +66,7 @@ def Payment(request, transaction_id):
                 transaction.pm = pm
                 transaction.save()
 
-                redirect_url = 'http://'+ request.get_host() + reverse('order_tracker', kwargs={'ref_id':transaction.order.ref_id})
+                redirect_url = 'http://'+ request.get_host() + reverse('my-orders')
 
                 # Process payment
                 attach = paymongo.AttachPaymentMethod(transaction.pi, transaction.pm, redirect_url)
@@ -88,7 +81,7 @@ def Payment(request, transaction_id):
                     transaction.status = 'Incomplete'
                     transaction.save()
                     # Include error details
-                    transaction.order.status = "Cancelled"
+                    transaction.order.status = "Pending"
                     transaction.order.cancel_reason = "Payment declined"
                     transaction.order.save()
                     
@@ -111,8 +104,7 @@ def Payment(request, transaction_id):
                         transaction.status = 'Incomplete'
                         transaction.save()
                         # Include error details
-                        transaction.order.status = "Cancelled"
-                        trasaction.order.cancel_reason = attach['data']['attributes']['last_payment_error']
+                        transaction.order.status = "Pending"
                         trasaction.order.save()
                         authurl = redirect_url
                         transaction_status = 3
@@ -125,11 +117,11 @@ def Payment(request, transaction_id):
     if 'confirm_card' in request.GET:
         # Update order as requested ONLY IF SUCCESSFUL
         if transaction.pi != '' or transaction.pm != '':
-            transaction.order.status = 'Requested'
+            transaction.order.status = 'Unfulfilled'
             transaction.order.save()
-            sms.send_sms(transaction.order, 'Requested')
-            send_mail.send_receipt_to_customer(request, transaction.order)
-            send_mail.send_email_to_merchant(request, transaction.order)
+            # sms.send_sms(transaction.order, 'Requested')
+            # send_mail.send_receipt_to_customer(request, transaction.order)
+            # send_mail.send_email_to_merchant(request, transaction.order)
             data = {'valid': 1}
         else: data = {'valid': 0}
         return HttpResponse(json.dumps(data), content_type="application/json")
@@ -139,4 +131,4 @@ def Payment(request, transaction_id):
         'order': order,
         'transaction': transaction,
     }
-    return render(request, 'order/payment.html', context)
+    return render(request, 'payments/payment.html', context)

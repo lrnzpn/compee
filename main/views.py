@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from admins.models import (
     Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview, VendorShipping ) 
 from users.models import Vendor, Buyer, VendorReview
-from .models import WishlistItem, CartItem, SiteOrder, OrderItem
+from .models import WishlistItem, CartItem, SiteOrder, OrderItem, Transaction
 from taggit.models import Tag
 from django.db.models import Q
 from django.http import HttpResponse
@@ -442,6 +442,9 @@ class Checkout(LoginRequiredMixin, CreateView):
                     shipping_fee= fee.rate
                 )
                 order.save()
+                if form.instance.payment_method.title == "Credit Card":
+                    transaction = Transaction(order=order)
+                    transaction.save()
 
                 for i in d['items']:
                     prod = Product.objects.get(product_id=i['product_id'])
@@ -457,9 +460,14 @@ class Checkout(LoginRequiredMixin, CreateView):
         for i in items:
             item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
             item.save()
-            i.delete()  
-        messages.success(self.request, 'Your order has been received!')
-        return reverse("home")
+            i.delete()
+        if self.object.payment_method.title == "Credit Card":
+            transaction = Transaction(order=self.object)
+            transaction.save()
+            return reverse("payment", kwargs={'pk':Transaction.objects.get(order=self.object).transaction_id})
+        else:
+            messages.success(self.request, 'Your order has been received!')
+            return reverse("home")
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = SiteOrder

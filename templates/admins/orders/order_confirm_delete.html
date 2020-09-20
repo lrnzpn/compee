@@ -6,7 +6,7 @@
             {% csrf_token %}
             <fieldset class = "form-group">
                 <legend class = "border-bottom mb-4">Delete Order</legend>
-                <h2>Are you sure you want to delete order <strong>#{{object.order_id}}</strong>? </h2>
+                <h2>Are you sure you want to delete order <strong>#{{object.ref_id}}</strong>? </h2>
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
