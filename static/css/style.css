@@ -20,7 +20,7 @@ ul {
 }
 
 .header-spacer {
-  height: 7.5em;
+  height: 8em;
 }
 
 /*
@@ -71,6 +71,27 @@ ul {
   border-color: #00A5D5;
 }
 
+.compee-service-container a {
+  font-size: 12px;
+}
+
+.compee-profile-container a {
+  font-size: 12px;
+  color: #cdcdcd;
+  font-weight: bold;
+}
+
+.nav-divider {
+  border-right: 1px solid white;
+  height: 1rem;
+}
+
+.navbar-bot {
+  padding: 1em 0;
+  border-bottom: 2px solid #00A5D5;
+}
+
+
 /* 
   SIDE NAV
 */
@@ -83,10 +104,33 @@ ul {
   z-index: 99;
 }
 
+.sidebar-toggle {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  right: -10%;
+  padding: 1rem .5rem;
+  background-color: #cdcdcd;
+  border-radius: 30px;
+}
+
+.sidebar ul {
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 5% 7.5%;
+}
+
+.sidebar ul li:not(:first-child) {
+  border-top: 1px solid #fff;
+}
+
 /*
   MAIN
 */
 
-.main-wrapper {
-  padding-left: 200px;
+.main-wrapper {}
+
+.landing {
+  margin: 5% 0;
 }

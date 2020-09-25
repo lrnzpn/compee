@@ -25,18 +25,14 @@
           {% include "partials/_sidenav.html" %}
         </div>
         <main role="main" class="container main-wrapper">
-            <div class="row">
-                <div class="col-md-8">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class = "alert alert-{{ message.tags}}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% block content %}{% endblock %}
-                </div>
-            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class = "alert alert-{{ message.tags}}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
         </main>
         <script src="{% static 'js/jquery-3.5.1.slim.min.js' %}" ></script>
         <script src="{% static 'js/popper.min.js' %}" ></script>
