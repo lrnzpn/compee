@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load logged_in %}
+{% load crispy_forms_tags %}
+{% block content %} 
+
+    {% if request.user|has_group:"Buyer" %}
+        <a href="{% url 'manage-buyer' %}" class="btn btn-primary">Edit Buyer Info</a>
+    {% endif %}
+
+    <a href="{% url 'manage-account' %}" class="btn btn-primary">Manage Account</a>
+
+
+    <h1>Manage Store</h1>
+    <div class="content-section">
+        <div class="media">
+            <img src="{{ site_user.image.url }}" width="200px" height="200px">
+        </div>
+        <form method = "POST" enctype = "multipart/form-data">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">Store Info</legend>
+                {{ s_form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-info" type = "submit">Update</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

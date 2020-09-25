@@ -1,0 +1,12 @@
+<div class="col-md-3">
+    <form action="{% url 'search-bar' %}" method="GET">
+        <input type="text" name="search">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    <h3>Categories</h3>
+    <ul class="list-group">
+        {% for cat in categories %}
+            <li class="list-group-item"><a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

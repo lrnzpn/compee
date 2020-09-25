@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">New Shipping Rate</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-info" type = "submit">Create</button>
+            </div>
+        </form>
+    </div>
+    {% if u_vendors %}
+        <h4>Unassigned vendors:</h4>
+        <ul>
+            {% for v in u_vendors %}
+                <li>{{ v.store_name }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if rates %}
+        <div class='content-section'>
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td>Rate</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% for r in rates %}
+                <tr>
+                    <td>{{ r.name }}</td>
+                    <td>{{ r.rate }}</td>
+                    <td><a href="{% url 'rate-update' r.id %}">Edit</a></td>
+                    <td><a href="{% url 'rate-delete' r.id %}">Delete</a></td>
+                    <td><a href="{% url 'rate-vendors' r.id %}">Assigned Vendors</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock content %}

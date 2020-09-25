@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">Add Vendor to Rate</legend>
+                <h2>Are you sure you want {{ vendor.store_name }} to use shipping rate {{ rate.name }}?</h2>
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-primary" type = "submit">Confirm</button>
+                <a class = "btn btn-outline-secondary" href = "{% url 'rate-vendors' rate.id %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

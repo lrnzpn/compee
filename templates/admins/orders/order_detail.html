@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <h5>Order Reference ID: <strong>#{{ object.ref_id }}</strong></h5>
+    <div class="row">
+        <div class="col-md-8">
+            <h5>Order Details</h5>
+            <ul>
+                <li>Status: {{object.status }} </li>
+                <li>Date Placed: {{object.date_placed }}</li>
+                <li>Shipping Address: {{ object.address_line }}, {{ object.city }}, {{ object.state }} {{ object.zip_code }}</li>
+                <li>Shipping Fee: {{ object.shipping_fee.name }} - {{ object.shipping_fee.rate }}</li>
+            </ul>
+            <a href='{% url "order-update-info" object.order_id %}' class="btn btn-primary">Edit Info</a>
+            <h5>Items</h5>
+            {% if is_open %}
+                <a href='{% url "order-update-items" object.order_id %}' class="btn btn-primary">Edit Items</a>
+            {% endif %}
+
+            <ul>
+                {% for item in items %}
+                    <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                {% endfor %}
+                <li>Total: {{object.total}}</li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h5>Customer Details</h5>
+            <ul>
+                <li>Name: {{object.user.first_name }} {{object.user.last_name }}</li>
+                <li>Contact Number: {{ object.contact_no }} </li>
+                <li>Email: {{ object.user.email }}</li>
+                <li>Username: {{object.user.username}}</li>
+            </ul>
+        </div>
+    </div>
+    <a href='{% url "order-delete" object.order_id %}' class="btn btn-outline-danger">Delete Order</a>
+{% endblock content %}

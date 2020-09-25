@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">New Category</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-info" type = "submit">Create</button>
+            </div>
+        </form>
+    </div>
+    <div class='content-section'>
+        <table>
+            <tr>
+                <td>Name</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% for cat in categories %}
+            <tr>
+                <td>{{ cat.name }}</td>
+                <td><a href="{% url 'category-update' cat.category_id %}">Edit</a></td>
+                <td><a href="{% url 'category-delete' cat.category_id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock content %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Checkout</h1>
+    {% if items %}
+        <h3>Product Review</h3>
+
+        <table border="1">
+            <thead>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Vendor</th>
+                <th>Quantity</th>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{item.product.name}}</td>
+                    <td>{{item.product.price}}</td>
+                    <td>{{item.product.vendor.store_name}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
+                    <td><a href="{% url 'cart-edit' item.product.product_id user.id item.id  %}">Edit</a></td>
+                    <td><a href="{% url 'cart-remove' item.product.product_id user.id item.id %}">x</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if fees %}
+        <h4>Included shipping fees:</h4>
+        <table border='1'>
+            <thead>
+                <th>Store</th>
+                <th>Fee</th>
+            </thead>
+            <tbody>
+                {% for f in fees %}
+                    <tr>
+                        <td>{{ f.vendor.store_name }}</td>
+                        <td>{{ f.rate.rate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="content-section">
+            <form method = "POST" enctype = "multipart/form-data">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Order Details</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Checkout</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    {% else %}
+        <h2>Your cart is empty!</h2>
+    {% endif %}
+{% endblock content %}

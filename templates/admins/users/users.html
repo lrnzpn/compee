@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load find_store %}
+{% load logged_in %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <h2>Site Users</h2>
+    <table border="1">
+        <thead>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Wishlist</th>
+            <th>Cart</th>
+            <th>Seller</th>
+            <th>Buyer</th>
+            <th>Admin</th>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{user.id}}</td>
+                <td>{{user.username}}</td>
+                <td>{{user.email}}</td>
+                <td><a href='{% url "user-wishlist" user.id %}'>View</a></td>
+                <td><a href='{% url "user-cart" user.id %}'>View</a></td>
+                {% if user|has_group:"Vendor" %}
+                <td><a href='{% url "vendor-detail" user.id|find_store:"Vendor"%}'>Store</a></td>
+                {% else %}
+                <td><a href='{% url "make-seller" user.id %}'>Make Seller</a></td>
+                {% endif %}
+
+                {% if user|has_group:"Buyer" %} 
+                <td><a href='{% url "buyer-detail" user.id|find_store:"Buyer"%}'>Store</a></td>
+                {% else %}
+                <td><a href='{% url "make-buyer" user.id %}'>Make Buyer</a></td>
+                {% endif %}
+
+                {% if user|has_group:"Admin" %}
+                <td><a href='{% url "remove-admin" user.id %}'>Remove Admin</a></td>
+                {% else %}
+                <td><a href='{% url "make-admin" user.id %}'>Give Admin</a></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {%include 'admins/partials/_paginate.html' %}
+{% endblock content %}

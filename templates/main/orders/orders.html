@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if orders %}
+        <table border="1">
+            <thead>
+                <th>Order ID</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date Placed</th>
+                <th>Payment Method</th>
+                <th>Delivered to</th>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><strong>#{{ order.ref_id }}</strong></td>
+                        <td>
+                            <ul>
+                                {% for set in items %}
+                                    {% for item in set %}
+                                        {% if item.order.order_id == order.order_id %}
+                                            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {%endfor%}
+                            </ul>
+                        </td>
+                        <td>{{ order.total }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.date_placed }}</td>
+                        <td>{{ order.payment_method }}</td>
+                        <td>{{ order.address_line }}, {{ order.city }}, {{ order.state }} {{ order.zip_code }}</td>
+                        {% if order.status == "Received" %}
+                            <td><a href="{% url 'add-review' order.order_id %}">Add Review</a></td>
+                        {% elif order.status != "Cancelled" and order.status != "Shipped"   %}
+                            <td><a href="{% url 'cancel-order' order.order_id %}">Cancel</a></td>
+                        {% elif order.status == "Shipped" %}
+                            <td><button id="recOrder" class="btn btn-primary" value='{% url "receive-order" %}' onclick='receiveOrder({{ order.order_id }})'>Mark as Received</button></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h3>You have no orders yet!</h3>
+    {% endif %}
+{% endblock content %}

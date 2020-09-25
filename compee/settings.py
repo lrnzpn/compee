@@ -31,9 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'taggit',
     'crispy_forms',
     'users',
     'main',
+    'admins',
+    'payments',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,3 +137,11 @@ LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = '59b433d284f86a'
+EMAIL_HOST_PASSWORD = 'e231cc90ba2823'
+EMAIL_PORT = '2525'
+
+DEFAULT_FROM_EMAIL  = 'webmaster@my-host.com'
