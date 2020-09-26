@@ -18,44 +18,10 @@
         {% endif %}
     </head>
     <body>
-        <header class =  "site-header">
-            <nav class = "navbar navbar-expand-md  fixed-top">
-                <div class = "container">
-                    <a class = "navbar-brand mr-4" href = "{% url 'home' %}">Compee</a>
-                    <button class = "navbar-toggler" type = "button" data-toggle = "collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class = "navbar-toggler-icon"></span>
-                    </button>
-                    <div class = "collapse navbar-collapse" id = "navbarToggle">
-                        <div class = "navbar-nav mr-auto">
-                            <a class = "nav-item nav-link" href = "{% url 'home' %}">Home</a>
-                            {% if request.user|has_group:"Admin" %}
-                                <a class = "nav-item nav-link" href = "{% url 'vendors' %}">Dashboard</a>
-                            {% endif %}
-                        </div>
-                        <div class = "navbar-nav">
-                            {% if user.is_authenticated %}
-                            <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Logged in as {{user.username}}
-                                    </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class = "dropdown-item" href = "{% url 'cart' %}">Cart</a>
-                                    <a class = "dropdown-item" href = "{% url 'wishlist' %}">Wishlist</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class = "dropdown-item" href = "{% url 'my-orders' %}">My Orders</a>
-                                    <a class = "dropdown-item" href = "{% url 'manage-account' %}">Profile</a>
-                                    <a class = "dropdown-item" href = "{% url 'logout' %}">Logout</a>
-                                </div>
-                            </div>
-                            {% else %}
-                                <a class = "nav-item nav-link" href = "{% url 'login' %}">Login</a>
-                                <a class = "nav-item nav-link" href = "{% url 'register' %}">Register</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </nav>
+        <header class= "site-header">
+            {% include 'partials/_navbar.html' %}
         </header>
+        <div class="header-spacer"></div>
 
         <main role="main" class="container">
             {% if messages %}
@@ -67,15 +33,9 @@
             {% endif %}
             {% block content %}{% endblock %}
         </main>
-<<<<<<< HEAD
-        <script src="{% static 'js/jquery-3.5.1.slim.min.js' %}" ></script>
-        <script src="{% static 'js/popper.min.js' %}" ></script>
-        <script src="{% static 'js/bootstrap.min.js' %}" ></script>
-=======
         <script src='{% static "js/main.js" %}' defer></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
->>>>>>> 24a46c82438096c1daef38455a9fa80db9e923ea
     </body>
 </html>
