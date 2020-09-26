@@ -1,10 +1,43 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/home.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    <div class="row">
-        {%include 'main/partials/_categories.html' %}
-        <div class="col-md-4">
-            <a href="{% url 'vendors-main' %}" class="btn btn-primary">Vendors</a>
-            <a href="{% url 'buyers-main' %}" class="btn btn-primary">Buyers</a>
+    <section class="banner-menu">
+        <div class="home-headers d-flex justify-content-start align-items-center">
+            <span>Today's Deals</span>
+            <a href="{% url 'vendors-main' %}" class="">Browse Sellers</a>
+            <a href="{% url 'buyers-main' %}" class="">Compee Cares</a>
         </div>
-    </div>
+        <div class="row">
+            {% include 'main/partials/_categories.html' %}
+            <div class="col-md-9">
+                content
+            </div>
+        </div>
+    </section>
+
+    <section class="deals">
+        <h3>Today's Deals</h3>
+    </section>
+
+    <section class="popular">
+        <h3>Most Popular</h3>
+    </section>
+
+    <section class="categories">
+        <h3>Categories</h3>
+
+        {% for cat in categories %}
+            {{cat}}
+        {% endfor %}
+    </section>
+
+    <section class="just-for-you">
+        <h3>Just For You</h3>
+    </section>
+
 {% endblock content %}

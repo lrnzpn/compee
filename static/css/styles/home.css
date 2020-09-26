@@ -1,0 +1,14 @@
+.home-headers * {
+    font-weight: 600;
+    font-size: 1.5em;
+    margin-right: 20px;
+}
+
+.home-headers span {
+    color: #225F79;
+}
+
+/* side nav */
+ul li a {
+    color: black;
+}
