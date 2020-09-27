@@ -62,12 +62,7 @@ class SiteOrder(models.Model):
     state = models.CharField(max_length=50)
     zip_code = models.PositiveSmallIntegerField()
     shipping_fee = models.ForeignKey(ShippingRate, blank=True, null=True, on_delete=models.SET_NULL)
-
-    def get_ref_id():
-        ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
-        return ref_id
-
-    ref_id = models.CharField(max_length=100, blank=True, unique=True, default=get_ref_id())
+    ref_id = models.CharField(max_length=100, blank=True, unique=True)
 
     def __str__(self):
         return f'{self.user.username}'
