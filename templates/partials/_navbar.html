@@ -11,9 +11,9 @@
                 <span class="nav-divider"></span>
             <a class = "nav-item nav-link" href = "{% url 'logout' %}">Logout</a>
             {% else %}
-            <a class = "nav-item nav-link" href = "{% url 'login' %}">Sign Up</a> 
+            <a class = "nav-item nav-link" href = "{% url 'register' %}">Sign Up</a> 
             <span class="nav-divider"></span>
-            <a class = "nav-item nav-link" href = "{% url 'register' %}">Login</a>
+            <a class = "nav-item nav-link" href = "{% url 'login' %}">Login</a>
             {% endif %}
         </div>
     </div>

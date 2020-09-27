@@ -5,7 +5,9 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.contrib import messages
 from .forms import UpdatePaymentMethodForm
 from users.forms import UserRegisterForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def PaypalPayment(request, pk):
     if SiteOrder.objects.filter(ref_id=pk).exists():
         order = SiteOrder.objects.get(ref_id=pk)
@@ -25,6 +27,7 @@ def PaymentSuccess(request):
     order.save()
     return JsonResponse('Payment completed!', safe=False)
 
+@login_required
 def OtherPayment(request, pk):
     if SiteOrder.objects.filter(ref_id=pk).exists():
         order = SiteOrder.objects.get(ref_id=pk)
@@ -37,7 +40,7 @@ def OtherPayment(request, pk):
         messages.error(request, 'Order does not exist.')
         return redirect('my-orders')
 
-
+@login_required
 def ChoosePaymentMethod(request, pk):
     if SiteOrder.objects.filter(ref_id=pk).exists():
         order = SiteOrder.objects.get(ref_id=pk)

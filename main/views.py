@@ -135,9 +135,10 @@ class ProductDetailView(DetailView):
 
             if ProductCategory.objects.filter(product=self.object).exists():
                 context['category'] = ProductCategory.objects.get(product=self.object)
-
-            if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
-                context['wishlist_item'] = True
+            
+            if self.request.user.is_authenticated:
+                if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
+                    context['wishlist_item'] = True
 
             similar = Product.objects.filter(name=self.object.name).exclude(product_id=self.object.product_id)
             if similar:
