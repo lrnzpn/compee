@@ -65,7 +65,6 @@ class SiteOrder(models.Model):
 
     def get_ref_id():
         ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
-        print("CALL COUNT: " + ref_id)
         return ref_id
 
     ref_id = models.CharField(max_length=100, blank=True, unique=True, default=get_ref_id())

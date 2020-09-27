@@ -1,25 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+
+/*
+  Global styles
+*/
+
+* {
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+}
+
+html,
 body {
-    background: #fafafa;
-    color: #333333;
-    margin-top: 5rem;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    position: relative;
+    font-family: 'Jost', sans-serif;
 }
 
-.site-header .navbar-nav .nav-link {
-    color: #333333;
+a {
+    text-decoration: none;
 }
 
-.site-header .navbar-nav .nav-link:hover {
-    color: #ffffff;
+ul {
+    list-style-type: none;
 }
 
-.site-header .navbar-nav .nav-link.active {
-    font-weight: 500;
+.header-spacer {
+    height: 8em;
 }
 
-.content-section {
-    background: #ffffff;
-    padding: 10px 20px;
-    border: 1px solid #dddddd;
-    border-radius: 3px;
-    margin-bottom: 20px;
+/* navbar */
+.bg-blue {
+    background: #225F79;
+}
+
+.nav-top a {
+    color: #fff;
+}
+
+.nav-divider {
+    border-left: 1px solid #fff;
+    height: 1em;
+}
+
+.compee-cares-btn {
+    margin-right: 10px;
+}
+
+.compee-cares-btn span {
+    color: white;
+    background-color: #202020;
+    padding: .125em .375em;
+    border-radius: 2px;
+}
+
+.compee-cares-btn a:hover {
+    text-decoration: none;
+}
+
+.search-wrapper input {
+    border: none;
+    height: auto;
+}
+
+.nav-bot a:not(:first-child) {
+    margin-left: 20px;
+}
+
+.btn-container {
+    background-color: #fff;
+    padding: 5px;
+}
+
+.btn-container button {
+    border: none;
+    background-color: #225F79;
+    border-radius: unset;
+
+}
+
+.btn-container i {
+    color: #fff;
+    font-size: 1.25em;
+}
+
+.btn-blue {
+    background-color: #225F79;
+    color: #fff;
+}
+
+.btn-blue:hover {
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.btn-white {
+    color: #202020;
+    background-color: #fff;
+}
+
+.btn-white:hover {
+    color: #fff;
+    background-color: #225F79;
+}
+
+.btn-white:hover path {
+    fill: #fff;
+}
+
+a.btn>.icon {
+    margin-right: 10px;
+}
+
+.icon {
+    height: 1.5rem;
+    width: 1.5rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.search {
+    background-image: url('../img/icons/Search.svg');
+}
+
+.heart {
+    background-image: url('../img/icons/Heart.svg')
 }
