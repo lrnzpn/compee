@@ -1,3 +1,4 @@
+
 function receiveOrder(pk) {
     var order_id = pk;
     var button = document.getElementById("recOrder");

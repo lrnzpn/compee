@@ -540,7 +540,7 @@ def get_sort_orders(request):
     elif option == 'u':
         context = {'orders': SiteOrder.objects.filter(status="Unfulfilled").order_by('-date_placed')  }
     elif option == 'p':
-        context = {'orders': SiteOrder.objects.filter(status="Pending").order_by('-date_placed')  }
+        context = {'orders': SiteOrder.objects.filter(status="Payment Pending").order_by('-date_placed')  }
     elif option == 'o':
         context = {'orders': SiteOrder.objects.filter( Q(status="Unfulfilled") | Q(status="Pending") | Q(status="Shipped") ).order_by('-date_placed') }
     elif option == 'c':
@@ -570,7 +570,7 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         context['title'] = "Dashboard | Order"
         context['items'] = OrderItem.objects.filter(order=self.object)
-        open_status = ['Unfulfilled', 'Pending']
+        open_status = ['Unfulfilled', 'Payment Pending']
         if self.object.status in open_status:
             context['is_open'] = True
         return context
@@ -610,7 +610,7 @@ class OrderDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def delete(self, *args, **kwargs):
         order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
-        open_status = ['Unfulfilled', 'Pending', 'Shipped']
+        open_status = ['Unfulfilled', 'Payment Pending', 'Shipped']
         if order.status in open_status:
             items = OrderItem.objects.filter(order=order)
             for i in items:
@@ -637,7 +637,7 @@ class OrderItemCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context['items'] = OrderItem.objects.filter(order_id=self.kwargs['pk'])
         order = SiteOrder.objects.get(order_id=self.kwargs['pk'])
         context['order'] = order
-        open_status = ['Unfulfilled', 'Pending']
+        open_status = ['Unfulfilled', 'Payment Pending']
         if order.status in open_status:
             context['is_open'] = True
         return context
@@ -682,7 +682,7 @@ class OrderItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(OrderItemUpdateView, self).get_context_data(**kwargs)
         context['title'] =  "Dashboard | Edit Order Items"
-        open_status = ['Unfulfilled', 'Pending']
+        open_status = ['Unfulfilled', 'Payment Pending']
         if self.object.order.status in open_status:
             context['is_open'] = True
         return context

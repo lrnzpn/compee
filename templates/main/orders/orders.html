@@ -33,10 +33,12 @@
                         <td>{{ order.address_line }}, {{ order.city }}, {{ order.state }} {{ order.zip_code }}</td>
                         {% if order.status == "Received" %}
                             <td><a href="{% url 'add-review' order.order_id %}">Add Review</a></td>
-                        {% elif order.status != "Cancelled" and order.status != "Shipped"   %}
-                            <td><a href="{% url 'cancel-order' order.order_id %}">Cancel</a></td>
+                        {% elif order.status == "Payment Pending" %}
+                            <td><a href="{% url 'payment-method' order.ref_id %}">Pay for Order</a></td>
                         {% elif order.status == "Shipped" %}
-                            <td><button id="recOrder" class="btn btn-primary" value='{% url "receive-order" %}' onclick='receiveOrder({{ order.order_id }})'>Mark as Received</button></td>
+                            <td><button id="recOrder" class="btn btn-primary" value='{% url "receive-order" %}' onclick='receiveOrder({{ order.order_id }})'>Mark as Received</button></td>    
+                        {% elif order.status != "Cancelled"%}
+                            <td><a href="{% url 'cancel-order' order.order_id %}">Cancel</a></td>
                         {% endif %}
                     </tr>
                 {% endfor %}

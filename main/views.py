@@ -6,14 +6,14 @@ from django.contrib.auth.models import User
 from admins.models import (
     Product, ProductCategory, Category, BuyerProduct, BuyerProductCategory, ProductReview, VendorShipping ) 
 from users.models import Vendor, Buyer, VendorReview
-from .models import WishlistItem, CartItem, SiteOrder, OrderItem, Transaction
+from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 import decimal
-from admins.funcs import updateVendorStatus
+from admins.funcs import updateVendorStatus, get_ref_id
 
 def Home(request):
     categories = Category.objects.all()
@@ -384,6 +384,8 @@ class Checkout(LoginRequiredMixin, CreateView):
                 if VendorShipping.objects.filter(vendor=vendor).exists():
                     fees.append(VendorShipping.objects.get(vendor=vendor))
                 vendors.append(i.product.vendor.vendor_id)
+        if len(fees) > 1:
+            context['multiple'] = True
 
         if len(vendors) == len(fees):
             context['fees'] = fees
@@ -428,6 +430,9 @@ class Checkout(LoginRequiredMixin, CreateView):
                 form.instance.user = self.request.user
                 form.instance.total = d['total'] + fee.rate.rate
                 form.instance.shipping_fee = fee.rate
+                form.instance.ref_id = get_ref_id()
+                if form.instance.payment_method.title != "Cash On Delivery":
+                    form.instance.status = "Payment Pending"
                 first = False
             else:
                 order = SiteOrder(
@@ -439,12 +444,12 @@ class Checkout(LoginRequiredMixin, CreateView):
                     city=form.instance.city,
                     state=form.instance.state,
                     zip_code= form.instance.zip_code,
-                    shipping_fee= fee.rate
+                    shipping_fee= fee.rate,
+                    ref_id = get_ref_id()
                 )
+                if form.instance.payment_method.title != "Cash On Delivery":
+                    order.status = "Payment Pending"
                 order.save()
-                if form.instance.payment_method.title == "Credit Card":
-                    transaction = Transaction(order=order)
-                    transaction.save()
 
                 for i in d['items']:
                     prod = Product.objects.get(product_id=i['product_id'])
@@ -461,13 +466,14 @@ class Checkout(LoginRequiredMixin, CreateView):
             item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
             item.save()
             i.delete()
-        if self.object.payment_method.title == "Credit Card":
-            transaction = Transaction(order=self.object)
-            transaction.save()
-            return reverse("payment", kwargs={'pk':Transaction.objects.get(order=self.object).transaction_id})
-        else:
+        if self.object.payment_method.title == "Paypal or Debit/Credit Card":
+            return reverse("credit-payment", kwargs={'pk':self.object.ref_id})
+        elif self.object.payment_method.title == "Cash on Delivery":
             messages.success(self.request, 'Your order has been received!')
-            return reverse("home")
+            return reverse("my-orders")
+        else:
+            return reverse("other-payment", kwargs={'pk':self.object.ref_id})
+
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = SiteOrder

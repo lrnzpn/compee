@@ -35,7 +35,7 @@ class CartItem(models.Model):
 STATUS_CHOICES = (
     ('Received','Received'),
     ('Shipped','Shipped'),
-    ('Pending','Pending'),
+    ('Payment Pending','Payment Pending'),
     ('Unfulfilled', 'Unfulfilled'),
     ('Cancelled', 'Cancelled')
 )
@@ -54,7 +54,7 @@ class SiteOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     contact_no = models.CharField(max_length=15, validators=[numericCheck])
     date_placed = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=11, choices=STATUS_CHOICES, default = ('Unfulfilled'))
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default = ('Unfulfilled'))
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, blank=True, null=True, on_delete=models.SET_NULL)
     address_line = models.CharField(max_length=200)
@@ -65,6 +65,7 @@ class SiteOrder(models.Model):
 
     def get_ref_id():
         ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
+        print("CALL COUNT: " + ref_id)
         return ref_id
 
     ref_id = models.CharField(max_length=100, blank=True, unique=True, default=get_ref_id())
@@ -83,18 +84,3 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = (('order', 'product'),)
-
-TRANSACTION_STATUS = [
-    ("Paid", "Paid"),
-    ("Refund","Refund"),
-    ("Incomplete","Incomplete"),
-    ("Pending","Pending" )
-]
-
-class Transaction(models.Model):
-    order = models.OneToOneField(SiteOrder, on_delete=models.CASCADE)    
-    transaction_id = models.CharField(max_length=100, blank=True, unique=True, default=uuid.uuid4)
-    method = models.CharField(max_length=100, blank=True, default='')
-    status = models.CharField(choices = TRANSACTION_STATUS, max_length=50, null=True, blank=True)
-    pi = models.CharField(max_length=120, blank=True, null=True, default="")
-    pm = models.CharField(max_length=120, blank=True, null=True, default="")

@@ -4,6 +4,9 @@
     <h1>Checkout</h1>
     {% if items %}
         <h3>Product Review</h3>
+        {% if multiple %}
+            <p>Reminder: For Paypal/Card payments, store orders must be paid separately. </p>
+        {% endif %}
 
         <table border="1">
             <thead>
