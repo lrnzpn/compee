@@ -2,24 +2,47 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <a href="{% url 'add-review' order.order_id %}" class="btn btn-primary">Back</a>
-    {% if review %}
-        <h3>You have already created a review for this vendor.</h3>
-        <a href="{% url 'vendor-review-edit' order.order_id review.review_id %}" class="btn btn-primary">Edit Review</a>
-    {% elif received %}
-        <h1>Create Vendor Review</h1>
-        <div class="content-section">
-            <form method = "POST" enctype = "multipart/form-data">
-                {% csrf_token %}
-                <fieldset class = "form-group">
-                    <legend class = "border-bottom mb-4">Vendor Review</legend>
-                    {{ form|crispy }}
-                </fieldset>
-                <div class="form-group">
-                    <button class = "btn btn-outline-info" type = "submit">Post</button>
-                </div>
-            </form>
-        </div>
+    {% if provider %}
+        {% if review %}
+            <h3>You have already created a review for this provider.</h3>
+            <a href="{% url 'provider-review-edit' review.review_id %}" class="btn btn-primary">Edit Review</a>
+        {% elif received %}
+            <h1>Create Provider Review</h1>
+            <div class="content-section">
+                <form method = "POST" enctype = "multipart/form-data">
+                    {% csrf_token %}
+                    <fieldset class = "form-group">
+                        <legend class = "border-bottom mb-4">Provider Review</legend>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class = "btn btn-outline-info" type = "submit">Post</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <h3>This order has not yet been received!</h3>
+        {% endif %}
     {% else %}
-        <h3>This order has not yet been received!</h3>
+        {% if review %}
+            <h3>You have already created a review for this vendor.</h3>
+            <a href="{% url 'vendor-review-edit' review.review_id %}" class="btn btn-primary">Edit Review</a>
+        {% elif received %}
+            <h1>Create Vendor Review</h1>
+            <div class="content-section">
+                <form method = "POST" enctype = "multipart/form-data">
+                    {% csrf_token %}
+                    <fieldset class = "form-group">
+                        <legend class = "border-bottom mb-4">Vendor Review</legend>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class = "btn btn-outline-info" type = "submit">Post</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <h3>This order has not yet been received!</h3>
+        {% endif %}
     {% endif %}
 {% endblock content %}

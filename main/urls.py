@@ -1,6 +1,5 @@
 from django.urls import path
 import main.views as v
-from admins.views import BuyerProductCreateView, BuyerProductUpdateView, BuyerProductDeleteView
 
 urlpatterns = [
     path('', v.Home, name='home'),
@@ -11,17 +10,14 @@ urlpatterns = [
     path('search/', v.SearchBar, name='search-bar'),
     path('compare-prices/<str:name>/', v.PriceComparison, name='compare-price'),
 
-    path('buyers/', v.BuyerListView.as_view(
-        template_name="main/buyers/buyers.html"), name='buyers-main'),
-    path('buyer/<str:slug>/', v.BuyerDetailView.as_view(
-        template_name='main/buyers/buyer_detail.html'), name='buyer-detail-main'),
-    path('buyer-product/<str:slug>/', v.BuyerProductDetailView.as_view(
-        template_name='main/buyers/products/buyer_product.html'), name='buyer-product'),
-
-    path('buyer-product/<int:pk>/new/', BuyerProductCreateView, name='buyer-product-new-main'),
-    path('buyer-product/<int:pk>/update/', BuyerProductUpdateView, name='buyer-product-update-main'),
-    path('buyer-product/<int:pk>/delete/', BuyerProductDeleteView.as_view(
-        template_name='main/buyers/products/buyer_product_confirm_delete.html'),name='buyer-product-delete-main'),
+    path('services/', v.ProviderListView.as_view(
+        template_name="main/providers/providers.html"), name='services-main'),
+    path('service/<str:slug>/', v.ProviderDetailView.as_view(
+        template_name='main/providers/provider_detail.html'), name='provider-detail-main'),
+    path('service-item/<str:slug>/', v.ServiceItemDetailView.as_view(
+        template_name='main/providers/service_item.html'), name='service-item'),
+    path('service-product/<str:slug>/', v.ServiceDetailView.as_view(
+        template_name='main/providers/service_product.html'), name='service-product'),
 
     path('vendors/', v.VendorListView.as_view(
         template_name="main/vendors/vendors.html"), name='vendors-main'),
@@ -33,15 +29,15 @@ urlpatterns = [
     path('wishlist/add', v.AddToWishlist, name='wishlist-add'),
     path('wishlist/', v.WishlistView.as_view(
         template_name="main/user/wishlist/wishlist.html"), name='wishlist'),
-    path('wishlist/<int:product_pk>/<int:user_pk>/<int:pk>/remove/', v.WishlistItemDeleteView.as_view(
+    path('wishlist/<int:pk>/remove/', v.WishlistItemDeleteView.as_view(
         template_name="main/user/wishlist/wishlist_confirm_delete.html"), name='wishlist-remove'),
 
     path('cart/add/', v.AddToCart, name='cart-add'),
     path('cart/', v.CartView.as_view(
         template_name='main/user/cart/cart.html'), name='cart'),
-    path('cart/<int:product_pk>/<int:user_pk>/<int:pk>/remove/', v.CartItemDeleteView.as_view(
+    path('cart/<int:pk>/remove/', v.CartItemDeleteView.as_view(
         template_name='main/user/cart/cart_confirm_delete.html'), name='cart-remove'),
-    path('cart/<int:product_pk>/<int:user_pk>/<int:pk>/edit/', v.CartItemUpdateView.as_view(
+    path('cart/<int:pk>/edit/', v.CartItemUpdateView.as_view(
         template_name='main/user/cart/cart_edit_item.html'), name='cart-edit'),
 
     path('checkout/', v.Checkout.as_view(
@@ -61,10 +57,24 @@ urlpatterns = [
     path('reviews/vendor/<int:pk>/delete/', v.VendorReviewDeleteView.as_view(
         template_name="main/orders/reviews/vendor/vendor_review_confirm_delete.html"), name='vendor-review-delete'),
 
+    path('order/<int:pk>/reviews/provider/new/', v.ProviderReviewCreateView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_form.html"), name='provider-review'),
+    path('reviews/provider/<int:pk>/edit/', v.ProviderReviewUpdateView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_form_edit.html"), name='provider-review-edit'),
+    path('reviews/provider/<int:pk>/delete/', v.ProviderReviewDeleteView.as_view(
+        template_name="main/orders/reviews/vendor/vendor_review_confirm_delete.html"), name='provider-review-delete'),
+
     path('order/<int:order_pk>/reviews/product/<int:pk>/new/', v.ProductReviewCreateView.as_view(
         template_name="main/orders/reviews/product/product_review_form.html"), name='product-review'),
     path('reviews/product/<int:pk>/edit/', v.ProductReviewUpdateView.as_view(
         template_name='main/orders/reviews/product/product_review_form_edit.html'), name='product-review-edit'),
     path('reviews/product/<int:pk>/delete/', v.ProductReviewDeleteView.as_view(
         template_name="main/orders/reviews/product/product_review_confirm_delete.html"), name='product-review-delete'),
+    
+    path('order/<int:order_pk>/reviews/service/<int:pk>/new/', v.ServiceReviewCreateView.as_view(
+        template_name="main/orders/reviews/product/product_review_form.html"), name='service-review'),
+    path('reviews/service/<int:pk>/edit/', v.ServiceReviewUpdateView.as_view(
+        template_name='main/orders/reviews/product/product_review_form_edit.html'), name='service-review-edit'),
+    path('reviews/service/<int:pk>/delete/', v.ServiceReviewDeleteView.as_view(
+        template_name="main/orders/reviews/product/product_review_confirm_delete.html"), name='service-review-delete'),
 ]

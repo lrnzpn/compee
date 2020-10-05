@@ -2,12 +2,12 @@
 {% load crispy_forms_tags %}
 {% block content %}
     {%include 'admins/partials/_dashboard_nav.html' %}
-    <a href="{% url 'buyer-detail' buyer.buyer_id %}" class="btn btn-primary">Back to Buyer</a>
-    <a href="{% url 'buyer-delete' buyer.buyer_id %}" class="btn btn-outline-danger">Delete Buyer</a>
-    <h3>Edit Buyer Information</h3>
+    <a href="{% url 'provider-detail' object.provider_id %}" class="btn btn-primary">Back to Provider</a>
+    <a href="{% url 'provider-delete' object.provider_id %}" class="btn btn-outline-danger">Delete Provider</a>
+    <h3>Edit Provider Information</h3>
     <div class="content-section">
         <div class="media">
-            <img src="{{ buyer.image.url }}" width="200px" height="200px">
+            <img src="{{ object.image.url }}" width="200px" height="200px">
         </div>
         <form method = "POST" enctype = "multipart/form-data">
             {% csrf_token %}

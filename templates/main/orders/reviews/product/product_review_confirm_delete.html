@@ -1,16 +1,27 @@
 {% extends "base.html" %}
-{% block content %}
+{% block content %} 
     <div class = "content-section">
         <form method = "POST">
             {% csrf_token %}
-            <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Delete Product Review</legend>
-                <h2>Are you sure you want to delete your review for <strong>{{ object.product.name }}</strong>? </h2>
-            </fieldset>
-            <div class="form-group">
-                <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
-                <a class = "btn btn-outline-secondary" href = "{% url 'vendor-product' object.product.slug %}">Cancel</a>
-            </div>
+            {% if service %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Delete Service Review</legend>
+                    <h2>Are you sure you want to delete your review for <strong>{{ object.service.name }}</strong>? </h2>
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
+                    <a class = "btn btn-outline-secondary" href = "{% url 'service-product' object.service.slug %}">Cancel</a>
+                </div>
+            {% else %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Delete Product Review</legend>
+                    <h2>Are you sure you want to delete your review for <strong>{{ object.product.name }}</strong>? </h2>
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
+                    <a class = "btn btn-outline-secondary" href = "{% url 'vendor-product' object.product.slug %}">Cancel</a>
+                </div>
+            {% endif %}
         </form>
     </div>
 {% endblock content %}

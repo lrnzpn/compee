@@ -4,7 +4,7 @@
     {%include 'admins/partials/_dashboard_nav.html' %}
     {% if is_open %}
         <a href = "{% url 'order-detail' order.order_id %}" class="btn btn-primary">Back to Order</a>
-        <div class = "content-section">
+        <!-- <div class = "content-section">
             <form method = "POST">
                 {% csrf_token %}
                 <fieldset class = "form-group">
@@ -15,7 +15,7 @@
                     <button class = "btn btn-outline-info" type = "submit">Add</button>
                 </div>
             </form>
-        </div>
+        </div> -->
         <div class='content-section'>
             <h3>Order Items</h3>
             <table>
@@ -26,11 +26,16 @@
                 </tr>
                 {% for item in items %}
                 <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>{{ item.product.price }}</td>
+                    {% if item.product %}
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.product.price }}</td>
+                    {% else %}
+                        <td>{{ item.service.name }}</td>
+                        <td>{{ item.service.price }}</td>
+                    {% endif %}
                     <td>{{ item.quantity }}</td>
-                    <td><a href="{% url 'order-item-edit' item.product.product_id item.order.order_id item.id %}">Edit</a></td>
-                    <td><a href="{% url 'order-item-delete' item.product.product_id item.order.order_id item.id %}">Delete</a></td>
+                    <td><a href="{% url 'order-item-edit'  item.id %}">Edit</a></td>
+                    <td><a href="{% url 'order-item-delete' item.id %}">Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>

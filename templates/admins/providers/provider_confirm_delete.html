@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
     {%include 'admins/partials/_dashboard_nav.html' %}
-    <a href="{% url 'buyer-detail' buyer.buyer_id %}" class="btn btn-primary">Back to Buyer</a>
-    <a href="{% url 'buyer-update' buyer.buyer_id %}" class="btn btn-primary">Edit Buyer Info</a>
+    <a href="{% url 'provider-detail' object.provider_id %}" class="btn btn-primary">Back to Provider</a>
+    <a href="{% url 'provider-update' object.provider_id %}" class="btn btn-primary">Edit Provider Info</a>
     <div class = "content-section">
         <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Delete Buyer</legend>
+                <legend class = "border-bottom mb-4">Delete Service Provider</legend>
                 <h2>Are you sure you want to delete the store "{{ object.store_name }}" </h2>
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-danger" type = "submit">Yes, Delete</button>
-                <a class = "btn btn-outline-secondary" href = "{% url 'buyer-detail' object.buyer_id %}">Cancel</a>
+                <a class = "btn btn-outline-secondary" href = "{% url 'provider-detail' object.provider_id %}">Cancel</a>
             </div>
         </form>
     </div>

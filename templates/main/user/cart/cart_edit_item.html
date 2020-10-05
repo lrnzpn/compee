@@ -16,13 +16,22 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><img src="{{object.product.image.url}}" width="100%" height="200px"></td>
-                        <td>{{object.product.name}}</td>
-                        <td>{{object.product.price}}</td>
-                        <td>{{object.product.vendor.store_name}}</td>
-                        <td>{{object.quantity}}</td>
-                        <td><a href="{% url 'vendor-product' object.product.slug %}">Go to Product</a></td>
-                        <td><a href="{% url 'cart-remove' object.product.product_id user.id object.id %}">x</a></td>
+                        {% if object.product %}
+                            <td><img src="{{object.product.image.url}}" width="100%" height="200px"></td>
+                            <td>{{object.product.name}}</td>
+                            <td>{{object.product.price}}</td>
+                            <td>{{object.product.vendor.store_name}}</td>
+                            <td>{{object.quantity}}</td>
+                            <td><a href="{% url 'vendor-product' object.product.slug %}">Go to Product</a></td>
+                        {% else %}
+                            <td><img src="{{object.service.image.url}}" width="100%" height="200px"></td>
+                            <td>{{object.service.name}}</td>
+                            <td>{{object.service.price}}</td>
+                            <td>{{object.service.provider.store_name}}</td>
+                            <td>{{object.quantity}}</td>
+                            <td><a href="{% url 'service-product' object.service.slug %}">Go to Service</a></td>
+                        {% endif  %}
+                        <td><a href="{% url 'cart-remove' object.id %}">x</a></td>
                     </tr>
                 </tbody>
             </table>

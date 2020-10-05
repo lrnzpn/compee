@@ -39,10 +39,14 @@ def unique_store_slug_generator(instance, new_slug=None):
 
 def updateVendorStatus():
     vendors = Vendor.objects.all()
+    notset = False
     for v in vendors:
         if v.status == "Active" and not VendorShipping.objects.filter(vendor=v).exists():
+            notset = True
             v.status = "Inactive"
             v.save()
+    return notset
+        
 
 def get_ref_id():
     ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())

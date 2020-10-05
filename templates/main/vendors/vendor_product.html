@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load logged_in %}
 {% block content %}
     {%include 'main/partials/_categories.html' %}
     {% if inactive %}
@@ -16,7 +17,7 @@
                 <h5>Date Created: </h5>
                 <p>{{ object.date_created }}</p>
                 <h5>Category: </h5>
-                <p><a href="{% url 'category-filter' category %}">{{ category }}</a></p>
+                <p><a href="{% url 'category-filter' category.category.name %}">{{ category.category.name }}</a></p>
                 <h5>Tags:</h5>
                 <p>
                     {% for tag in object.tags.all %}
@@ -31,7 +32,7 @@
                 <img src="{{ object.image.url }}" width="100%" height="200px">
                 <p><b>Created by: </b><a href="{% url 'vendor-detail-main' object.vendor.slug %}">{{ object.vendor.store_name }}</a></p>
                 {% if not wishlist_item %}
-                <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ object.product_id }}")'>Add to Wishlist</button> <br>
+                <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ object.product_id }}","product")'>Add to Wishlist</button> <br>
                 {% endif %}
                 <label for="quantity">Quantity:</label>
                 {% if object.item_stock >= 5 %}
@@ -39,7 +40,7 @@
                 {% else %}
                     <input type="number" required id="quantityInput" name="quantity" min="1" max="{{ object.item_stock }}" value="1">
                 {% endif%}
-                <button id="AddCart" class="btn btn-sm btn-outline-secondary" value='{% url "cart-add" %}'onclick='addToCart("{{ object.product_id }}")'>Add to Cart</button>
+                <button id="AddCart" class="btn btn-sm btn-outline-secondary" value='{% url "cart-add" %}'onclick='addToCart("{{ object.product_id }}", "product")'>Add to Cart</button>
             </div>
         </div>
 
@@ -52,7 +53,7 @@
                     {% if r.description %}
                     <li>"{{r.description}}"</li>
                     {% endif %}
-                    {% if r.author == request.user %}
+                    {% if r.author == request.user or request.user|has_group:"Admin" %}
                         <a href='{% url "product-review-edit" r.review_id %}'>Edit</a>
                         <a href='{% url "product-review-delete" r.review_id %}'>Delete</a>
                     {% endif %}

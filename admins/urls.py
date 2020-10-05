@@ -2,14 +2,14 @@ from django.urls import path
 import admins.views as v
 
 urlpatterns = [
-    path('buyers/', v.BuyerListView.as_view(
-        template_name='admins/buyers/buyers.html'), name='buyers'),
-    path('buyer/<int:pk>/', v.BuyerDetailView.as_view(
-        template_name='admins/buyers/buyer_detail.html'), name='buyer-detail' ),
-    path('buyer/<int:pk>/update/', v.BuyerUpdateView.as_view(
-        template_name='admins/buyers/buyer_update.html'), name='buyer-update'),
-    path('buyer/<int:pk>/delete/', v.BuyerDeleteView.as_view(
-        template_name='admins/buyers/buyer_confirm_delete.html'), name='buyer-delete'),
+    path('service-providers/', v.ProviderListView.as_view(
+        template_name='admins/providers/providers.html'), name='providers'),
+    path('provider/<int:pk>/', v.ProviderDetailView.as_view(
+        template_name='admins/providers/provider_detail.html'), name='provider-detail' ),
+    path('provider/<int:pk>/update/', v.ProviderUpdateView.as_view(
+        template_name='admins/providers/provider_update.html'), name='provider-update'),
+    path('provider/<int:pk>/delete/', v.ProviderDeleteView.as_view(
+        template_name='admins/providers/provider_confirm_delete.html'), name='provider-delete'),
 
     path('vendors/', v.VendorListView.as_view(
         template_name='admins/vendors/vendors.html'), name='vendors'),
@@ -22,24 +22,31 @@ urlpatterns = [
 
     path('vendor/<int:pk>/product/new/', v.ProductCreateView, name='product-new'),
     path('product/<str:slug>/', v.ProductDetailView.as_view(
-        template_name='admins/products/product_detail.html'), name='product-detail'),
+        template_name='admins/vendors/products/product_detail.html'), name='product-detail'),
     path('product/<int:pk>/update', v.ProductUpdateView, name='product-update'),
     path('product/<int:pk>/delete', v.ProductDeleteView.as_view(
-        template_name='admins/products/product_confirm_delete.html'), name='product-delete'),
+        template_name='admins/vendors/products/product_confirm_delete.html'), name='product-delete'),
 
-    path('buyer/<int:pk>/product/new/', v.BuyerProductCreateView, name='buyer-product-new'),
-    path('buyer-product/<str:slug>/', v.BuyerProductDetailView.as_view(
-        template_name='admins/products/product_detail.html'), name='buyer-product-detail'),
-    path('buyer-product/<int:pk>/update/', v.BuyerProductUpdateView, name='buyer-product-update'),
-    path('buyer-product/<int:pk>/delete/', v.BuyerProductDeleteView.as_view(
-        template_name='admins/products/product_confirm_delete.html'), name='buyer-product-delete'),
+    path('provider/<int:pk>/item/new/', v.ServiceItemCreateView, name='service-item-new'),
+    path('service-item/<str:slug>/', v.ServiceItemDetailView.as_view(
+        template_name='admins/providers/items/service_item_detail.html'), name='service-item-detail'),
+    path('service-item/<int:pk>/update/', v.ServiceItemUpdateView, name='service-item-update'),
+    path('service-item/<int:pk>/delete/', v.ServiceItemDeleteView.as_view(
+        template_name='admins/providers/items/service_item_confirm_delete.html'), name='service-item-delete'),
+
+    path('provider/<int:pk>/service/new/', v.ServiceCreateView, name='service-new'),
+    path('service/<str:slug>/', v.ServiceDetailView.as_view(
+        template_name='admins/providers/services/service_detail.html'), name='service-detail'),
+    path('service/<int:pk>/update/', v.ServiceUpdateView, name='service-update'),
+    path('service/<int:pk>/delete/', v.ServiceDeleteView.as_view(
+        template_name='admins/providers/services/service_confirm_delete.html'), name='service-delete'),
 
     path('users/', v.UserListView.as_view(
         template_name='admins/users/users.html'), name='users'),
     path('vendor/new/<int:pk>/', v.VendorCreateView.as_view(
         template_name='admins/users/roles/make_seller.html'), name='make-seller'),
-    path('buyer/new/<int:pk>/', v.BuyerCreateView.as_view(
-        template_name='admins/users/roles/make_buyer.html'), name='make-buyer'),
+    path('provider/new/<int:pk>/', v.ProviderCreateView.as_view(
+        template_name='admins/users/roles/make_provider.html'), name='make-provider'),
     path('admin/new/<int:pk>/', v.GiveAdmin, name='make-admin'),
     path('admin/remove/<int:pk>/', v.RemoveAdmin, name='remove-admin'),
 
@@ -60,9 +67,9 @@ urlpatterns = [
 
     path('order/<int:pk>/update-items/', v.OrderItemCreateView.as_view(
         template_name="admins/orders/items/items.html"), name='order-update-items'),
-    path('order/<int:product_pk>/<int:order_pk>/<int:pk>/edit/', v.OrderItemUpdateView.as_view(
+    path('order-item/<int:pk>/edit/', v.OrderItemUpdateView.as_view(
         template_name="admins/orders/items/item_update.html"), name='order-item-edit'),
-    path('order/<int:product_pk>/<int:order_pk>/<int:pk>/delete/', v.OrderItemDeleteView.as_view(
+    path('order-item/<int:pk>/delete/', v.OrderItemDeleteView.as_view(
         template_name="admins/orders/items/item_confirm_delete.html"), name='order-item-delete'),
 
     path('settings/', v.Settings, name="settings"),

@@ -20,7 +20,11 @@
                                 {% for set in items %}
                                     {% for item in set %}
                                         {% if item.order.order_id == order.order_id %}
-                                            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                            {% if item.product %}
+                                                <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                            {% else %}
+                                                <li>{{ item.service.name }} x{{ item.quantity }}</li>
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 {%endfor%}

@@ -8,9 +8,7 @@
 {% endif %}
 <a href="{% url 'manage-account' %}" class="btn btn-primary">Manage Account</a>
 
-<h1>Buyer Information</h1>
-<a href="{% url 'buyer-detail-main' site_user.slug %}" class="btn btn-primary">See Buyer Store</a>
-
+<h1>Service Provider Information</h1>
 <div class = "content-section">
     <div class="media">
         <img src="{{ site_user.image.url }}" width="200px" height="200px">
@@ -19,13 +17,11 @@
         {% csrf_token %}
         <fieldset class = "form-group">
             <legend class = "border-bottom mb-4">Store Info</legend>
-            {{ b_form|crispy }}
+            {{ p_form|crispy }}
         </fieldset>
         <div class="form-group">
             <button class = "btn btn-outline-info" type = "submit">Update</button>
         </div>
     </form>
-
-    <a href="{% url 'delete-buyer'%}" class="btn btn-outline-danger">Delete Buyer Profile</a>
 </div>
 {% endblock content %}
