@@ -28,12 +28,12 @@ ul {
 }
 
 .header-spacer {
-    height: 8em;
+    height: 8.5em;
 }
 
 /* navbar */
 .bg-blue {
-    background: #225F79;
+    background: #159ABD;
 }
 
 .nav-top a {
@@ -76,7 +76,7 @@ ul {
 
 .btn-container button {
     border: none;
-    background-color: #225F79;
+    background-color: #159ABD;
     border-radius: unset;
 
 }
@@ -87,7 +87,7 @@ ul {
 }
 
 .btn-blue {
-    background-color: #225F79;
+    background-color: #159ABD;
     color: #fff;
 }
 
@@ -101,9 +101,14 @@ ul {
     background-color: #fff;
 }
 
+.btn-white path {
+    fill: #159ABD;
+    transition: fill .15s ease-in-out;
+}
+
 .btn-white:hover {
     color: #fff;
-    background-color: #225F79;
+    background-color: #159ABD;
 }
 
 .btn-white:hover path {
@@ -128,4 +133,62 @@ a.btn>.icon {
 
 .heart {
     background-image: url('../img/icons/Heart.svg')
+}
+
+/* footer */
+footer {
+    bottom: 0;
+    background-color: #159ABD;
+}
+
+.footer-content {
+    padding: 2.5% 0;
+}
+
+.footer-content>div>span {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 1.25em;
+    color: #fff;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.footer-content>div li,
+.footer-content>div li a {
+    color: #fff;
+}
+
+.payment-methods li {
+    margin-bottom: 10px;
+}
+
+.online-payment img {
+    height: 35px;
+    width: auto;
+    background-color: #fff;
+    margin-right: 20px;
+}
+
+.delivery-container img {
+    height: 35px;
+    width: 75px;
+    margin: 0 10px 10px 0;
+}
+
+.socmed {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.socmed a {
+    margin: 0 5px;
+}
+
+.fb {
+    background-image: url('../img//icons/facebook-2\ 1.svg');
+}
+
+.ig {
+    background-image: url('../img/icons/instagram-2\ 1.svg');
 }
