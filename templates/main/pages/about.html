@@ -1,7 +1,25 @@
+
 {% extends "base.html" %}
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/about.css' %}">
+{% endblock stylesheets %}
 {% block content %}
 
-	<h1>About Page</h1>
-
-
+	
+	<div class="container about-container">
+	<div class="row">
+		<div class="col-md-8" >
+			<h1>About Compee</h1>
+			<h3>Lorem Ipsum?</h3>
+			<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam perspiciatis recusandae ad. Saepe doloremque temporibus repellat repudiandae ipsum dolor aliquam perspiciatis quidem, incidunt aperiam eligendi aliquid obcaecati officiis nemo quam!
+				Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam perspiciatis recusandae ad. Saepe doloremque temporibus repellat repudiandae ipsum dolor aliquam perspiciatis quidem, incidunt aperiam eligendi aliquid obcaecati officiis nemo quam!
+			</p>
+		</div>
+		<div class="col-md-4">
+			<img src="/static/img/logos/Logo 2@4x.png" class="about-logo">
+		</div>	
+	</div>
+	</div>
+	
 {% endblock content %}
