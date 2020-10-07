@@ -12,7 +12,7 @@
             <th>Wishlist</th>
             <th>Cart</th>
             <th>Seller</th>
-            <th>Buyer</th>
+            <th>Service</th>
             <th>Admin</th>
         </thead>
         <tbody>
@@ -29,10 +29,10 @@
                 <td><a href='{% url "make-seller" user.id %}'>Make Seller</a></td>
                 {% endif %}
 
-                {% if user|has_group:"Buyer" %} 
-                <td><a href='{% url "buyer-detail" user.id|find_store:"Buyer"%}'>Store</a></td>
+                {% if user|has_group:"Provider" %} 
+                <td><a href='{% url "provider-detail" user.id|find_store:"Provider"%}'>Store</a></td>
                 {% else %}
-                <td><a href='{% url "make-buyer" user.id %}'>Make Buyer</a></td>
+                <td><a href='{% url "make-provider" user.id %}'>Make Provider</a></td>
                 {% endif %}
 
                 {% if user|has_group:"Admin" %}

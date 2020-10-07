@@ -1,0 +1,19 @@
+<div class="row">
+    {% for service in services %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="{{ product.image.url }}" width="100%" height="200px">
+                <div class="card-body">
+                    <p class="card-text">{{ service.name }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="{% url 'service-detail' service.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a href="{% url 'service-update' service.service_id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </div>
+                        <small class="text-muted">{{ service.price }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

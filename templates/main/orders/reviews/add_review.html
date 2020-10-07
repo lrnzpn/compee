@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load check_prod_review %}
 {% load find_prod_review_id %}
+{% load check_serv_review %}
+{% load find_serv_review_id %}
 {% block content %}
     <a href="{% url 'my-orders' %}" class="btn btn-primary">Back to Orders</a>
     <div class="row">
@@ -13,11 +15,20 @@
                 <tbody>
                     {% for item in items %}
                         <tr>
-                            <td>{{ item.product.name }}</td>
-                            {% if item.product.product_id|check_prod_review:user %}
-                            <td><a href="{% url 'product-review-edit' item.product.product_id|find_prod_review_id:user %}">Edit Review</a></td>
+                            {% if is_service %}
+                                <td>{{ item.service.name }}</td>
+                                {% if item.service.service_id|check_serv_review:user %}
+                                    <td><a href="{% url 'product-review-edit' item.service.service_id|find_serv_review_id:user %}">Edit Review</a></td>
+                                {% else %}
+                                    <td><a href="{% url 'product-review' order.order_id item.service.service_id %}">Add Review</a></td>
+                                {% endif %}
                             {% else %}
-                            <td><a href="{% url 'product-review' order.order_id item.product.product_id %}">Add Review</a></td>
+                                <td>{{ item.product.name }}</td>
+                                {% if item.product.product_id|check_prod_review:user %}
+                                    <td><a href="{% url 'product-review-edit' item.product.product_id|find_prod_review_id:user %}">Edit Review</a></td>
+                                {% else %}
+                                    <td><a href="{% url 'product-review' order.order_id item.product.product_id %}">Add Review</a></td>
+                                {% endif %}
                             {% endif %}
                         </tr>
                     {% endfor %}
@@ -26,13 +37,24 @@
             </table>
         </div>
         <div class='col-md-4'>
-            <h3>Vendor Review</h3>
-            {% if review %}
-                <p>You have already created a review for this vendor.</p>
-                <a href="{% url 'vendor-review-edit' review.review_id  %}" class="btn btn-primary">Edit Review</a>
+            {% if is_service %}
+                <h3>Service Provider Review</h3>
+                {% if p_review %}
+                    <p>You have already created a review for this service provider.</p>
+                    <a href="{% url 'provider-review-edit' p_review.review_id  %}" class="btn btn-primary">Edit Review</a>
+                {% else %}
+                    <a href="{% url 'provider-review' order.order_id  %}" class="btn btn-primary">Add Review</a>
+                {% endif %}
             {% else %}
-                <a href="{% url 'vendor-review' order.order_id  %}" class="btn btn-primary">Add Review</a>
+                <h3>Vendor Review</h3>
+                {% if v_review %}
+                    <p>You have already created a review for this vendor.</p>
+                    <a href="{% url 'vendor-review-edit' review.review_id  %}" class="btn btn-primary">Edit Review</a>
+                {% else %}
+                    <a href="{% url 'vendor-review' order.order_id  %}" class="btn btn-primary">Add Review</a>
+                {% endif %}
             {% endif %}
         </div>
+        
     </div>
 {% endblock content %}

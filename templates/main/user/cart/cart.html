@@ -12,23 +12,31 @@
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
-                    <td>{{item.product.name}}</td>
-                    <td>{{item.product.price}}</td>
-                    <td>{{item.product.vendor.store_name}}</td>
-                    <td>{{item.quantity}}</td>
-                    <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-                    <td><a href="{% url 'cart-edit' item.product.product_id user.id item.id  %}">Edit</a></td>
-                    <td><a href="{% url 'cart-remove' item.product.product_id user.id item.id %}">x</a></td>
+                    {% if item.product %}
+                        <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
+                        <td>{{item.product.name}}</td>
+                        <td>{{item.product.price}}</td>
+                        <td>{{item.product.vendor.store_name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
+                    {% else %}
+                        <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
+                        <td>{{item.service.name}}</td>
+                        <td>{{item.service.price}}</td>
+                        <td>{{item.service.provider.store_name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
+                    {% endif %}
+                    <td><a href="{% url 'cart-edit' item.id %}">Edit</a></td>
+                    <td><a href="{% url 'cart-remove' item.id %}">x</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {%include 'admins/partials/_paginate.html' %}
-        {% if fees %}
+        {% if fees or s_only %}
         <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
         {% endif %}
-        
     {% else %}
         <h3>You have nothing in your cart!</h3>
     {% endif %}

@@ -38,11 +38,11 @@ class Vendor(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-class Buyer(models.Model):
-    buyer_id = models.AutoField(primary_key=True)
+class ServiceProvider(models.Model):
+    provider_id = models.AutoField(primary_key=True)
     store_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True,max_length=100)
-    store_info = models.TextField(blank=True, null=True)
+    provider_info = models.TextField(blank=True, null=True)
     address_line = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
     state = models.CharField(max_length=50,blank=True, null=True)
@@ -73,5 +73,16 @@ class VendorReview(models.Model):
     order = models.ForeignKey('main.SiteOrder', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.author.username}'
+        return f'{self.vendor.store_name} Review - {self.author.username}'
+
+class ProviderReview(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE)
+    rating = models.CharField(max_length=1, choices=RATING_CHOICES, default=('3'))
+    description = models.TextField(blank=True, null=True)
+    order = models.ForeignKey('main.SiteOrder', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.provider.store_name} Review - {self.author.username}'
 

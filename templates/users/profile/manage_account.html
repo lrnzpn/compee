@@ -6,10 +6,8 @@
     {% if request.user|has_group:"Vendor" %}
         <a href="{% url 'manage-vendor' %}" class="btn btn-primary">Edit Vendor info</a>
     {% endif %}
-    {% if request.user|has_group:"Buyer" %}
-        <a href="{% url 'manage-buyer' %}" class="btn btn-primary">Edit Buyer Info</a>
-    {% else %}
-        <a href="{% url 'become-buyer' %}" class="btn btn-primary">Become a Buyer</a> <!-- separate this button frm profile nav -->
+    {% if request.user|has_group:"Provider" %}
+        <a href="{% url 'manage-provider' %}" class="btn btn-primary">Edit Provider Info</a>
     {% endif %}
     <h1>Manage Account</h1>
     <div class="content-section">

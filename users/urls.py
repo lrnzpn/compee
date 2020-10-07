@@ -3,9 +3,7 @@ from django.contrib.auth import views as auth_views
 import users.views as v
 
 urlpatterns = [
-    path('profile/become-buyer/', v.BecomeBuyer, name='become-buyer'),
-    path('profile/buyer-info/', v.ManageBuyer, name='manage-buyer'),
-    path('profile/delete-buyer/', v.DeleteBuyer, name='delete-buyer'),
+    path('profile/provider-info/', v.ManageProvider, name='manage-provider'),
     path('profile/vendor-info/', v.ManageVendor, name='manage-vendor'),
 
     path('register/', v.Register, name='register'),

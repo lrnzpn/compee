@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <h2>Services List</h2>
+    <div class="row">
+        {% for p in providers %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="{{ p.image.url }}" width="100%" height="200px">
+                    <div class="card-body">
+                        <p class="card-text">{{ p.store_name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="{% url 'provider-detail' p.provider_id  %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                <a href="{% url 'provider-update' p.provider_id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            </div>
+                            <small class="text-muted">{{ p.user.username }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {%include 'admins/partials/_paginate.html' %}
+    
+{% endblock content %}

@@ -4,6 +4,9 @@
     <h1>Checkout</h1>
     {% if items %}
         <h3>Product Review</h3>
+        {% if multiple %}
+            <p>Reminder: For Paypal/Card payments, store orders must be paid separately. </p>
+        {% endif %}
 
         <table border="1">
             <thead>
@@ -15,13 +18,23 @@
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td>{{item.product.name}}</td>
-                    <td>{{item.product.price}}</td>
-                    <td>{{item.product.vendor.store_name}}</td>
-                    <td>{{item.quantity}}</td>
-                    <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-                    <td><a href="{% url 'cart-edit' item.product.product_id user.id item.id  %}">Edit</a></td>
-                    <td><a href="{% url 'cart-remove' item.product.product_id user.id item.id %}">x</a></td>
+                    {% if item.product %}
+                        <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
+                        <td>{{item.product.name}}</td>
+                        <td>{{item.product.price}}</td>
+                        <td>{{item.product.vendor.store_name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
+                    {% else %}
+                        <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
+                        <td>{{item.service.name}}</td>
+                        <td>{{item.service.price}}</td>
+                        <td>{{item.service.provider.store_name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
+                    {% endif %}
+                    <td><a href="{% url 'cart-edit' item.id  %}">Edit</a></td>
+                    <td><a href="{% url 'cart-remove' item.id %}">x</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -42,7 +55,8 @@
                 {% endfor %}
             </tbody>
         </table>
-
+        {% endif %}
+        {% if fees or s_only %}
         <div class="content-section">
             <form method = "POST" enctype = "multipart/form-data">
                 {% csrf_token %}

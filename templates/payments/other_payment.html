@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-section">
+    <p>Once paid, please wait for an admin to confirm your order.</p>
+    <h4>ORDER TOTAL: </h4>
+    <h4>PHP {{ order.total }}</h4>
+    <h4>Chosen payment method details: </h4>
+    <p><strong>{{order.payment_method.title}}</strong></p>
+    <p>{{order.payment_method.details}}</p>
+</div>
+{% endblock content %}

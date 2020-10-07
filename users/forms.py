@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Vendor, Buyer
+from .models import Vendor, ServiceProvider
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
@@ -36,21 +36,21 @@ class VendorUpdateForm(forms.ModelForm):
         fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no', 'image']
 
-class BuyerUpdateForm(forms.ModelForm):
+class ProviderUpdateForm(forms.ModelForm):
     class Meta:
-        model = Buyer
-        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+        model = ServiceProvider
+        fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no', 'image']
 
-class BuyerCreateForm(forms.ModelForm):
+class ProviderCreateForm(forms.ModelForm):
     class Meta:
-        model = Buyer
-        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+        model = ServiceProvider
+        fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no']
 
-class BuyerDeleteForm(forms.ModelForm):
+class ProviderDeleteForm(forms.ModelForm):
     class Meta:
-        model = Buyer
+        model = ServiceProvider
         fields = []
 
 class AdminForm(forms.ModelForm):

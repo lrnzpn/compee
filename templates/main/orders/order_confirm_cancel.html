@@ -23,7 +23,11 @@
                             <td>
                                 <ul>
                                     {% for item in items %}
-                                        <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                        {% if item.product %}
+                                            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                                        {% else %}
+                                            <li>{{ item.service.name }} x{{ item.quantity }}</li>
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
                             </td>

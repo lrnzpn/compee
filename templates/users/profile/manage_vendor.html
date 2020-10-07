@@ -3,8 +3,8 @@
 {% load crispy_forms_tags %}
 {% block content %} 
 
-    {% if request.user|has_group:"Buyer" %}
-        <a href="{% url 'manage-buyer' %}" class="btn btn-primary">Edit Buyer Info</a>
+    {% if request.user|has_group:"Provider" %}
+        <a href="{% url 'manage-provider' %}" class="btn btn-primary">Edit Provider Info</a>
     {% endif %}
 
     <a href="{% url 'manage-account' %}" class="btn btn-primary">Manage Account</a>
