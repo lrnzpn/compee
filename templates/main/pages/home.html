@@ -7,20 +7,45 @@
 
 {% block content %}
     <section class="banner-menu">
-        <div class="home-headers d-flex justify-content-start align-items-center">
-            <span>Today's Deals</span>
-            <a href="{% url 'vendors-main' %}" class="">Browse Sellers</a>
-            <a href="#" class="">Compee Cares</a>
+        <div class="home-headers d-flex justify-content-between align-items-center">
+            <div class="home-nav d-flex align-items-center">
+                <a href="#deals">Today's Deals</a>
+                <a href="{% url 'vendors-main' %}" class="">Browse Sellers</a>
+                <a href="#" class="">Browse Services</a>
+            </div>
+            
+            <div class="compee-cares">
+                <a href="" class="btn btn-blue d-flex justify-content-center align-items-center">
+                    <div class="compee-cares icon"></div>
+                    <span>Compee Cares</span>
+                </a>
+            </div>
         </div>
         <div class="row">
             {% include 'main/partials/_categories.html' %}
             <div class="col-md-9">
-                content
+                <div class="">
+
+                </div>
+
+                <div class="sellers-services d-flex justify-content-between align-items-center">
+                    <a href="" class="sellers">
+                        <div class="sellers-wrapper">
+                            <div class="sellers-icon icon"></div>
+                        </div>
+
+                    </a>
+                    <a href="" class="services">
+                        <div class="services-wrapper">
+                            <div class="services-icon icon"></div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="deals">
+    <section class="deals" id="deals">
         <h3>Today's Deals</h3>
     </section>
 

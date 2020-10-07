@@ -18,9 +18,11 @@ from admins.funcs import updateVendorStatus, get_ref_id
 
 def Home(request):
     categories = Category.objects.all()
+    products = Product.objects.all()
 
     context = {
-        'categories' : categories
+        'categories' : categories,
+        'products' : products
     }
     return render(request, 'main/pages/home.html', context)
 

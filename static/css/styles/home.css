@@ -1,11 +1,15 @@
-.home-headers * {
+.home-nav a:first-child {
     font-weight: 600;
+}
+
+.home-nav a {
+    color: #159ABD;
     font-size: 1.5em;
     margin-right: 20px;
 }
 
-.home-headers span {
-    color: #225F79;
+.compee-cares {
+    background-image: url('../../img/icons/Compee\ Cares\ Logo.svg');
 }
 
 /* side nav */
