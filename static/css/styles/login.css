@@ -16,11 +16,10 @@ legend {
     padding: 50px 50px;
 }
 
-button {
+.form-group button {
+    width: 50%;
     margin-left: 25%;
     margin-right: 25%;
-    width: 50%;
-
 }
 
 .text-muted {
