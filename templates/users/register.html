@@ -6,7 +6,18 @@
             {% csrf_token %}
             <fieldset class = "form-group">
                 <legend class = "border-bottom mb-4">Join Today</legend>
-                {{ form|crispy }}
+                {{ form.email.label}}
+                {{ form.email }}
+                {{ form.username.label}}
+                {{ form.username }}
+                {{ form.first_name.label}}
+                {{ form.first_name }}
+                {{ form.last_name.label }}
+                {{ form.last_name }}
+                {{ form.password1.label }}
+                {{ form.password1 }}
+                {{ form.password2.label }}
+                {{ form.password2 }}
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-info" type = "submit">Sign Up</button>

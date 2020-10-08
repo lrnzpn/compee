@@ -1,23 +1,32 @@
 import decimal
+from django.db.models import Q
+from django.utils import timezone
 from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
-from django.db.models import Q
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
-from django.contrib.auth.models import User, Group
-from main.models import SiteOrder, OrderItem, WishlistItem, CartItem, PaymentMethod
 from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
+from users.forms import VendorUpdateForm, ProviderCreateForm, AdminForm
+from main.models import (
+    SiteOrder, OrderItem, WishlistItem, CartItem, PaymentMethod,
+    CompeeCaresRenewal
+)
 from .models import (
-    Product, ServiceItem, Service, Category, ProductCategory, ServiceCategory, ServiceItemCategory,
-    ProductReview, ServiceReview, ShippingRate, VendorShipping)
+    Product, ServiceItem, Service, Category, ProductCategory, ServiceCategory, 
+    ServiceItemCategory, ProductReview, ServiceReview, ShippingRate, VendorShipping,
+    CompeeCaresRate, ProductGuide
+)
 from .forms import (
     ProductCreateForm, AssignCategoryForm, ServiceCreateForm, AssignServiceCategoryForm,
     ServiceItemCreateForm, AssignItemCategoryForm
 )
-from users.forms import VendorUpdateForm, ProviderCreateForm, AdminForm
-from .funcs import unique_product_slug_generator, unique_store_slug_generator, updateVendorStatus
+from .funcs import (
+    unique_product_slug_generator, unique_store_slug_generator, 
+    unique_post_slug_generator, updateVendorStatus
+)
 
 class ProviderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ServiceProvider
@@ -643,7 +652,14 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         context['title'] = "Dashboard | Order"
-        context['items'] = OrderItem.objects.filter(order=self.object)
+        items = OrderItem.objects.filter(order=self.object)
+        context['items'] = items
+        if items.filter(c_cares=True).exists():
+            context['cares'] = True
+            d1 = self.object.date_placed
+            d2 = timezone.now()
+            context['days'] = abs((d2-d1).days)
+
         open_status = ['Unfulfilled', 'Payment Pending']
         if self.object.status in open_status:
             context['is_open'] = True
@@ -851,7 +867,10 @@ class OrderItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse('order-detail', kwargs={'pk':item.order.order_id})
 
 def Settings(request):
-    return render(request, 'admins/settings/settings.html', {'title':"Settings | Dashboard"})
+    context = {
+        'title' : 'Settings | Dashboard'
+    }
+    return render(request, 'admins/settings/settings.html', context)
 
 class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Category
@@ -1116,3 +1135,184 @@ class ShippingVendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVi
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'This vendor will no longer use this rate.')
         return reverse('rate-vendors',kwargs={'pk':self.kwargs['rate_pk']})
+
+class CaresRateUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CompeeCaresRate
+    fields = ['rate']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(CaresRateUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Settings | Compee Cares"
+        return context 
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Compee Cares rate updated!')
+        return reverse("cares-rate")
+
+class RenewalRequestListView(LoginRequiredMixin,UserPassesTestMixin, ListView):
+    model = CompeeCaresRenewal
+    context_object_name = 'requests'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(RenewalRequestListView, self).get_context_data(**kwargs)
+        context['title'] = "Compee Cares | Requests"
+        context['cares'] = CompeeCaresRate.objects.all().first()
+        return context
+
+class RenewalRequestDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = CompeeCaresRenewal
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(RenewalRequestDetailView, self).get_context_data(**kwargs)
+        context['title'] = "Compee Cares | Renewal Request"
+        d1 = self.object.order.date_placed
+        d2 = timezone.now()
+        context['days'] = abs((d2-d1).days)
+        return context
+
+class ResolveRenewalRequest(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CompeeCaresRenewal
+    fields = []
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ResolveRenewalRequest, self).get_context_data(**kwargs)
+        context['title'] = "Compee Cares | Resolve Request"
+        return context
+
+    def form_valid(self, form):
+        form.instance.status = "Resolved"
+        return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Request marked as resolved.')
+        return reverse("renewal-request",  kwargs={'pk': self.object.id})
+
+class UnresolveRenewalRequest(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CompeeCaresRenewal
+    fields = []
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(UnresolveRenewalRequest, self).get_context_data(**kwargs)
+        context['title'] = "Compee Cares | Unresolve Request"
+        return context
+
+    def form_valid(self, form):
+        form.instance.status = "Unresolved"
+        return super().form_valid(form)
+    
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Request marked as resolved.')
+        return reverse("renewal-request",  kwargs={'pk': self.object.id})
+
+class RenewalRequestDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CompeeCaresRenewal
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(RenewalRequestDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Compee Cares | Delete Request"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Renewal request deleted.')
+        return reverse('renewal-requests')
+
+class ProductGuideListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = ProductGuide
+    context_object_name = 'posts'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideListView, self).get_context_data(**kwargs)
+        context['title'] = "Settings | Product Guides"
+        return context
+
+class ProductGuideCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ProductGuide
+    fields = ['title', 'content']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Product Guides | New Post"
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New post created!')
+        return reverse("guide-detail", kwargs={'pk': self.object.pk})
+
+class ProductGuideDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = ProductGuide
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideDetailView, self).get_context_data(**kwargs)
+        context['title'] = f'Product Guides | {self.object.title}'
+        return context
+
+class ProductGuideUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ProductGuide
+    fields = ['title', 'content']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideUpdateView, self).get_context_data(**kwargs)
+        context['title'] = 'Product Guides | Update Post'
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New post created!')
+        return reverse("guide-detail", kwargs={'pk': self.object.pk})
+class ProductGuideDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ProductGuide
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Product Guides | Delete Post"
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New post created!')
+        return reverse("product-guides")
