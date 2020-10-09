@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <a href="{% url 'display-groups' %}" class="btn btn-primary">Back To Display Groups</a>
+    <a href="{% url 'add-products' group.id %}" class="btn btn-primary">Add Products</a>
+    <h3>Edit Products for {{ group.title }}</h3>
+    {% if products %}
+        <p>Check products you would like to remove from the group.</p>
+        <form method="POST">
+            {% csrf_token %}
+            <table border="1">
+                <thead>
+                    <th></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Discount Price</th>
+                    <th>Vendor</th>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" id="{{p.id}}" name="check_{{p.id}}" value="True">
+                            </td>
+                            <td><img src="{{p.product.image.url}}" width="100%" height="200px"></td>
+                            <td>{{p.product.name}}</td>
+                            <td>{{p.product.price}}</td>
+                            <td>
+                                {% if p.product.discount_price %}
+                                    {{p.product.discount_price}}
+                                {% else %}
+                                    No set discount price.
+                                {% endif %}
+                            </td>
+                            <td>{{p.product.vendor.store_name}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class = "btn btn-outline-info" type = "submit">Remove</button>
+        </form>
+    {% else %}
+        <p>There are no products assigned to this group.</p>
+    {% endif %}
+{% endblock content %}

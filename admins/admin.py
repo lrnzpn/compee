@@ -3,7 +3,7 @@ from .models import (
     Product, ServiceItem, Service,
     Category, ProductCategory, ServiceCategory, ServiceItemCategory,
     ProductReview, ServiceReview, ShippingRate, VendorShipping, 
-    CompeeCaresRate, ProductGuide
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 )
 
 admin.site.register(Product)
@@ -19,3 +19,5 @@ admin.site.register(ShippingRate)
 admin.site.register(VendorShipping)
 admin.site.register(CompeeCaresRate)
 admin.site.register(ProductGuide)
+admin.site.register(DisplayGroup)
+admin.site.register(ProductGroup)

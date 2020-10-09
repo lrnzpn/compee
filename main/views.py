@@ -17,7 +17,7 @@ from .models import (
 from admins.models import (
     Product, ProductCategory, Category, Service, ServiceCategory, ServiceItem, 
     ServiceItemCategory, ProductReview, ServiceReview, VendorShipping, 
-    CompeeCaresRate, ProductGuide
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 ) 
 
 from admins.funcs import updateVendorStatus, get_ref_id
@@ -56,6 +56,17 @@ def Home(request):
     context = {
         'categories' : categories
     }
+    q_groups = DisplayGroup.objects.filter(enabled=True)
+    if q_groups:
+        groups = []
+        for i in q_groups:
+            products = ProductGroup.objects.filter(group=i)
+            group = {
+                'title':i.title,
+                'products':products
+            }
+            groups.append(group)
+        context.update({'groups':groups})
     return render(request, 'main/pages/home.html', context)
 
 def About(request):

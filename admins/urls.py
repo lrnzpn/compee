@@ -125,4 +125,14 @@ urlpatterns = [
         template_name='admins/settings/product_guides/guide_update.html'),name='guide-update'),
     path('product-guides/<int:pk>/delete/', v.ProductGuideDeleteView.as_view(
         template_name='admins/settings/product_guides/guide_delete.html'),name='guide-delete'),
+
+    path('display-groups/', v.DisplayGroupCreateView.as_view(
+        template_name='admins/settings/display_groups/display_groups.html'), name='display-groups'),
+    path('display-group/<int:pk>/update/', v.DisplayGroupUpdateView.as_view(
+        template_name='admins/settings/display_groups/display_group_edit.html'), name='display-group-edit'),
+    path('display-group/<int:pk>/delete/', v.DisplayGroupDeleteView.as_view(
+        template_name='admins/settings/display_groups/display_group_confirm_delete.html'), name='display-group-delete'),
+    
+    path('display-group/<int:pk>/edit-products/', v.EditProductsInGroup, name='edit-products'),
+    path('display-group/<int:pk>/add-products/', v.AddProductsToGroup, name='add-products')
 ]

@@ -17,7 +17,7 @@ from main.models import (
 from .models import (
     Product, ServiceItem, Service, Category, ProductCategory, ServiceCategory, 
     ServiceItemCategory, ProductReview, ServiceReview, ShippingRate, VendorShipping,
-    CompeeCaresRate, ProductGuide
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 )
 from .forms import (
     ProductCreateForm, AssignCategoryForm, ServiceCreateForm, AssignServiceCategoryForm,
@@ -616,6 +616,7 @@ class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['title'] = user.username + "'s Cart"
         return context
 
+@login_required
 def get_sort_orders(request):
     option = request.GET.get('option')
     if option == 'a':
@@ -866,11 +867,15 @@ class OrderItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         item = OrderItem.objects.get(id=self.kwargs['pk'])
         return reverse('order-detail', kwargs={'pk':item.order.order_id})
 
+@login_required
 def Settings(request):
-    context = {
-        'title' : 'Settings | Dashboard'
-    }
-    return render(request, 'admins/settings/settings.html', context)
+    if request.user.groups.filter(name='Admin').exists():
+        context = {
+            'title' : 'Settings | Dashboard'
+        }
+        return render(request, 'admins/settings/settings.html', context)
+    else:
+        return reverse('home')
 
 class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Category
@@ -1298,6 +1303,7 @@ class ProductGuideUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'New post created!')
         return reverse("guide-detail", kwargs={'pk': self.object.pk})
+
 class ProductGuideDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = ProductGuide
 
@@ -1316,3 +1322,122 @@ class ProductGuideDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'New post created!')
         return reverse("product-guides")
+
+class DisplayGroupCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = DisplayGroup
+    fields = ['title']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(DisplayGroupCreateView, self).get_context_data(**kwargs)
+        context['title'] = "Settings | Display Groups"
+        context['groups'] = DisplayGroup.objects.all()
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New product display group created!')
+        return reverse("display-groups")
+
+class DisplayGroupUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = DisplayGroup
+    fields = ['title', 'enabled']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(DisplayGroupUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Display Groups | Edit Group"
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Display group updated!')
+        return reverse("display-groups")
+
+class DisplayGroupDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = DisplayGroup
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(DisplayGroupDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Display Groups | Delete Group"
+        return context
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'Display group deleted!')
+        return reverse("display-groups")
+
+@login_required
+def EditProductsInGroup(request, pk):
+    if request.user.groups.filter(name='Admin').exists():
+        group = DisplayGroup.objects.get(id=pk)
+        products = ProductGroup.objects.filter(group=group)
+        if request.method == "POST":
+            for i in request.POST:
+                if i != "csrfmiddlewaretoken":
+                    item_id = int(i[6:])
+                    item = ProductGroup.objects.get(id=item_id)
+                    item.delete()
+
+        context = {
+            'title' : "Display Groups | Assign Products",
+            'products' : products,
+            'group' : group
+        } 
+        return render(request, 'admins/settings/display_groups/products/assigned_products.html', context)
+    else:
+        return reverse('home')
+
+@login_required
+def AddProductsToGroup(request, pk):
+    if request.user.groups.filter(name='Admin').exists():
+        group = DisplayGroup.objects.get(id=pk)
+        products = Product.objects.all()
+        checked=[]
+
+        i_products = ProductGroup.objects.filter(group=group)
+        if i_products:
+            for i in i_products:
+                checked.append(i.product.product_id)
+
+        if request.method == "POST":
+            for i in request.POST:
+                if i != "csrfmiddlewaretoken":
+                    item_id = int(i[6:])
+                    product = products.get(product_id=item_id)
+                    if not ProductGroup.objects.filter(product=product, group=group).exists():
+                        new = ProductGroup(product=product, group=group)
+                        new.save()
+                    products = products.exclude(product_id=item_id)
+            for i in products:
+                if i.product_id in checked:
+                    item = ProductGroup.objects.get(group=group, product=i)
+                    item.delete()
+            return redirect('edit-products', group.id)
+        context = {
+            'title' : "Display Groups | Assign Products",
+            'products' : products,
+            'group' : group,
+            'checked':checked
+        } 
+        return render(request, 'admins/settings/display_groups/products/assign_products.html', context)
+    else:
+        return reverse('home')
+
+
+
+
+
+
