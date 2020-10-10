@@ -91,6 +91,16 @@ ul {
     font-size: 1.25em;
 }
 
+.btn-navy {
+    background-color: #005F7B;
+    color: #fff;
+}
+
+.btn-navy:hover {
+    background-color: #159ABD;
+    color: #fff;
+}
+
 .btn-blue {
     background-color: #159ABD;
     color: #fff;

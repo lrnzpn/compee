@@ -7,41 +7,59 @@
 
 {% block content %}
     <section class="banner-menu">
-        <div class="home-headers d-flex justify-content-between align-items-center">
-            <div class="home-nav d-flex align-items-center">
-                <a href="#deals">Today's Deals</a>
-                <a href="{% url 'vendors-main' %}" class="">Browse Sellers</a>
-                <a href="#" class="">Browse Services</a>
-            </div>
-            
-            <div class="compee-cares">
-                <a href="" class="btn btn-blue d-flex justify-content-center align-items-center">
-                    <div class="compee-cares icon"></div>
-                    <span>Compee Cares</span>
-                </a>
-            </div>
-        </div>
         <div class="row">
             {% include 'main/partials/_categories.html' %}
             <div class="col-md-9">
+                <div class="d-flex justify-content-end align-items-end">
+                    <a href="" class="btn btn-navy d-flex justify-content-center align-items-center">
+                        <div class="compee-cares icon"></div>
+                        <span>Compee Cares</span>
+                    </a>
+                </div>
                 <div class="">
 
                 </div>
 
                 <div class="sellers-services d-flex justify-content-between align-items-center">
-                    <a href="" class="sellers">
-                        <div class="sellers-wrapper">
+                    <a href="" class="sellers btn-navy">
+                        <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="sellers-icon icon"></div>
+                            <span>Sellers</span>
                         </div>
-
+                        <p>
+                            Reach out and sell to our community of buyers.<br>Register with Compee as a Seller now!
+                        </p>
                     </a>
-                    <a href="" class="services">
-                        <div class="services-wrapper">
+                    <a href="" class="services btn-navy">
+                        <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="services-icon icon"></div>
+                            <span>Services</span>
                         </div>
+                        <p>
+                            Have something to offer to serve our community?<br>Register with Compee as a Service now!
+                        </p>
                     </a>
                 </div>
             </div>
+        </div>
+
+        <div class="compee-overlay">
+            <a href="" class="overlay-icon d-flex align-items-center">
+                <div class="deals-icon icon"></div>
+                <span>Today's Deals</span>
+            </a>
+            <a href="" class="overlay-icon d-flex align-items-center">
+                <div class="popular-icon icon"></div>
+                <span>Most Popular</span>
+            </a>
+            <a href="" class="overlay-icon d-flex align-items-center">
+                <div class="categories-icon icon"></div>
+                <span>Categories</span>
+            </a>
+            <a href="" class="overlay-icon d-flex align-items-center">
+                <div class="blogs-icon icon"></div>
+                <span>Compee Blogs</span>
+            </a>
         </div>
     </section>
 
@@ -51,6 +69,9 @@
 
     <section class="popular">
         <h3>Most Popular</h3>
+        {% for prod in products %}
+        <p>{{prod}}</p>
+        {% endfor %}
     </section>
 
     <section class="categories">
