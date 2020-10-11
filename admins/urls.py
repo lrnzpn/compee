@@ -101,4 +101,38 @@ urlpatterns = [
         template_name='admins/settings/shipping_rates/vendors/rate_add_vendor.html'), name='rate-vendor-add'),
     path('rate/<int:rate_pk>/vendor/<int:pk>/remove/', v.ShippingVendorDeleteView.as_view(
         template_name='admins/settings/shipping_rates/vendors/rate_remove_vendor.html'),name='rate-vendor-remove'),
+    
+    path('compee-cares/<int:pk>/edit', v.CaresRateUpdateView.as_view(
+        template_name='admins/settings/compee_cares/rate_update.html'), name='cares-rate'),
+    path('compee-cares/', v.RenewalRequestListView.as_view(
+        template_name='admins/settings/compee_cares/requests.html'), name='renewal-requests'),
+    path('compee-cares/request/<int:pk>/', v.RenewalRequestDetailView.as_view(
+        template_name='admins/settings/compee_cares/request_detail.html'), name='renewal-request'),
+    path('compee-cares/request/<int:pk>/resolve/', v.ResolveRenewalRequest.as_view(
+        template_name='admins/settings/compee_cares/request_resolve.html'), name='renewal-request-resolve'),
+    path('compee-cares/request/<int:pk>/unresolve/', v.UnresolveRenewalRequest.as_view(
+        template_name='admins/settings/compee_cares/request_unresolve.html'), name='renewal-request-unresolve'),
+    path('compee-cares/request/<int:pk>/delete/', v.RenewalRequestDeleteView.as_view(
+        template_name='admins/settings/compee_cares/request_confirm_delete.html'), name='renewal-request-delete'),
+
+    path('product-guides/', v.ProductGuideListView.as_view(
+        template_name='admins/settings/product_guides/guides.html'),name='product-guides'),
+    path('product-guides/new', v.ProductGuideCreateView.as_view(
+        template_name='admins/settings/product_guides/guide_create.html'),name='guide-create'),
+    path('product-guides/<int:pk>/detail/', v.ProductGuideDetailView.as_view(
+        template_name='admins/settings/product_guides/guide_detail.html'),name='guide-detail'),
+    path('product-guides/<int:pk>/update/', v.ProductGuideUpdateView.as_view(
+        template_name='admins/settings/product_guides/guide_update.html'),name='guide-update'),
+    path('product-guides/<int:pk>/delete/', v.ProductGuideDeleteView.as_view(
+        template_name='admins/settings/product_guides/guide_delete.html'),name='guide-delete'),
+
+    path('display-groups/', v.DisplayGroupCreateView.as_view(
+        template_name='admins/settings/display_groups/display_groups.html'), name='display-groups'),
+    path('display-group/<int:pk>/update/', v.DisplayGroupUpdateView.as_view(
+        template_name='admins/settings/display_groups/display_group_edit.html'), name='display-group-edit'),
+    path('display-group/<int:pk>/delete/', v.DisplayGroupDeleteView.as_view(
+        template_name='admins/settings/display_groups/display_group_confirm_delete.html'), name='display-group-delete'),
+    
+    path('display-group/<int:pk>/edit-products/', v.EditProductsInGroup, name='edit-products'),
+    path('display-group/<int:pk>/add-products/', v.AddProductsToGroup, name='add-products')
 ]

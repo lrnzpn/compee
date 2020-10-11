@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {%include 'admins/partials/_dashboard_nav.html' %}
+    <a href="{% url 'my-orders' %}" class="btn btn-primary">Back to Orders</a>
     <h5>Order Reference ID: <strong>#{{ object.ref_id }}</strong></h5>
     <div class="row">
         <div class="col-md-8">
@@ -11,12 +11,7 @@
                 <li>Shipping Address: {{ object.address_line }}, {{ object.city }}, {{ object.state }} {{ object.zip_code }}</li>
                 <li>Shipping Fee: {{ object.shipping_fee.name }} - {{ object.shipping_fee.rate }}</li>
             </ul>
-            <a href='{% url "order-update-info" object.order_id %}' class="btn btn-primary">Edit Info</a>
             <h5>Items</h5>
-            {% if is_open %}
-                <a href='{% url "order-update-items" object.order_id %}' class="btn btn-primary">Edit Items</a>
-            {% endif %}
-
             <ul>
                 {% for item in items %}
                     {% if item.product %}
@@ -27,6 +22,7 @@
                         {% endif %}
                     {% else %}
                         <li>{{ item.service.name }} x{{ item.quantity }}</li>
+                        {{item.c_cares}}
                     {% endif %}
                 {% endfor %}
                 <li>Total: {{object.total}}</li>
@@ -43,9 +39,8 @@
             {% if cares %}
                 <h5>Compee Cares</h5>
                 <p>Days since purchased: {{days}}</p>
-                <a href="#" class="btn btn-primary">Renew</a>
+                <a href="{% url 'request-renewal' object.ref_id %}" class="btn btn-primary">Renew</a>
             {% endif %}
         </div>
     </div>
-    <a href='{% url "order-delete" object.order_id %}' class="btn btn-outline-danger">Delete Order</a>
 {% endblock content %}

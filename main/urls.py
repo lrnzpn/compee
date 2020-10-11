@@ -2,12 +2,20 @@ from django.urls import path
 import main.views as v
 
 urlpatterns = [
+    path('search/', v.SearchBar, name='search-bar'),
     path('', v.Home, name='home'),
     path('about/', v.About, name='about'),
     path('contact/', v.Contact, name='contact'),
+
+    path('compee-cares/', v.CompeeCares, name='compee-cares'),
+    path('compee-concierge/', v.CompeeConcierge, name='compee-concierge'),
+    path('product-guides/', v.ProductGuideListView.as_view(
+        template_name='main/pages/concierge/product_guides.html'), name='product-guides-main'),
+    path('product-guides/post/<str:slug>', v.ProductGuideDetailView.as_view(
+        template_name='main/pages/concierge/product_guide.html'), name='product-guide'),
+
     path('tag/<str:name>/', v.TagProductsListView, name='tag-filter'),
     path('category/<str:name>/', v.CategoryProductsListView, name='category-filter'),
-    path('search/', v.SearchBar, name='search-bar'),
     path('compare-prices/<str:name>/', v.PriceComparison, name='compare-price'),
 
     path('services/', v.ProviderListView.as_view(
@@ -39,15 +47,19 @@ urlpatterns = [
         template_name='main/user/cart/cart_confirm_delete.html'), name='cart-remove'),
     path('cart/<int:pk>/edit/', v.CartItemUpdateView.as_view(
         template_name='main/user/cart/cart_edit_item.html'), name='cart-edit'),
-
+    
+    path('checkout/compee-cares/', v.CompeeCaresForm, name='compee-cares'),
     path('checkout/', v.Checkout.as_view(
         template_name='main/orders/checkout.html'), name='checkout'),
     path('my-orders', v.OrderListView.as_view(
         template_name='main/orders/orders.html'), name='my-orders'),
+    path('order/<int:pk>/', v.OrderDetailView.as_view(
+        template_name='main/orders/order_detail.html'),name='order-detail-main'),
     path('order/<int:pk>/cancel', v.CancelOrderView.as_view(
         template_name='main/orders/order_confirm_cancel.html'), name='cancel-order'),
     path('order/receive/', v.ReceiveOrder, name='receive-order' ),
-
+    
+    path('compee-cares/<str:pk>/request/', v.RequestRenewal, name='request-renewal'),
     path('order/<int:pk>/reviews/', v.AddReviewPage, name='add-review'),
 
     path('order/<int:pk>/reviews/vendor/new/', v.VendorReviewCreateView.as_view(

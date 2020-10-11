@@ -64,7 +64,25 @@
     </section>
 
     <section class="deals" id="deals">
+    <!-- OPTIONAL PRODUCT GROUP DISPLAY -->
+    {% if groups %}
+        {% for group in groups %}
+            <section>
+                <h3>{{ group.title }}</h3>
+                <ul>
+                    {% for i in group.products %}
+                        <li>{{i.product.name}} {{i.product.price}}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    {% endif %}
+    <!-- OPTIONAL PRODUCT GROUP DISPLAY -->
+
+
+    <section class="deals">
         <h3>Today's Deals</h3>
+
     </section>
 
     <section class="popular">

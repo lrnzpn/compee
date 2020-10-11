@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <a href="{% url 'display-groups' %}" class="btn btn-primary">Back To Display Groups</a>
+    <a href="{% url 'edit-products' group.id %}" class="btn btn-primary">Remove Products</a>
+    <h3>Assign Products for {{ group.title }}</h3>
+    <p>Check products you would like to include in the display group.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <table border="1">
+            <thead>
+                <th></th>
+                <th></th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Discount Price</th>
+                <th>Vendor</th>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                    <tr>
+                        <td>
+                            {% if p.product_id not in checked %}
+                                <input type="checkbox" id="{{p.product_id}}" name="check_{{p.product_id}}" value="True">
+                            {% else %}
+                                <input type="checkbox" id="{{p.product_id}}" name="check_{{p.product_id}}" value="True" checked>
+                            {% endif %}
+                        </td>
+                        <td><img src="{{p.image.url}}" width="100%" height="200px"></td>
+                        <td>{{p.name}}</td>
+                        <td>{{p.price}}</td>
+                        <td>
+                            {% if p.discount_price %}
+                                {{p.discount_price}}
+                            {% else %}
+                                No set discount price.
+                            {% endif %}
+                        </td>
+                        <td>{{p.vendor.store_name}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class = "btn btn-outline-info" type = "submit">Update</button>
+    </form>
+{% endblock content %}

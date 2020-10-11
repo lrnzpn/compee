@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Compee Cares</h1>
+    <p>insert compee cares info here</p>
+    <p>Please tick the check marks beside the items you would like to purchase with Compee Cares with.</p>
+    {% if items %}
+        <h3>Order Review</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <table border="1">
+                <thead>
+                    <th></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Vendor</th>
+                    <th>Quantity</th>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" id="{{item.id}}" name="cares_{{item.id}}" value="True">
+                        </td>
+                            <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
+                            <td>{{item.product.name}}</td>
+                            <td>{{item.product.price}}</td>
+                            <td>{{item.product.vendor.store_name}}</td>
+                            <td>{{item.quantity}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class = "btn btn-outline-info" type = "submit">Proceed to Checkout</button>
+        </form>
+    {% else %}
+        <h2>Your cart is empty!</h2>
+    {% endif %}
+{% endblock content %}

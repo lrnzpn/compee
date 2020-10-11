@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <a href="{% url 'guide-create' %}" class="btn btn-primary">Add New Post</a>
+    <h1>Product Guide Posts</h1>
+    {% if posts %}
+        {% for post in posts %}
+            <h2><a href="{% url 'guide-detail' post.id %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+        {% endfor %}
+    {% else %}
+        <p>There are no posts to display!</p>
+    {% endif %}
+{% endblock content %}

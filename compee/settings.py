@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Manila'
 
 USE_I18N = True
 
@@ -134,14 +134,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_cdn')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mailtrap.io'
-EMAIL_HOST_USER = '59b433d284f86a'
-EMAIL_HOST_PASSWORD = 'e231cc90ba2823'
+EMAIL_HOST_USER = 'fc2d7c489d7dab'
+EMAIL_HOST_PASSWORD = 'b99e1c445a68da'
 EMAIL_PORT = '2525'
 
 DEFAULT_FROM_EMAIL  = 'webmaster@my-host.com'
