@@ -2,18 +2,35 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <a href="{% url 'add-review' object.order.order_id %}" class="btn btn-primary">Back</a>
-    <a href="{% url 'product-review-delete' object.review_id %}" class="btn btn-outline-danger">Delete Review</a>
-    <h1>Edit Product Review</h1>
-    <div class="content-section">
-        <form method = "POST" enctype = "multipart/form-data">
-            {% csrf_token %}
-            <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Product Review</legend>
-                {{ form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class = "btn btn-outline-info" type = "submit">Update</button>
-            </div>
-        </form>
-    </div>
+    {% if service %}
+        <a href="{% url 'service-review-delete' object.review_id %}" class="btn btn-outline-danger">Delete Review</a>
+        <h1>Edit Service Review</h1>
+        <div class="content-section">
+            <form method = "POST" enctype = "multipart/form-data">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Service Review</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Update</button>
+                </div>
+            </form>
+        </div>    
+    {% else %}
+        <a href="{% url 'product-review-delete' object.review_id %}" class="btn btn-outline-danger">Delete Review</a>
+        <h1>Edit Product Review</h1>
+        <div class="content-section">
+            <form method = "POST" enctype = "multipart/form-data">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <legend class = "border-bottom mb-4">Product Review</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class = "btn btn-outline-info" type = "submit">Update</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
 {% endblock content %}

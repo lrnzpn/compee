@@ -1,13 +1,26 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Vendor, Buyer
+from .models import Vendor, ServiceProvider
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField()
+    email = forms.EmailField(label="Email")
+    username = forms.CharField(label="Username", max_length=150)
+    first_name = forms.CharField(label="First Name", max_length=150)
+    last_name = forms.CharField(label="Last Name", max_length=150)
+    password1 = forms.CharField(label="Password", widget=forms.TextInput(attrs={'type':'password'}))
+    password2 = forms.CharField(label="Confirm Password", widget=forms.TextInput(attrs={'type':'password'}))
+
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+        
+
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
@@ -36,21 +49,21 @@ class VendorUpdateForm(forms.ModelForm):
         fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no', 'image']
 
-class BuyerUpdateForm(forms.ModelForm):
+class ProviderUpdateForm(forms.ModelForm):
     class Meta:
-        model = Buyer
-        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+        model = ServiceProvider
+        fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no', 'image']
 
-class BuyerCreateForm(forms.ModelForm):
+class ProviderCreateForm(forms.ModelForm):
     class Meta:
-        model = Buyer
-        fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
+        model = ServiceProvider
+        fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
                 'zip_code', 'contact_no', 'secondary_no']
 
-class BuyerDeleteForm(forms.ModelForm):
+class ProviderDeleteForm(forms.ModelForm):
     class Meta:
-        model = Buyer
+        model = ServiceProvider
         fields = []
 
 class AdminForm(forms.ModelForm):

@@ -1,11 +1,97 @@
-.home-headers * {
+.home-nav a:first-child {
     font-weight: 600;
+}
+
+.home-nav a {
+    color: #159ABD;
     font-size: 1.5em;
     margin-right: 20px;
 }
 
-.home-headers span {
-    color: #225F79;
+.compee-cares {
+    background-image: url('../../img/icons/Compee\ Cares\ Logo.svg');
+}
+
+.sellers-icon {
+    background-image: url('../../img/icons/seller.svg');
+    width: 3.5em;
+    height: 3.5em;
+}
+
+.services-icon {
+    background-image: url('../../img/icons/services.svg');
+    width: 3.5em;
+    height: 3.5em;
+}
+
+.sellers-services a {
+    background: #005F7B;
+    text-decoration: none;
+    padding: 1.5% 2.5%;
+}
+
+.sellers-services p {
+    color: #fff;
+    text-align: center;
+}
+
+.sellers-services .ss-wrapper span {
+    color: #fff;
+    font-size: 3.5em;
+    margin-left: 20px;
+}
+
+.compee-overlay {
+    position: fixed;
+    display: inline-block;
+    bottom: 10%;
+    left: 0;
+    border-radius: 5px;
+    border: 1px solid #159ABD;
+}
+
+.overlay-icon {
+    background-color: #159ABD;
+    color: #fff;
+    padding: .5em .75em;
+    font-weight: 500;
+}
+
+a.overlay-icon {
+    text-decoration: none;
+}
+
+a.overlay-icon:hover {
+    width: 100%;
+}
+
+.overlay-icon span {
+    margin-left: 10px;
+}
+
+.overlay-icon:not(:first-child) {
+    border-top: 1px solid #fff;
+}
+
+.overlay-icon .icon {
+    width: 2em;
+    height: 2em;
+}
+
+.deals-icon {
+    background-image: url('../../img/icons/Sale.svg');
+}
+
+.popular-icon {
+    background-image: url('../../img/icons/Most\ Popular.svg')
+}
+
+.categories-icon {
+    background-image: url('../../img/icons/Categories.svg');
+}
+
+.blogs-icon {
+    background-image: url('../../img/icons/Blogs.svg');
 }
 
 /* side nav */

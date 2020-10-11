@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-section">
+    <h3 >Review Order</h3>
+    <h4>ORDER SUMMARY</h4>
+    <div class="scrollable flex-col orders-list">
+        <div class="order flex-row">
+            <h4>Placeholder</h4>
+            <h4>PHP 00.00</h4>
+        </div>
+    </div>
+    <div class="order total flex-row">
+        <h4>TOTAL: </h4>
+        <h4>PHP {{ order.total }}</h4>
+    </div>
+    <div id="paypal-button-container"></div>
+</div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AVxVk_oGM3ZrvL0bBOxA6Hs6axeN4FBZl9kv-X8JsKdChp7LTPfwkT-ni9rXm0epaXwuZmUp68qdbWVO&currency=USD&disable-funding=credit"></script>
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    var total = '{{order.total}}';
+    var orderId = '{{order.ref_id}}';
+    var success_url = "{% url 'my-orders' %}";
+
+    function completeOrder(){
+        var url = "{% url 'payment-success' %}";
+        fetch(url, {
+            method:'POST',
+            headers:{
+                'Content-type':'application/json',
+                'X-CSRFToken':csrftoken
+            },
+            body:JSON.stringify({'orderId':orderId})
+        })
+    }
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+            style: {
+            color:  'blue',
+            shape:  'rect',
+            label:  'pay',
+            height: 40
+        },
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: total
+                    }
+                }]
+            });
+        },
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // Show a success message to the buyer
+                completeOrder()
+                window.location.href = success_url;
+            });
+        }
+    }).render('#paypal-button-container');
+</script>
+{% endblock content %}

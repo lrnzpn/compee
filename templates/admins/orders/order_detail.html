@@ -19,7 +19,15 @@
 
             <ul>
                 {% for item in items %}
-                    <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                    {% if item.product %}
+                        {% if item.c_cares == True %}
+                            <li>{{ item.product.name }} x{{ item.quantity }} - <strong>Purchased with Compee Cares</strong></li>
+                        {% else %}
+                            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+                        {% endif %}
+                    {% else %}
+                        <li>{{ item.service.name }} x{{ item.quantity }}</li>
+                    {% endif %}
                 {% endfor %}
                 <li>Total: {{object.total}}</li>
             </ul>
@@ -32,6 +40,11 @@
                 <li>Email: {{ object.user.email }}</li>
                 <li>Username: {{object.user.username}}</li>
             </ul>
+            {% if cares %}
+                <h5>Compee Cares</h5>
+                <p>Days since purchased: {{days}}</p>
+                <a href="#" class="btn btn-primary">Renew</a>
+            {% endif %}
         </div>
     </div>
     <a href='{% url "order-delete" object.order_id %}' class="btn btn-outline-danger">Delete Order</a>

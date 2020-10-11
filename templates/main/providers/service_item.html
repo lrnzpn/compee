@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'main/partials/_categories.html' %}
+    <h3>{{ object.name }}</h3>
+    <div class="row">
+        <div class="col-md-8">
+            <h5>Description: </h5>
+            <p>{{ object.description }}</p>
+            <h5>Price: </h5>
+            <p>{{ object.price }}</p>
+            <h5>Quantity needed: </h5>
+            <p>{{ object.stock_required }}</p>
+            <h5>Date Created: </h5>
+            <p>{{ object.date_created }}</p>
+            <h5>Category: </h5>
+            <p><a href="{% url 'category-filter' category.category.name %}">{{ category.category.name }}</a></p>
+            <h5>Tags:</h5>
+            <p>
+                {% for tag in object.tags.all %}
+                    <a href="{% url 'tag-filter' tag %}">{{ tag }}</a>,
+                {% endfor %}
+            </p>
+        </div>
+        <div class="col-md-4">
+            <img src="{{ object.image.url }}" width="100%" height="200px">
+            <p><b>Created by: </b><a href="{% url 'provider-detail-main' object.provider.slug %}">{{ object.provider.store_name }}</a></p>
+            <p>insert connect with us here</p>
+        </div>
+    </div>
+
+    <!-- Products here -->
+    <h3>Other Items Needed:</h3>
+    {% if items %}
+        {%include 'main/partials/_service_items.html' %}
+    {% else %}
+        <h4>This provider does not have anymore required items!</h4>
+    {% endif %}
+    
+{% endblock content %}

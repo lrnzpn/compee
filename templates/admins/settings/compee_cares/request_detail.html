@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class="content-section">
+        <h5>Compee Cares Renewal Request</h5>
+        <p>ID: {{ object.id }}</p>
+        <p>Requested by: {{ object.order.user.first_name }} {{ object.order.user.last_name }} ({{ object.order.user.username }})</p>
+        <p>Contact No: {{ object.order.contact_no }}</p>
+        <p>Email: {{ object.order.user.email }}</p>
+        <p>Product purchased: {{ object.order_item.product.name }}</p>
+        <p>Purchase date: {{ object.order.date_placed }} ({{ days }} days since purchase)</p>
+        <p>Order Reference: <a href="{% url 'order-detail' object.order.order_id %}">{{ object.order.ref_id }}</a></p>
+        
+        {% if object.status == "Unresolved" %}
+            <a href="{% url 'renewal-request-resolve' object.id %}" class="btn btn-primary">Mark as Resolved</a>
+        {% else %}
+            <a href="{% url 'renewal-request-unresolve' object.id %}" class="btn btn-primary">Mark as Unresolved</a>
+        {% endif %}
+        <a href="{% url 'renewal-request-delete' object.id  %}" class="btn btn-danger">Delete Request</a>
+    </div>
+{% endblock content %}

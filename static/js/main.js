@@ -1,3 +1,4 @@
+
 function receiveOrder(pk) {
     var order_id = pk;
     var button = document.getElementById("recOrder");
@@ -13,14 +14,14 @@ function receiveOrder(pk) {
     });
 }
 
-function addToWishlist(pk) {
-    var product_id = pk;
+function addToWishlist(pk, type) {
     var button = document.getElementById("AddWishlist");
     var url = button.value;
     $.ajax({
         url: url,
         data: {
-            'product_id': product_id
+            'id': pk,
+            'type':type
         },
         success: function(data) {
             location.reload();
@@ -28,8 +29,7 @@ function addToWishlist(pk) {
     });
 }
 
-function addToCart(pk) {
-    var product_id = pk;
+function addToCart(pk, type) {
     var button = document.getElementById("AddCart");
     var url = button.value;
     var quantity = 1;
@@ -40,7 +40,8 @@ function addToCart(pk) {
     $.ajax({
         url: url,
         data: {
-            'product_id':pk,
+            'id':pk,
+            'type':type,
             'quantity': quantity
         },
         success: function(data) {

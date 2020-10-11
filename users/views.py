@@ -1,17 +1,16 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
-from .forms import (
-    UserRegisterForm, UserUpdateForm, PasswordResetForm, 
-    BuyerUpdateForm, BuyerCreateForm, BuyerDeleteForm,
-    VendorUpdateForm, AdminForm
-)
-from .models import Vendor, Buyer
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView
 from admins.funcs import unique_store_slug_generator
+from .models import Vendor, ServiceProvider
+from .forms import (
+    UserRegisterForm, UserUpdateForm, PasswordResetForm, 
+    ProviderUpdateForm, VendorUpdateForm, AdminForm
+)
 
 def Register(request): 
     if request.user.is_authenticated:
@@ -34,72 +33,26 @@ def Register(request):
         return render(request, 'users/register.html', context)
 
 @login_required
-def BecomeBuyer(request):
-    if request.user.groups.filter(name='Buyer').exists():
-        return redirect('home')
-    else:
+def ManageProvider(request):
+    if request.user.groups.filter(name='Provider').exists():
+        user = ServiceProvider.objects.get(user = request.user)
         if request.method == "POST":
-            form = BuyerCreateForm(request.POST)
-            if form.is_valid():
-                form.instance.user = request.user
-                form.instance.slug = unique_store_slug_generator(form.instance)
-                b_group = Group.objects.get(name='Buyer')
-                b_group.user_set.add(request.user)
-                form.save()
-                messages.success(request, f'Successfully registered as a public buyer!')
-                return redirect('manage-buyer')
-        else:
-            form = BuyerCreateForm()
-
-        context = {
-            'form': form,
-            'title': 'Buyer Sign Up'
-        }
-        return render(request, 'users/profile/buyer/buyer_form.html', context)
-
-@login_required
-def ManageBuyer(request):
-    if request.user.groups.filter(name='Buyer').exists():
-        user = Buyer.objects.get(user = request.user)
-        if request.method == "POST":
-            b_form = BuyerUpdateForm(request.POST, instance=user)
-            if b_form.is_valid():
-                b_form.instance.slug = unique_store_slug_generator(b_form.instance)
-                b_form.save()
+            p_form = ProviderUpdateForm(request.POST, instance=user)
+            if p_form.is_valid():
+                p_form.instance.slug = unique_store_slug_generator(p_form.instance)
+                p_form.save()
                 messages.success(request, f'Your store details have been updated!')
-                return redirect('manage-buyer')
+                return redirect('manage-provider')
         else:
-            b_form = BuyerUpdateForm(instance=user)
+            p_form = ProviderUpdateForm(instance=user)
         context = {
-            'b_form': b_form,
+            'p_form': p_form,
             'site_user': user,
             'title': 'Profile'
         }
-        return render(request, 'users/profile/buyer/manage_buyer.html', context)
+        return render(request, 'users/profile/provider/manage_provider.html', context)
     else:
         return redirect('home')
-
-def DeleteBuyer(request):
-    if request.user.groups.filter(name='Buyer').exists():
-        user = Buyer.objects.get(user = request.user)
-        if request.method == "POST":
-            b_form = BuyerDeleteForm(request.POST, instance=user)
-            if b_form.is_valid():
-                user.delete()
-                b_group = Group.objects.get(name='Buyer')
-                b_group.user_set.remove(request.user)
-                messages.success(request, f'Buyer profile deleted.')
-                return redirect('manage-account')
-        else:
-            b_form = BuyerDeleteForm(instance=user)
-        context = {
-            'b_form': b_form,
-            'title': 'Delete Buyer Profile'
-        }
-        return render(request, 'users/profile/buyer/buyer_confirm_delete.html', context)
-    else:
-        return redirect('home')
-
 
 @login_required
 def ManageVendor(request):
@@ -136,7 +89,7 @@ def ManageAccount(request):
             new1 = pass_form.cleaned_data['newpassword1']
             new2 = pass_form.cleaned_data['newpassword2']
 
-            if all(v is not "" for v in [old, new1, new2]):
+            if all(v != "" for v in [old, new1, new2]):
                 username = request.user.username
                 user = authenticate(username=username, password=old)
                 if user is not None:

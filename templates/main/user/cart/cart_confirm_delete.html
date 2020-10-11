@@ -5,7 +5,11 @@
             {% csrf_token %}
             <fieldset class = "form-group">
                 <legend class = "border-bottom mb-4">Remove from Cart</legend>
-                <h2>Are you sure you want to remove "{{ object.product.name }}" from your cart? </h2>
+                {% if object.product %}
+                    <h2>Are you sure you want to remove "{{ object.product.name }}" from your cart? </h2>
+                {% else %}
+                    <h2>Are you sure you want to remove "{{ object.service.name }}" from your cart? </h2>
+                {% endif %}
             </fieldset>
             <div class="form-group">
                 <button class = "btn btn-outline-danger" type = "submit">Yes, Remove</button>

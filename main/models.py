@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from admins.models import Product, ShippingRate
+from admins.models import Product, Service, ShippingRate
 from django.utils import timezone
 import datetime
 import uuid
@@ -11,31 +11,22 @@ numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
 class WishlistItem(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.product.name}'
-
-    class Meta:
-        unique_together = (('user', 'product'),)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
 
 class CartItem(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     date_added = models.DateTimeField(default=timezone.now)
     quantity = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return f'{self.product.name}'
-
-    class Meta:
-        unique_together = (('user', 'product'),)
+    c_cares = models.BooleanField(default=False)
 
 STATUS_CHOICES = (
     ('Received','Received'),
     ('Shipped','Shipped'),
-    ('Pending','Pending'),
+    ('Payment Pending','Payment Pending'),
     ('Unfulfilled', 'Unfulfilled'),
     ('Cancelled', 'Cancelled')
 )
@@ -54,7 +45,7 @@ class SiteOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     contact_no = models.CharField(max_length=15, validators=[numericCheck])
     date_placed = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=11, choices=STATUS_CHOICES, default = ('Unfulfilled'))
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default = ('Unfulfilled'))
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_method = models.ForeignKey(PaymentMethod, blank=True, null=True, on_delete=models.SET_NULL)
     address_line = models.CharField(max_length=200)
@@ -62,12 +53,7 @@ class SiteOrder(models.Model):
     state = models.CharField(max_length=50)
     zip_code = models.PositiveSmallIntegerField()
     shipping_fee = models.ForeignKey(ShippingRate, blank=True, null=True, on_delete=models.SET_NULL)
-
-    def get_ref_id():
-        ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
-        return ref_id
-
-    ref_id = models.CharField(max_length=100, blank=True, unique=True, default=get_ref_id())
+    ref_id = models.CharField(max_length=100, blank=True, unique=True)
 
     def __str__(self):
         return f'{self.user.username}'
@@ -75,26 +61,25 @@ class SiteOrder(models.Model):
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
     order = models.ForeignKey(SiteOrder, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.PositiveIntegerField(default=1)
+    c_cares = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.product.name}'
 
-    class Meta:
-        unique_together = (('order', 'product'),)
+RENEWAL_STATUS_CHOICES = (
+    ('Unresolved','Unresolved'),
+    ('Resolved', 'Resolved')
+)
 
-TRANSACTION_STATUS = [
-    ("Paid", "Paid"),
-    ("Refund","Refund"),
-    ("Incomplete","Incomplete"),
-    ("Pending","Pending" )
-]
+class CompeeCaresRenewal(models.Model):
+    id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(SiteOrder, on_delete=models.CASCADE)
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE)
+    notes = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=RENEWAL_STATUS_CHOICES, default = ('Unresolved'))
 
-class Transaction(models.Model):
-    order = models.OneToOneField(SiteOrder, on_delete=models.CASCADE)    
-    transaction_id = models.CharField(max_length=100, blank=True, unique=True, default=uuid.uuid4)
-    method = models.CharField(max_length=100, blank=True, default='')
-    status = models.CharField(choices = TRANSACTION_STATUS, max_length=50, null=True, blank=True)
-    pi = models.CharField(max_length=120, blank=True, null=True, default="")
-    pm = models.CharField(max_length=120, blank=True, null=True, default="")
+    def __str__(self):
+        return f'{self.user.username} - {self.order_item.product.name}'

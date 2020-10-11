@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    {% if cares %}
+        <a href="{% url 'cares-rate' cares.id %}" class="btn btn-primary">Compee Cares Rate</a>
+    {% else %}
+        <p>No set Compee Cares rate.</p>
+    {% endif %}
+    <h1>Requests for Compee Cares Renewal</h1>
+    {% if requests %}
+        <table border="1">
+            <thead>
+                <th>ID</th>
+                <th>Customer Name</th>
+                <th>Product</th>
+                <th>Status</th>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for r in requests %}
+                        <td>{{ r.id }}</td>
+                        <td>{{ r.order.user.first_name }} {{ r.order.user.last_name }} ({{ r.order.user.username }})</td>
+                        <td>{{ r.order_item.product.name }}</td>
+                        <td>{{ r.status }}</td>
+                        <td><a href="{% url 'renewal-request' r.id %}">View</a></td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <p>No requests have been made.</p>
+    {% endif %}
+{% endblock content %}

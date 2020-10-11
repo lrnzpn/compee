@@ -1,6 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Product, Category, ProductCategory, BuyerProduct, BuyerProductCategory
+from .models import (
+    Product, Category, ProductCategory, 
+    Service, ServiceCategory,
+    ServiceItem, ServiceItemCategory
+)
 
 class ProductCreateForm(forms.ModelForm):
     class Meta:
@@ -15,15 +19,29 @@ class AssignCategoryForm(forms.ModelForm):
         model = ProductCategory
         fields = ['category']
 
-class BuyerProductCreateForm(forms.ModelForm):
+class ServiceCreateForm(forms.ModelForm):
     class Meta:
-        model = BuyerProduct
-        fields = ['name', 'description', 'price', 'stock_required', 'image', 'tags']
-
-class AssignBuyerCategoryForm(forms.ModelForm):
+        model = Service
+        fields =  ['name', 'description', 'price', 'discount_price', 'image', 'tags']
+    
+class AssignServiceCategoryForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(AssignBuyerCategoryForm, self).__init__(*args, **kwargs)
+        super(AssignServiceCategoryForm, self).__init__(*args, **kwargs)
         self.fields['category'].label = "Category"
     class Meta:
-        model = BuyerProductCategory
+        model = ServiceCategory
         fields = ['category']
+
+class ServiceItemCreateForm(forms.ModelForm):
+    class Meta:
+        model = ServiceItem
+        fields = ['name', 'description', 'price', 'stock_required', 'image', 'tags']
+
+class AssignItemCategoryForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AssignItemCategoryForm, self).__init__(*args, **kwargs)
+        self.fields['category'].label = "Category"
+    class Meta:
+        model = ServiceItemCategory
+        fields = ['category']
+

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Services List</h2>
+    <div class="row">
+        {%include 'main/partials/_categories.html' %}
+        {% for p in providers %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="{{ p.image.url }}" width="100%" height="200px">
+                    <div class="card-body">
+                        <p class="card-text">{{ p.store_name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="{% url 'provider-detail-main' p.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            </div>
+                            <small class="text-muted">{{ p.user.username }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {%include 'admins/partials/_paginate.html' %}
+    
+{% endblock content %}
