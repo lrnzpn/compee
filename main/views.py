@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
 from django.template.loader import get_template
+from admins.funcs import updateVendorStatus, get_ref_id
 from django.shortcuts import render, get_object_or_404, reverse, redirect
 from django.views.generic import (
     ListView, CreateView, DetailView, UpdateView, DeleteView)
@@ -21,8 +22,6 @@ from admins.models import (
     ServiceItemCategory, ProductReview, ServiceReview, VendorShipping, 
     CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 ) 
-
-from admins.funcs import updateVendorStatus, get_ref_id
 
 def SearchBar(request):
     if request.method == 'GET':

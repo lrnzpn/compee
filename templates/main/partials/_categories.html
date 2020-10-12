@@ -1,7 +1,9 @@
 <div class="col-md-3">
     <ul class="list-group">
+        <li class="list-group-item"><a href="">All Products</a></li>
         {% for cat in categories %}
             <li class="list-group-item"><a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a></li>
         {% endfor %}
+        <li class="list-group-item"><a href="">Support</a></li>
     </ul>
 </div>
