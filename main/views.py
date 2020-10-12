@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from taggit.models import Tag
+from admins.funcs import updateVendorStatus, get_ref_id
 from .forms import RenewalForm
 from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
 from .models import (
@@ -20,7 +21,18 @@ from admins.models import (
     CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 ) 
 
-from admins.funcs import updateVendorStatus, get_ref_id
+def Home(request):
+    categories = Category.objects.all()
+    products = Product.objects.all()
+
+    context = {
+        'categories' : categories,
+        'products' : products
+    }
+    return render(request, 'main/pages/home.html', context)
+
+def About(request):
+    return render(request, 'main/pages/about.html')
 
 def SearchBar(request):
     if request.method == 'GET':
