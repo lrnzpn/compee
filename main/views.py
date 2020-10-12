@@ -1,7 +1,9 @@
 import decimal
+from xhtml2pdf import pisa
 from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
+from django.template.loader import get_template
 from django.shortcuts import render, get_object_or_404, reverse, redirect
 from django.views.generic import (
     ListView, CreateView, DetailView, UpdateView, DeleteView)
@@ -332,6 +334,43 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         else:
             messages.success(self.request, 'Item has been removed from your wishlist')
             return reverse('wishlist')
+
+@login_required
+def ShareWishlist(request):
+    if request.method == "POST":
+        data = request.POST
+        request.session['note'] = data['w-message']
+        return redirect('share-wishlist-pdf')
+    context = {
+        'title': "Compee | Share Wishlist"
+    }
+    return render(request, 'main/user/wishlist/share_wishlist.html', context)
+    
+@login_required
+def wishlist_render_pdf_view(request):
+    user = User.objects.get(username=request.user)
+    items = WishlistItem.objects.filter(user=user)
+    context = {
+        'items': items,
+        'user':user.username
+    }
+    if 'note' in request.session.keys():
+        note = request.session.get('note')
+        del request.session['note']
+        context.update({'note':note})
+
+    response = HttpResponse(content_type='application/pdf')
+    #if download:
+    # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    #if display:
+    response['Content-Disposition'] = f'filename="{request.user}_wishlist.pdf"'
+    template = get_template('main/user/wishlist/user_wishlist.html')
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
 
 @login_required
 def AddToCart(request):

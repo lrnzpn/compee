@@ -39,6 +39,8 @@ urlpatterns = [
         template_name="main/user/wishlist/wishlist.html"), name='wishlist'),
     path('wishlist/<int:pk>/remove/', v.WishlistItemDeleteView.as_view(
         template_name="main/user/wishlist/wishlist_confirm_delete.html"), name='wishlist-remove'),
+    path('wishlist/share/',v.ShareWishlist, name='share-wishlist'),
+    path('wishlist/share/pdf/', v.wishlist_render_pdf_view, name='share-wishlist-pdf'),
 
     path('cart/add/', v.AddToCart, name='cart-add'),
     path('cart/', v.CartView.as_view(

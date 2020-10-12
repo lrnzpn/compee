@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'xhtml2pdf',
     'taggit',
     'crispy_forms',
     'users',

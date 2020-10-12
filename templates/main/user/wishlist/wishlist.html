@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
     {% if items %}
+        <a href="{% url 'share-wishlist' %}" class="btn btn-primary">Share my wishlist..</a>
+        <a href="#" class="btn btn-primary">Share to Facebook</a>
+        <a href="#" class="btn btn-primary">Share to Twitter</a>
         <table border="1">
             <thead>
                 <th></th>
@@ -8,7 +11,7 @@
                 <th>Price</th>
                 <th>Vendor</th>
             </thead>
-            <tbody>
+            <tbody> 
                 {% for item in items %}
                 <tr>
                     {% if item.product %}
