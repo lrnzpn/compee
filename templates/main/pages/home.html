@@ -45,19 +45,19 @@
 
         <div class="compee-overlay">
             <a href="" class="overlay-icon d-flex align-items-center">
-                <div class="deals-icon icon"></div>
+                <img src="../../../static/img/icons/Sale.svg" alt="deals">
                 <span>Today's Deals</span>
             </a>
             <a href="" class="overlay-icon d-flex align-items-center">
-                <div class="popular-icon icon"></div>
+                <img src="../../../static/img/icons/Most Popular.svg" alt="popular">
                 <span>Most Popular</span>
             </a>
             <a href="" class="overlay-icon d-flex align-items-center">
-                <div class="categories-icon icon"></div>
+                <img src="../../../static/img/icons/Categories.svg" alt="categories">
                 <span>Categories</span>
             </a>
             <a href="" class="overlay-icon d-flex align-items-center">
-                <div class="blogs-icon icon"></div>
+                <img src="../../../static/img/icons/Blogs.svg" alt="blogs">
                 <span>Compee Blogs</span>
             </a>
         </div>
@@ -78,11 +78,8 @@
         {% endfor %}
     {% endif %}
     <!-- OPTIONAL PRODUCT GROUP DISPLAY -->
-
-
     <section class="deals">
         <h3>Today's Deals</h3>
-
     </section>
 
     <section class="popular">
@@ -94,14 +91,41 @@
 
     <section class="categories">
         <h3>Categories</h3>
-
-        {% for cat in categories %}
-            {{cat}}
-        {% endfor %}
+        <div class="container categories-container">
+            {% for cat in categories %}
+                {% if forloop.first %}<div class="row">{% endif %}
+                <a href="#" class="col-md-4 cat-item cat-item--{{forloop.counter}}">       
+                    <span>{{ cat }}</span>                    
+                </a>
+                {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
+                {% if forloop.last %}</div>{% endif %}
+            {% endfor %}    
+        </div>
     </section>
 
     <section class="just-for-you">
         <h3>Just For You</h3>
+    </section>
+
+    <section class="compee-blogs">
+        <h3>Compee Blogs</h3>
+        <div class="blog-container">
+            <div class="blog-item">
+                <div class="blog-img">
+                    <img src="" alt="">
+                </div>
+                <div class="blog-details">
+                    <div class="blog-header">
+                        <span class="blog-title"></span>
+                        <span class="blog-author"></span>
+                    </div>
+                    <div class="blog-published">
+                        <span></span>
+                        <a href="" class="btn-blue">Read Post</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
 {% endblock content %}

@@ -207,3 +207,13 @@ footer {
 .ig {
     background-image: url('../img/icons/instagram-2\ 1.svg');
 }
+
+/* navbar */
+.navbar {
+    padding: 0;
+}
+
+/* override some bootstrap styles */
+.container {
+    padding: 0px;
+}

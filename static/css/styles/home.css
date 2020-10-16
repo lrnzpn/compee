@@ -46,55 +46,82 @@
     display: inline-block;
     bottom: 10%;
     left: 0;
-    border-radius: 5px;
-    border: 1px solid #159ABD;
+
 }
 
 .overlay-icon {
     background-color: #159ABD;
     color: #fff;
-    padding: .5em .75em;
     font-weight: 500;
+    max-width: calc(.75em + 1.75em);
+    width: auto;
+    border: 1px solid #159ABD;
+    align-items: center;
+    overflow: hidden;
+    -webkit-transition: max-width 0.5s;
+    transition: max-width 0.5s;
+    display: inline-flex;
 }
 
 a.overlay-icon {
     text-decoration: none;
+    color: #fff;
 }
 
-a.overlay-icon:hover {
-    width: 100%;
+.overlay-icon:hover {
+    max-width: 350px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .overlay-icon span {
-    margin-left: 10px;
+    white-space: nowrap;
+    padding: .35em;
 }
 
-.overlay-icon:not(:first-child) {
-    border-top: 1px solid #fff;
+.overlay-icon:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
-.overlay-icon .icon {
-    width: 2em;
-    height: 2em;
+.overlay-icon:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
-.deals-icon {
-    background-image: url('../../img/icons/Sale.svg');
+.overlay-icon:not(:last-child) {
+    border-bottom: 1px solid #fff;
 }
 
-.popular-icon {
-    background-image: url('../../img/icons/Most\ Popular.svg')
-}
-
-.categories-icon {
-    background-image: url('../../img/icons/Categories.svg');
-}
-
-.blogs-icon {
-    background-image: url('../../img/icons/Blogs.svg');
+.overlay-icon img {
+    width: 1.75em;
+    height: 1.75em;
+    margin: .35em;
 }
 
 /* side nav */
 ul li a {
     color: black;
+}
+
+/* categories section */
+.categories-container {
+    border: 1px solid #202020;
+    border-radius: 2px;
+}
+
+.categories-container .row {
+    margin: 0;
+}
+
+.categories-container .row .cat-item {
+    padding: 0;
+}
+
+.categories-container .row:not(:last-child) .cat-item {
+    border-bottom: 1px solid #CECDCD;
+}
+
+.categories-container .row .cat-item:not(:last-child) {
+    border-right: 1px solid #CECDCD;
 }
