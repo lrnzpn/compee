@@ -74,12 +74,8 @@
                         <li>{{i.product.name}} {{i.product.price}}</li>
                     {% endfor %}
                 </ul>
-            </section>
         {% endfor %}
     {% endif %}
-    <!-- OPTIONAL PRODUCT GROUP DISPLAY -->
-    <section class="deals">
-        <h3>Today's Deals</h3>
     </section>
 
     <section class="popular">
@@ -94,8 +90,8 @@
         <div class="container categories-container">
             {% for cat in categories %}
                 {% if forloop.first %}<div class="row">{% endif %}
-                <a href="#" class="col-md-4 cat-item cat-item--{{forloop.counter}}">       
-                    <span>{{ cat }}</span>                    
+                <a href="#" class="col-md-4 cat-item cat-item--{{forloop.counter}} d-flex justify-content-start align-items-center">       
+                    <img src="https://via.placeholder.com/150" alt=""><span>{{ cat }}</span>                    
                 </a>
                 {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
                 {% if forloop.last %}</div>{% endif %}
@@ -110,20 +106,29 @@
     <section class="compee-blogs">
         <h3>Compee Blogs</h3>
         <div class="blog-container">
-            <div class="blog-item">
+            {% for i in '123'|make_list %}
+            <!-- placeholder -->
+            <div class="blog-item d-flex justify-content-start align-items-start">
                 <div class="blog-img">
-                    <img src="" alt="">
+                    <img src="https://via.placeholder.com/300x150" alt="">
                 </div>
-                <div class="blog-details">
+                <div class="blog-details d-flex flex-column justify-content-between">
                     <div class="blog-header">
-                        <span class="blog-title"></span>
-                        <span class="blog-author"></span>
+                        <span class="blog-title">Lorem Ipsum</span>
+                        <span class="blog-author">by Lorem & Ipsum</span>
                     </div>
-                    <div class="blog-published">
-                        <span></span>
-                        <a href="" class="btn-blue">Read Post</a>
+                    <div class="blog-published d-flex justify-content-between align-items-center">
+                        <span>06 Oct 2020</span>
+                        <a href="" class="btn btn-navy">Read Post</a>
                     </div>
                 </div>
+            </div>
+            {% endfor %}
+            <div class="read-more d-flex justify-content-center align-items-center">
+                <a href="#" class="btn btn-navy d-flex justify-content-center align-items-center">
+                    <span>Read More</span>
+                    <div class="share icon"></div>
+                </a>
             </div>
         </div>
     </section>
