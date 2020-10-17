@@ -9,7 +9,7 @@ class UserRegisterForm(UserCreationForm):
     first_name = forms.CharField(label="First Name", max_length=150)
     last_name = forms.CharField(label="Last Name", max_length=150)
     password1 = forms.CharField(label="Password", widget=forms.TextInput(attrs={'type':'password'}))
-    password2 = forms.CharField(label="Confirm Password", widget=forms.TextInput(attrs={'type':'password'}))
+    password2 = forms.CharField(label="Password Confirmation", widget=forms.TextInput(attrs={'type':'password'}))
 
     class Meta:
         model = User
