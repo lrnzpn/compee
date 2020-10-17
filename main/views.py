@@ -1,34 +1,27 @@
+import decimal
+from xhtml2pdf import pisa
+from django.db.models import Q
+from django.utils import timezone
+from django.http import HttpResponse
+from django.template.loader import get_template
+from admins.funcs import updateVendorStatus, get_ref_id
 from django.shortcuts import render, get_object_or_404, reverse, redirect
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView, CreateView, DetailView, UpdateView, DeleteView)
+from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User
-from admins.models import (
-    Product, ProductCategory, Category, Service, ServiceCategory, ServiceItem, ServiceItemCategory,
-    ProductReview, ServiceReview, VendorShipping ) 
-from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
-from .models import WishlistItem, CartItem, SiteOrder, OrderItem
 from taggit.models import Tag
-from django.db.models import Q
-from django.http import HttpResponse
-from django.contrib import messages
-from django.utils import timezone
-import decimal
-from admins.funcs import updateVendorStatus, get_ref_id
-
-def Home(request):
-    categories = Category.objects.all()
-
-    context = {
-        'categories' : categories
-    }
-    return render(request, 'main/pages/home.html', context)
-
-def About(request):
-    return render(request, 'main/pages/about.html')
-
-def Contact(request):
-    return render(request, 'main/pages/contact.html')
+from .forms import RenewalForm
+from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
+from .models import (
+    WishlistItem, CartItem, SiteOrder, OrderItem, CompeeCaresRenewal)
+from admins.models import (
+    Product, ProductCategory, Category, Service, ServiceCategory, ServiceItem, 
+    ServiceItemCategory, ProductReview, ServiceReview, VendorShipping, 
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
+) 
 
 def SearchBar(request):
     if request.method == 'GET':
@@ -58,6 +51,66 @@ def SearchBar(request):
         if vendors:
             context.update({'vendors':list(set(vendors))})
         return render(request, 'main/filters/search_result.html', context )
+
+def Home(request):
+    categories = Category.objects.all()
+    context = {
+        'categories' : categories
+    }
+    q_groups = DisplayGroup.objects.filter(enabled=True)
+    if q_groups:
+        groups = []
+        for i in q_groups:
+            products = ProductGroup.objects.filter(group=i)
+            group = {
+                'title':i.title,
+                'products':products
+            }
+            groups.append(group)
+        context.update({'groups':groups})
+    return render(request, 'main/pages/home.html', context)
+
+def About(request):
+    context = {
+        'title': 'About Us'
+    }
+    return render(request, 'main/pages/about.html', context)
+
+def Contact(request):
+    context = {
+        'title': 'Contact Us'
+    }
+    return render(request, 'main/pages/contact.html', context)
+
+def CompeeConcierge(request):
+    context = {
+        'title': 'Compee Concierge'
+    }
+    return render(request, 'main/pages/concierge/concierge.html', context)
+
+def CompeeCares(request):
+    context = {
+        'title': 'Compee Cares'
+    }
+    return render(request, 'main/pages/cares.html', context)
+
+class ProductGuideListView(ListView):
+    model = ProductGuide
+    context_object_name = 'posts'
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideListView, self).get_context_data(**kwargs)
+        context['title'] = "Compee PH | Product Guides"
+        return context
+
+class ProductGuideDetailView(DetailView):
+    model = ProductGuide
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductGuideDetailView, self).get_context_data(**kwargs)
+        context['title'] = f'Product Guides | {self.object.title}'
+        return context
 
 def TagProductsListView(request, name):
     tag = get_object_or_404(Tag, name=name)
@@ -89,7 +142,6 @@ def CategoryProductsListView(request, name):
             product_cats = product_cats.exclude(product=p.product)
     service_cats = ServiceCategory.objects.filter(category=category)
     service_item_cats = ServiceItemCategory.objects.filter(category=category)
-
 
     products = []
     for i in product_cats:
@@ -283,6 +335,43 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
             return reverse('wishlist')
 
 @login_required
+def ShareWishlist(request):
+    if request.method == "POST":
+        data = request.POST
+        request.session['note'] = data['w-message']
+        return redirect('share-wishlist-pdf')
+    context = {
+        'title': "Compee | Share Wishlist"
+    }
+    return render(request, 'main/user/wishlist/share_wishlist.html', context)
+    
+@login_required
+def wishlist_render_pdf_view(request):
+    user = User.objects.get(username=request.user)
+    items = WishlistItem.objects.filter(user=user)
+    context = {
+        'items': items,
+        'user':user.username
+    }
+    if 'note' in request.session.keys():
+        note = request.session.get('note')
+        del request.session['note']
+        context.update({'note':note})
+
+    response = HttpResponse(content_type='application/pdf')
+    #if download:
+    # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    #if display:
+    response['Content-Disposition'] = f'filename="{request.user}_wishlist.pdf"'
+    template = get_template('main/user/wishlist/user_wishlist.html')
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+@login_required
 def AddToCart(request):
     p_id = request.GET.get('id')
     p_type = request.GET.get('type')
@@ -452,6 +541,33 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             messages.success(self.request, 'Item has been removed from your cart')
             return reverse('cart')
 
+@login_required
+def CompeeCaresForm(request):
+    items = CartItem.objects.filter(user=request.user,service__isnull=True )
+    if items:
+        if request.method == "POST":
+            for i in request.POST:
+                if i != "csrfmiddlewaretoken":
+                    item_id = int(i[6:])
+                    item = items.get(id=item_id)
+                    item.c_cares = True
+                    item.save()
+                    items = items.exclude(id=item_id)
+            for i in items:
+                i.c_cares = False
+                i.save()
+            return redirect('checkout')
+            
+        context = {
+            'title': "Checkout | Compee Cares",
+            'items':items
+        }
+
+        return render(request, 'main/orders/compee_cares.html', context)
+    else:
+        return reverse('home')
+        
+
 class Checkout(LoginRequiredMixin, CreateView):
     model = SiteOrder
     fields = ['contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
@@ -459,7 +575,13 @@ class Checkout(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super(Checkout, self).get_context_data(**kwargs)
         context['title'] = "Checkout"
-        context['items'] = CartItem.objects.filter(user=self.request.user)
+        items = CartItem.objects.filter(user=self.request.user)
+        context['items'] = items
+        items = items.filter(c_cares=True)
+        if items:
+            context['cc_total'] = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            context['cc_count'] = len(items)
+
         vendors = []
         providers = []
         fees = []                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
@@ -499,8 +621,10 @@ class Checkout(LoginRequiredMixin, CreateView):
             }
             product = {
                 'product_id': None,
-                'quantity': 0
+                'quantity': 0,
+                'c_cares': False
             }
+            c_cares = CompeeCaresRate.objects.all().first().rate
 
             if i.product:
                 vendor = i.product.vendor.vendor_id
@@ -508,16 +632,25 @@ class Checkout(LoginRequiredMixin, CreateView):
                     order['vendor_id'] = vendor
                     product['product_id'] = i.product.product_id
                     product['quantity'] = i.quantity
+                    product['c_cares'] = i.c_cares
                     order['items'] = [product]
-                    order['total'] = i.product.price * decimal.Decimal(i.quantity)
+                    if i.c_cares == True:
+                        order['total'] = i.product.price * decimal.Decimal(i.quantity) + c_cares
+                    else:
+                        order['total'] = i.product.price * decimal.Decimal(i.quantity)
                     order_list.append(order)
                 else:
                     for d in order_list:
                         if d['vendor_id'] == vendor:
                             product['product_id'] = i.product.product_id
                             product['quantity'] = i.quantity
+                            product['c_cares'] = i.c_cares
                             d['items'].append(product)
                             d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
+                            if i.c_cares == True:
+                                d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity) + c_cares
+                            else:
+                                d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
             else:
                 provider = i.service.provider.provider_id
                 if service_order_list == [] or not any(d['vendor_id'] == provider for d in service_order_list):
@@ -566,7 +699,7 @@ class Checkout(LoginRequiredMixin, CreateView):
 
                     for i in d['items']:
                         prod = Product.objects.get(product_id=i['product_id'])
-                        item = OrderItem(order=order, product=prod, quantity=i['quantity'])
+                        item = OrderItem(order=order, product=prod, quantity=i['quantity'], c_cares=i['c_cares'])
                         item.save()
                         c_item = CartItem.objects.get(product=prod, user=self.request.user)
                         c_item.delete()
@@ -589,9 +722,9 @@ class Checkout(LoginRequiredMixin, CreateView):
                 order.save()
                 for i in d['items']:
                     serv = Service.objects.get(service_id=i['product_id'])
-                    item = OrderItem(order=order, service=serv, quantity=i['quantity'])
+                    item = OrderItem(order=order, service=serv, quantity=i['quantity'], c_cares=i['c_cares'])
                     item.save()
-                    c_item = CartItem.objects.get(serivce=serv, user=self.request.user)
+                    c_item = CartItem.objects.get(service=serv, user=self.request.user)
                     c_item.delete()
         else:
             first = True
@@ -622,7 +755,7 @@ class Checkout(LoginRequiredMixin, CreateView):
 
                     for i in d['items']:
                         serv = Service.objects.get(service_id=i['product_id'])
-                        item = OrderItem(order=order, service=serv, quantity=i['quantity'])
+                        item = OrderItem(order=order, service=serv, quantity=i['quantity'],c_cares=i['c_cares'])
                         item.save()
                         c_item = CartItem.objects.get(serivce=serv, user=self.request.user)
                         c_item.delete()
@@ -633,7 +766,7 @@ class Checkout(LoginRequiredMixin, CreateView):
         items = CartItem.objects.filter(user=self.request.user)
         for i in items:
             if i.product:
-                item = OrderItem(order=self.object, product=i.product, quantity=i.quantity)
+                item = OrderItem(order=self.object, product=i.product, quantity=i.quantity,c_cares=i.c_cares)
             else:
                 item = OrderItem(order=self.object, service=i.service, quantity=i.quantity)
             item.save()
@@ -661,6 +794,47 @@ class OrderListView(LoginRequiredMixin, ListView):
             context['orders'] = orders
             context['items'] = items
         return context
+
+class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = SiteOrder
+
+    def test_func(self):
+        order = SiteOrder.objects.get(order_id = self.kwargs['pk'])
+        return order.user == self.request.user
+    
+    def get_context_data(self, **kwargs):
+        context = super(OrderDetailView, self).get_context_data(**kwargs)
+        context['title'] = 'Order Details'
+        items = OrderItem.objects.filter(order=self.object)
+        context['items'] = items
+        if items.filter(c_cares=True).exists():
+            context['cares'] = True
+            d1 = self.object.date_placed
+            d2 = timezone.now()
+            context['days'] = abs((d2-d1).days)
+        return context
+
+@login_required
+def RequestRenewal(request,pk):
+    order = SiteOrder.objects.get(ref_id=pk)
+    if order.user == request.user:
+        if request.method == "POST":
+            form = RenewalForm(order,request.POST)
+            if form.is_valid():
+                form.instance.order = order
+                form.save()
+                messages.success(request, 'Your request for renewal has been sent.')
+                return redirect('home')
+        else:
+            form = RenewalForm(order)
+
+        context={
+            'title':'Request Renewal',
+            'form':form
+        }
+        return render(request, 'main/orders/cc_renewal.html', context)
+    else:
+        return reverse('home')
 
 class CancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = SiteOrder

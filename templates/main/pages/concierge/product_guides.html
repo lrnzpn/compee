@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Product Guide Posts</h1>
+    {% if posts %}
+        {% for post in posts %}
+            <h2><a href="{% url 'product-guide' post.slug %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+        {% endfor %}
+    {% else %}
+        <p>There are no posts to display!</p>
+    {% endif %}
+{% endblock content %}

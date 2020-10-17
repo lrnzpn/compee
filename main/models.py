@@ -21,6 +21,7 @@ class CartItem(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     date_added = models.DateTimeField(default=timezone.now)
     quantity = models.PositiveIntegerField(default=1)
+    c_cares = models.BooleanField(default=False)
 
 STATUS_CHOICES = (
     ('Received','Received'),
@@ -63,3 +64,22 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.PositiveIntegerField(default=1)
+    c_cares = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.product.name}'
+
+RENEWAL_STATUS_CHOICES = (
+    ('Unresolved','Unresolved'),
+    ('Resolved', 'Resolved')
+)
+
+class CompeeCaresRenewal(models.Model):
+    id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(SiteOrder, on_delete=models.CASCADE)
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE)
+    notes = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=RENEWAL_STATUS_CHOICES, default = ('Unresolved'))
+
+    def __str__(self):
+        return f'{self.user.username} - {self.order_item.product.name}'

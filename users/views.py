@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView
+from admins.funcs import unique_store_slug_generator
+from .models import Vendor, ServiceProvider
 from .forms import (
     UserRegisterForm, UserUpdateForm, PasswordResetForm, 
     ProviderUpdateForm, VendorUpdateForm, AdminForm
 )
-from .models import Vendor, ServiceProvider
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from admins.funcs import unique_store_slug_generator
 
 def Register(request): 
     if request.user.is_authenticated:

@@ -4,16 +4,26 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Vendor, ServiceProvider
 
 class UserRegisterForm(UserCreationForm):
+<<<<<<< HEAD
     email = forms.EmailField()
     username = forms.CharField(max_length=150)
     first_name = forms.CharField(max_length=150)
     last_name = forms.CharField(max_length=150)
     password1 = forms.CharField(widget=forms.TextInput(attrs={'type':'password'}))
     password2 = forms.CharField(widget=forms.TextInput(attrs={'type':'password'}))
+=======
+    email = forms.EmailField(label="Email")
+    username = forms.CharField(label="Username", max_length=150)
+    first_name = forms.CharField(label="First Name", max_length=150)
+    last_name = forms.CharField(label="Last Name", max_length=150)
+    password1 = forms.CharField(label="Password", widget=forms.TextInput(attrs={'type':'password'}))
+    password2 = forms.CharField(label="Confirm Password", widget=forms.TextInput(attrs={'type':'password'}))
+>>>>>>> b9cc30669ccb0db717c2f295e3b63f69ef36ae9a
 
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+<<<<<<< HEAD
         labels  = {
             'email': 'Email',
             'username':'Username',
@@ -22,11 +32,18 @@ class UserRegisterForm(UserCreationForm):
             'password1': 'Password',
             'password2':'Password confirm'
         }
+=======
+>>>>>>> b9cc30669ccb0db717c2f295e3b63f69ef36ae9a
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
+<<<<<<< HEAD
+=======
+        
+
+>>>>>>> b9cc30669ccb0db717c2f295e3b63f69ef36ae9a
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()

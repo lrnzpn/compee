@@ -2,26 +2,26 @@
 {% extends "base.html" %}
 {% load static %}
 {% block stylesheets %}
-<link rel="stylesheet" href="{% static 'css/styles/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/users.css' %}">
 {% endblock stylesheets %}
 {% load crispy_forms_tags %}
 {% block content %}
         <div class = "content-section">
-            <legend class = "col-mb-4">Welcome to Compee! Please login.</legend>
+            <legend class = "d-flex justify-content-center align-items-center">Welcome to Compee! Please login.</legend>
             <div class="login-container">
             <form method = "POST">
                 {% csrf_token %}
                 <fieldset class = "form-group">
                         {{ form|crispy }}
                 </fieldset>
-                <div class="form-group">
+                <div class="form-group d-flex justify-content-center align-content-center">
                     <button class = "btn btn-blue" type = "submit">Login</button>
                 </div>
             </form>
             </div>
                 <div>
                 <small class = "text-muted">
-                    New Member? <a class = "ml-2" href="{% url 'register' %}">Register</a> here.
+                    <span>New Member? <a href="{% url 'register' %}">Register</a> here.</span>
                 </small>
                 </div>
                 <small class = "text-muted">

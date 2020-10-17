@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import (
     Product, ServiceItem, Service,
     Category, ProductCategory, ServiceCategory, ServiceItemCategory,
-    ProductReview, ServiceReview,
-    ShippingRate, VendorShipping
+    ProductReview, ServiceReview, ShippingRate, VendorShipping, 
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
 )
 
 admin.site.register(Product)
@@ -17,3 +17,7 @@ admin.site.register(ProductReview)
 admin.site.register(ServiceReview)
 admin.site.register(ShippingRate)
 admin.site.register(VendorShipping)
+admin.site.register(CompeeCaresRate)
+admin.site.register(ProductGuide)
+admin.site.register(DisplayGroup)
+admin.site.register(ProductGroup)

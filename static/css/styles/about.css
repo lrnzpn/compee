@@ -3,18 +3,23 @@
 }
 
 p {
-    font-size: 18px;
-    line-height: 26px;
-    width: 80%;
     text-align: justify;
+    width: 85%;
+}
+
+@media screen and (max-width: 991px) {
+    p {
+        width: 100%;
+    }
 }
 
 h3 {
     padding: 10px 0
 }
+
 .about-logo {
     width: auto;
     height: 350px;
-    margin-top: 50px;
-   
+    margin-top: 2em;
+
 }

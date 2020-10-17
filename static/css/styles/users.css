@@ -1,11 +1,10 @@
 .content-section {
     margin: auto;
     width: 50%;
-    padding-top: 30px;
+    padding: 2em 0;
 }
 
 legend {
-    padding: 15px 0;
     font-weight: bold;
     text-align: center;
 }
@@ -17,9 +16,7 @@ legend {
 }
 
 .form-group button {
-    width: 50%;
-    margin-left: 25%;
-    margin-right: 25%;
+    width: 200px;
 }
 
 .text-muted {

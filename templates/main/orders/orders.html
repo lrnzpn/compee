@@ -7,9 +7,7 @@
                 <th>Items</th>
                 <th>Total</th>
                 <th>Status</th>
-                <th>Date Placed</th>
                 <th>Payment Method</th>
-                <th>Delivered to</th>
             </thead>
             <tbody>
                 {% for order in orders %}
@@ -32,9 +30,8 @@
                         </td>
                         <td>{{ order.total }}</td>
                         <td>{{ order.status }}</td>
-                        <td>{{ order.date_placed }}</td>
                         <td>{{ order.payment_method }}</td>
-                        <td>{{ order.address_line }}, {{ order.city }}, {{ order.state }} {{ order.zip_code }}</td>
+                        <td><a href="{% url 'order-detail-main' order.order_id %}">Details</a></td>
                         {% if order.status == "Received" %}
                             <td><a href="{% url 'add-review' order.order_id %}">Add Review</a></td>
                         {% elif order.status == "Payment Pending" %}

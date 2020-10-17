@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <h3>Product Display Groups</h3>
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">New Display Group</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-info" type = "submit">Create</button>
+            </div>
+        </form>
+    </div>
+    {% if groups %}
+        <div class='content-section'>
+            <table>
+                <tr>
+                    <td>Title</td>
+                    <td>Status</td>
+                </tr>
+                {% for g in groups %}
+                <tr>
+                    <td>{{ g.title }}</td>
+                    <td>
+                        {% if g.enabled == True %}
+                            Enabled
+                        {% else %}
+                            Disabled
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'edit-products' g.id %}">Assigned Products</a></td>
+                    <td><a href="{% url 'display-group-edit' g.id %}">Edit</a></td>
+                    <td><a href="{% url 'display-group-delete' g.id %}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <p>There are no groups to display.</p>
+    {% endif %}
+{% endblock content %}
