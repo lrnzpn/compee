@@ -157,7 +157,7 @@ footer {
 }
 
 .footer-content {
-    padding: 2.5% 0;
+    padding: 2.5% 0 !important;
 }
 
 .footer-content>div>span {
