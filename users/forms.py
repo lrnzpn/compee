@@ -5,9 +5,28 @@ from .models import Vendor, ServiceProvider
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
+    username = forms.CharField(max_length=150)
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'type':'password'}))
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'type':'password'}))
+
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+        labels  = {
+            'email': 'Email',
+            'username':'Username',
+            'first_name':'First Name',
+            'last_name':'Last Name', 
+            'password1': 'Password',
+            'password2':'Password confirm'
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()

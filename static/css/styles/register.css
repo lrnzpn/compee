@@ -1,0 +1,29 @@
+.content-section {
+    margin: auto;
+    width: 50%;
+    padding-top: 30px;
+}
+
+legend {
+    padding: 15px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.login-container {
+    border: 2px solid #000000;
+    border-radius: 5px;
+    padding: 50px 50px;
+}
+
+.form-group button {
+    width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+}
+
+.text-muted {
+    padding-top: 2.5%;
+    display: flex;
+    justify-content: center;
+}

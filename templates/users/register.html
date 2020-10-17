@@ -1,21 +1,40 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/register.css' %}">
+{% endblock stylesheets %}
+
 {% load crispy_forms_tags %}
 {% block content %}
     <div class = "content-section">
+        <legend class = "col-mb-4">Create your Compee Account</legend>
+        <div class="login-container">
         <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Join Today</legend>
-                {{ form|crispy }}
+                {{ form.email.label}}
+                {{ form.email }}
+                {{ form.username.label}}
+                {{ form.username }}
+                {{ form.first_name.label}}
+                {{ form.first_name }}
+                {{ form.last_name.label }}
+                {{ form.last_name }}
+                {{ form.password1.label }}
+                {{ form.password1 }}
+                {{ form.password2.label }}
+                {{ form.password2 }}
             </fieldset>
             <div class="form-group">
-                <button class = "btn btn-outline-info" type = "submit">Sign Up</button>
+                <button class = "btn btn-blue" type = "submit">Sign Up</button>
             </div>
         </form>
-        <div class = "border-top pt-3">
-            <small class = "text-muted">
-                Already have an account? <a class = "ml-2" href="{% url 'login' %}">Sign In</a>
-            </small>
+            <div>
+             <small class = "text-muted">
+                    Already a member? <a class = "ml-2" href="{% url 'login' %}">Login</a> here
+             </small>
+            </div>
         </div>
     </div>
 {% endblock content %}
