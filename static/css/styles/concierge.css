@@ -16,6 +16,10 @@
     margin: 0 20px;
 }
 
+h3 {
+    padding: 10px 0;
+}
+
 /* blog posts */
 .blog-item {
     height: 150px;
@@ -56,3 +60,37 @@
 .blog-published {
     width: 100%;
 }
+
+/* fqa */
+.question-item {
+    height: 150px;
+    width: 100%;
+    border-bottom: 1px solid #202020;
+    padding: 10px 0;
+}
+
+.question-details {
+    height: 100%;
+    width: 100%;
+
+}
+
+.question-header {
+    display: block;
+}
+
+.question-header .question-title {
+    font-weight: 500;
+    line-height: 24px;
+    color: #000000;
+
+}
+
+.question-content {
+    font-size: 0.8em;
+}
+
+.question-content {
+    width: 100%;
+}
+
