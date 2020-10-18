@@ -37,7 +37,7 @@ def ManageProvider(request):
     if request.user.groups.filter(name='Provider').exists():
         user = ServiceProvider.objects.get(user = request.user)
         if request.method == "POST":
-            p_form = ProviderUpdateForm(request.POST, instance=user)
+            p_form = ProviderUpdateForm(request.POST, request.FILES, instance=user)
             if p_form.is_valid():
                 p_form.instance.slug = unique_store_slug_generator(p_form.instance)
                 p_form.save()
@@ -59,7 +59,7 @@ def ManageVendor(request):
     if request.user.groups.filter(name='Vendor').exists():
         user = Vendor.objects.get(user = request.user)
         if request.method == "POST":
-            s_form = VendorUpdateForm(request.POST, instance=user)
+            s_form = VendorUpdateForm(request.POST, request.FILES,instance=user)
             if s_form.is_valid():
                 s_form.instance.slug = unique_store_slug_generator(s_form.instance)
                 s_form.save()

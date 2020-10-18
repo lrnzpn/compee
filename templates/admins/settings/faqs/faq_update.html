@@ -3,13 +3,10 @@
 {% block content %}
     {%include 'admins/partials/_dashboard_nav.html' %}
     <div class = "content-section">
-        <div class="media">
-            <img src="{{ object.image.url }}" width="200px" height="200px">
-        </div>
-        <form method = "POST" enctype = "multipart/form-data">
+        <form method = "POST">
             {% csrf_token %}
             <fieldset class = "form-group">
-                <legend class = "border-bottom mb-4">Update Category</legend>
+                <legend class = "border-bottom mb-4">Update Post</legend>
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">

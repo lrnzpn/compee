@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="{% url 'compee-concierge' %}" class='btn btn-primary'>Back to Concierge</a>
-    <h1>Product Guide Posts</h1>
-    
-    {% if posts %}
-        {% for post in posts %}
+    <a href="{% url 'compee-concierge' %}" class='btn btn-primary'>Back to Concierge</a>
+    <h1>Frequently Asked Questions</h1>
+    {% if faqs %}
+        {% for post in faqs %}
             <h2><a href="{% url 'product-guide' post.slug %}">{{ post.title }}</a></h2>
             <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
         {% endfor %}

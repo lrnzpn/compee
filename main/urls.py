@@ -13,7 +13,13 @@ urlpatterns = [
         template_name='main/pages/concierge/product_guides.html'), name='product-guides-main'),
     path('product-guides/post/<str:slug>', v.ProductGuideDetailView.as_view(
         template_name='main/pages/concierge/product_guide.html'), name='product-guide'),
+    path('faqs/', v.FaqListView.as_view(
+        template_name='main/pages/concierge/faqs.html'), name='faqs-main'),
+    path('faqs/post/<str:slug>', v.FaqDetailView.as_view(
+        template_name='main/pages/concierge/faq.html'), name='faq-guide'),
 
+    path('categories/', v.CategoryListView.as_view(
+        template_name='main/filters/categories.html'), name='all-categories'),
     path('tag/<str:name>/', v.TagProductsListView, name='tag-filter'),
     path('category/<str:name>/', v.CategoryProductsListView, name='category-filter'),
     path('compare-prices/<str:name>/', v.PriceComparison, name='compare-price'),
@@ -50,7 +56,7 @@ urlpatterns = [
     path('cart/<int:pk>/edit/', v.CartItemUpdateView.as_view(
         template_name='main/user/cart/cart_edit_item.html'), name='cart-edit'),
     
-    path('checkout/compee-cares/', v.CompeeCaresForm, name='compee-cares'),
+    path('checkout/compee-cares/', v.CompeeCaresForm, name='checkout-compee-cares'),
     path('checkout/', v.Checkout.as_view(
         template_name='main/orders/checkout.html'), name='checkout'),
     path('my-orders', v.OrderListView.as_view(

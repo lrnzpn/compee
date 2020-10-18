@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <a href="{% url 'faq-create' %}" class="btn btn-primary">Add New Post</a>
+    <h1>FAQ Posts</h1>
+    {% if faqs %}
+        {% for faq in faqs %}
+            <h2><a href="{% url 'faq-detail' faq.id %}">{{ faq.title }}</a></h2>
+            <p>{{ faq.content|safe|truncatewords:"30"|linebreaks }}</p>
+        {% endfor %}
+    {% else %}
+        <p>There are no faq posts to display!</p>
+    {% endif %}
+{% endblock content %}
