@@ -1,0 +1,13 @@
+/* cat nav */
+
+.category-nav {
+    color: #159ABD;
+}
+
+.category-nav a:last-child {
+    color: #159ABD;
+}
+
+.category-nav a:not(:last-child) {
+    color: #CECDCD;
+}
