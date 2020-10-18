@@ -1,5 +1,62 @@
 {% extends "base.html" %}
+
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/concierge.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    <h1>Compee Concierge Page</h1>
-    <a class="btn btn-primary" href="{% url 'product-guides-main' %}">Product Guides</a>
+
+<div class="jumbotron compee-concierge">
+    <div class="content d-flex justify-content-center align-items-center">
+        <img src="/static/img/icons/Compee Cares Logo.svg" class="img-fluid">
+        <h1>Compee Concierge</h1>
+    </div>
+</div>
+
+<a class="btn btn-primary" href="{% url 'product-guides-main' %}">Product Guides</a>
+
+<section class="compee-blogs">
+        <h3>Compee Blogs</h3>
+        <div class="blog-container">
+            {% for i in '123'|make_list %}
+            <!-- placeholder -->
+            <div class="blog-item d-flex justify-content-start align-items-start">
+                <div class="blog-img">
+                    <img src="https://via.placeholder.com/300x150" alt="">
+                </div>
+                <div class="blog-details d-flex flex-column justify-content-between">
+                    <div class="blog-header">
+                        <span class="blog-title">Lorem Ipsum</span>
+                        <span class="blog-author">by Lorem & Ipsum</span>
+                    </div>
+                    <div class="blog-published d-flex justify-content-between align-items-center">
+                        <span>06 Oct 2020</span>
+                        <a href="" class="btn btn-navy">Read Post</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+</section>
+<hr>
+<section class="compee-fqa">
+    <h3>Frequently Asked Questions</h3>
+    <div class="question-container">
+        {% for i in '123'|make_list %}
+        <div class="question-item d-flex justify-content-start align-items-start">
+            <div class="question-header">
+                <span class="question-title">Lorem Ipsum</span>
+                <button class="open" data-toggle="collapse" data-target="#content">Click</button>
+            </div>
+            <div id="content" class="collapse">
+                <div class="question-content">
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi aspernatur necessitatibus ipsum voluptatem libero porro ex temporibus rem in! A ipsam nostrum ratione! Ab eos minus rem voluptatum vel quos.</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</section>
 {% endblock content %}
