@@ -1,0 +1,17 @@
+.jumbotron {
+    background-color: #005F7B;
+    
+}
+.compee-cares {
+    width: 100%;
+}
+
+.content h1 {
+    color: #ffffff;
+    font-size: 75px;
+}
+
+.content .img-fluid {
+    width: 15%;
+    margin: 0 20px;
+}
