@@ -1,0 +1,31 @@
+.content-section {
+    margin: auto;
+    
+    padding-top: 30px;
+}
+
+legend {
+    padding: 15px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.login-container {
+    border: 2px solid #000000;
+    border-radius: 5px;
+    padding: 50px 50px;
+    
+}
+
+
+.text-muted {
+    padding-top: 2.5%;
+    display: flex;
+    justify-content: center;
+}
+
+.password span {
+    font-size: .8em;
+    display: block;
+}
+
