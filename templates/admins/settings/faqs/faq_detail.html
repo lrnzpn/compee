@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    {%include 'admins/partials/_dashboard_nav.html' %}
+    <div class="content-section">
+        <h5><strong>{{ object.title }}</strong></h5>
+        <p>{{object.content|linebreaks}}</p>
+        <a href="{% url 'faq-update' object.id %}" class="btn btn-primary">Edit Post</a>
+        <a href="{% url 'faq-delete' object.id  %}" class="btn btn-danger">Delete Post</a>
+    </div>
+{% endblock content %}

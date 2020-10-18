@@ -78,9 +78,18 @@ class Service(models.Model):
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
+    image = models.ImageField(default='default.jpg', upload_to='cat_pics')
 
     def __str__(self):
         return f'{self.name}' 
+
+    def save(self):
+        super().save()
+        img = Image.open(self.image.path)
+        if img.height > 300 or img.width > 300:
+            output_size = (300,300)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
 
 class ProductCategory(models.Model):
     id = models.AutoField(primary_key=True)
@@ -203,5 +212,19 @@ class ProductGroup(models.Model):
 
     def __str__(self):
         return f'{self.group.title } - {self.product.name}'
+
+class Faq(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    slug = models.SlugField(unique=True, max_length=100)
+
+    def __str__(self):
+        return f'{self.title}'
+    
+class Banner(models.Model):
+    image = models.ImageField(default='default.jpg', upload_to='banner_pics')
+
+
 
 

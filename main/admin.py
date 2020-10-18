@@ -7,3 +7,5 @@ admin.site.register(PaymentMethod)
 admin.site.register(SiteOrder)
 admin.site.register(OrderItem)
 admin.site.register(CompeeCaresRenewal)
+
+

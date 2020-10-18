@@ -7,7 +7,7 @@
 
 {% block content %}
     <p class="category-nav">
-        <a href="">Home</a> > <a href="">Categories</a> > <a href="">{{category.name}}</a>
+        <a href="">Home</a> > <a href="{% url 'all-categories' %}">Categories</a> > <a href="">{{category.name}}</a>
     </p>
 
     <div class="row">

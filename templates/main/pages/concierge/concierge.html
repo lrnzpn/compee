@@ -1,5 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Compee Concierge Page</h1>
-    <a class="btn btn-primary" href="{% url 'product-guides-main' %}">Product Guides</a>
+    <h3>Product Guides</h3>
+    {% if guides %}
+        {% for post in guides %}
+            <h2><a href="{% url 'product-guide' post.slug %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+        {% endfor %}
+        <a class="btn btn-primary" href="{% url 'product-guides-main' %}">See All..</a>
+    {% else %}
+        <p>There are no posts to display!</p>
+    {% endif %}
+
+    <h3>Frequently Asked Questions</h3>
+    {% if faqs %}
+        {% for post in faqs %}
+            <h2><a href="{% url 'faq-guide' post.slug %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+        {% endfor %}
+        <a class="btn btn-primary" href="{% url 'faqs-main' %}">See All..</a>
+    {% else %}
+        <p>There are no posts to display!</p>
+    {% endif %}
 {% endblock content %}

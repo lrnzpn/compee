@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-section">
+        <h2>All Categories</h2>
+        {% for cat in categories %}
+            <img src="{{ cat.image.url }}" width="100%" height="200px">
+            <a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a>
+        {% endfor %}
+    </div>
+{% endblock content %}

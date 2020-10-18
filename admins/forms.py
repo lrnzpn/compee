@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from .models import (
     Product, Category, ProductCategory, 
     Service, ServiceCategory,
-    ServiceItem, ServiceItemCategory
+    ServiceItem, ServiceItemCategory, 
+    Banner
 )
 
 class ProductCreateForm(forms.ModelForm):
@@ -45,3 +46,7 @@ class AssignItemCategoryForm(forms.ModelForm):
         model = ServiceItemCategory
         fields = ['category']
 
+class EditBannerForm(forms.ModelForm):
+    class Meta:
+        model = Banner
+        fields = ['image']
