@@ -157,7 +157,7 @@ footer {
 }
 
 .footer-content {
-    padding: 2.5% 0;
+    padding: 2.5% 0 !important;
 }
 
 .footer-content>div>span {
@@ -206,4 +206,14 @@ footer {
 
 .ig {
     background-image: url('../img/icons/instagram-2\ 1.svg');
+}
+
+/* navbar */
+.navbar {
+    padding: 0;
+}
+
+/* override some bootstrap styles */
+.container {
+    padding: 0px;
 }

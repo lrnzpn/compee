@@ -55,7 +55,7 @@ def SearchBar(request):
 def Home(request):
     categories = Category.objects.all()
     context = {
-        'categories' : categories
+        'categories' : categories,
     }
     q_groups = DisplayGroup.objects.filter(enabled=True)
     if q_groups:
