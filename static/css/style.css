@@ -217,3 +217,8 @@ footer {
 .container {
     padding: 0px;
 }
+
+/* search filter */
+.search-filter {
+    top: 150px;
+}

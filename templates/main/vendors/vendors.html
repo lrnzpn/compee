@@ -1,24 +1,47 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    <h2>Vendor List</h2>
     <div class="row">
-        {%include 'main/partials/_categories.html' %}
-        {% for vendor in vendors %}
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <img src="{{ vendor.image.url }}" width="100%" height="200px">
-                    <div class="card-body">
-                        <p class="card-text">{{ vendor.store_name }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a href="{% url 'vendor-detail-main' vendor.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
+        <div class="col-md-3">
+            <div class="search-filter sticky-top">
+                <p class="link-nav">
+                    <a href="{% url 'home' %}">Home</a> > <span>Browse Sellers</span>
+                </p>
+                <h4>Seller Categories</h4>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsam obcaecati asperiores pariatur temporibus unde consectetur recusandae reprehenderit eius animi, earum ad fugiat itaque suscipit nobis reiciendis in numquam odit atque!</p>
+                <span>
+                    Want to be a Seller?<br>Contact us!
+                </span>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h2>All Sellers</h2>
+            <span>{{vendors.count}} Total Sellers</span>
+            {% for vendor in vendors %}
+                {% if forloop.first %}<div class="row item-row">{% endif %}
+                <div class="col-md-3">
+                        <div class="card mb-4 shadow-sm">
+                            <img src="{{ vendor.image.url }}" width="100%" height="200px">
+                            <div class="card-body">
+                                <p class="card-text">{{ vendor.store_name }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a href="{% url 'vendor-detail-main' vendor.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                    </div>
+                                    <small class="text-muted">{{ vendor.user.username }}</small>
+                                </div>
                             </div>
-                            <small class="text-muted">{{ vendor.user.username }}</small>
                         </div>
                     </div>
-                </div>
-            </div>
-        {% endfor %}
+                {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
+                {% if forloop.last %}</div>{% endif %}
+            {% endfor %}
+        </div>
     </div>
     {%include 'admins/partials/_paginate.html' %}
     
