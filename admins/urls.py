@@ -126,6 +126,17 @@ urlpatterns = [
     path('product-guides/<int:pk>/delete/', v.ProductGuideDeleteView.as_view(
         template_name='admins/settings/product_guides/guide_delete.html'),name='guide-delete'),
 
+    path('faqs/', v.FaqListView.as_view(
+        template_name='admins/settings/faqs/faqs.html'),name='faqs'),
+    path('faq/new', v.FaqCreateView.as_view(
+        template_name='admins/settings/faqs/faq_create.html'),name='faq-create'),
+    path('faq/<int:pk>/detail/', v.FaqDetailView.as_view(
+        template_name='admins/settings/faqs/faq_detail.html'),name='faq-detail'),
+    path('faq/<int:pk>/update/', v.FaqUpdateView.as_view(
+        template_name='admins/settings/faqs/faq_update.html'),name='faq-update'),
+    path('faq/<int:pk>/delete/', v.FaqDeleteView.as_view(
+        template_name='admins/settings/faqs/faq_delete.html'),name='faq-delete'),
+
     path('display-groups/', v.DisplayGroupCreateView.as_view(
         template_name='admins/settings/display_groups/display_groups.html'), name='display-groups'),
     path('display-group/<int:pk>/update/', v.DisplayGroupUpdateView.as_view(
@@ -134,5 +145,9 @@ urlpatterns = [
         template_name='admins/settings/display_groups/display_group_confirm_delete.html'), name='display-group-delete'),
     
     path('display-group/<int:pk>/edit-products/', v.EditProductsInGroup, name='edit-products'),
-    path('display-group/<int:pk>/add-products/', v.AddProductsToGroup, name='add-products')
+    path('display-group/<int:pk>/add-products/', v.AddProductsToGroup, name='add-products'),
+
+    path('edit-banner/', v.EditBanner, name='edit-banner'),
+
+
 ]

@@ -1,5 +1,76 @@
 {% extends "base.html" %}
+
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/concierge.css' %}">
+{% endblock stylesheets %}
 {% block content %}
-    <h1>Compee Concierge Page</h1>
-    <a class="btn btn-primary" href="{% url 'product-guides-main' %}">Product Guides</a>
+
+<div class="jumbotron compee-concierge">
+    <div class="content d-flex justify-content-center align-items-center">
+        <img src="/static/img/icons/Compee Cares Logo.svg" class="img-fluid">
+        <h1>Compee Concierge</h1>
+    </div>
+</div>
+
+
+<h3>Product Guides</h3>
+<section class="compee-blogs">
+        <div class="blog-container">
+        {% if guides %}
+            {% for post in guides %}
+            <!-- placeholder -->
+            <div class="blog-item d-flex justify-content-start align-items-start">
+                <div class="blog-img">
+                    <img src="https://via.placeholder.com/300x150" alt="">
+                </div>
+                <div class="blog-details d-flex flex-column justify-content-between">
+                    <div class="blog-header">
+                        <h2><a href="{% url 'product-guide' post.slug %}">{{ post.title }}</a></h2>
+                        <span class="blog-author">by Lorem & Ipsum</span>
+                        <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+                    </div>
+                    <div class="blog-published d-flex justify-content-between align-items-center">
+                        <span>06 Oct 2020</span>
+                        <a href="" class="btn btn-navy">Read Post</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <a class="btn btn-primary" href="{% url 'product-guides-main' %}">See All..</a>
+        {% else %}
+            <p>There are no posts to display!</p>
+        {% endif %}
+        </div>
+</section>
+
+<hr>
+<section class="compee-fqa">
+    <h3>Frequently Asked Questions</h3>
+    <div class="question-container">
+    {% if faqs %}
+        {% for post in faqs %}
+        <div class="question-item d-flex justify-content-start align-items-center">
+            <div class="question-details">
+                <div class="question-header d-flex justify-content-between align-items-center">
+                    <h2><a class="question-title d-flex" href="{% url 'faq-guide' post.slug %}" >{{ post.title }}</a></h2>
+                    <button class="open" data-toggle="collapse" data-target="#content_{{ post.title }}">
+                        Click
+                    </button>
+                </div>
+                <div id="content_{{ post.title }}" class="collapse question-content">
+                     <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <a class="btn btn-primary" href="{% url 'faqs-main' %}">See All..</a>
+    {% else %}
+        <p>There are no posts to display!</p>
+    {% endif %}
+    </div>
+</section>
+    
+
+    
 {% endblock content %}

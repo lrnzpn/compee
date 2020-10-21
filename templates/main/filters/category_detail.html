@@ -6,8 +6,8 @@
 {% endblock stylesheets %}
 
 {% block content %}
-    <p class="link-nav">
-        <a href="{% url 'home' %}">Home</a> > <a href="">Categories</a> > <span>{{category.name}}</span>
+    <p class="category-nav">
+        <a href="">Home</a> > <a href="{% url 'all-categories' %}">Categories</a> > <a href="">{{category.name}}</a>
     </p>
 
     <div class="row">

@@ -20,7 +20,7 @@ from .models import (
 from admins.models import (
     Product, ProductCategory, Category, Service, ServiceCategory, ServiceItem, 
     ServiceItemCategory, ProductReview, ServiceReview, VendorShipping, 
-    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup, Banner, Faq
 ) 
 
 def SearchBar(request):
@@ -56,6 +56,7 @@ def Home(request):
     categories = Category.objects.all()
     context = {
         'categories' : categories,
+        'banner': Banner.objects.all().first()
     }
     q_groups = DisplayGroup.objects.filter(enabled=True)
     if q_groups:
@@ -84,7 +85,9 @@ def Contact(request):
 
 def CompeeConcierge(request):
     context = {
-        'title': 'Compee Concierge'
+        'title': 'Compee Concierge', 
+        'guides' : ProductGuide.objects.all()[:3],
+        'faqs': Faq.objects.all()[:3]
     }
     return render(request, 'main/pages/concierge/concierge.html', context)
 
@@ -101,7 +104,7 @@ class ProductGuideListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductGuideListView, self).get_context_data(**kwargs)
-        context['title'] = "Compee PH | Product Guides"
+        context['title'] = "Product Guides"
         return context
 
 class ProductGuideDetailView(DetailView):
@@ -110,6 +113,33 @@ class ProductGuideDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductGuideDetailView, self).get_context_data(**kwargs)
         context['title'] = f'Product Guides | {self.object.title}'
+        return context
+
+class FaqListView(ListView):
+    model = Faq
+    context_object_name = 'faqs'
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqListView, self).get_context_data(**kwargs)
+        context['title'] = "Frequently Asked Questions"
+        return context
+
+class FaqDetailView(DetailView):
+    model = Faq
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqDetailView, self).get_context_data(**kwargs)
+        context['title'] = f'FAQs | {self.object.title}'
+        return context
+
+class CategoryListView(ListView):
+    model = Category
+    context_object_name = 'categories'
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryListView, self).get_context_data(**kwargs)
+        context['title'] = "All Categories"
         return context
 
 def TagProductsListView(request, name):
@@ -311,7 +341,7 @@ class WishlistView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super(WishlistView, self).get_context_data(**kwargs)
-        context['title'] = "Wishlist"
+        context['title'] = self.request.user.username + "'s Wishlist"
         return context
 
 class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -341,7 +371,7 @@ def ShareWishlist(request):
         request.session['note'] = data['w-message']
         return redirect('share-wishlist-pdf')
     context = {
-        'title': "Compee | Share Wishlist"
+        'title': "Share Wishlist"
     }
     return render(request, 'main/user/wishlist/share_wishlist.html', context)
     
@@ -441,7 +471,7 @@ class CartView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CartView, self).get_context_data(**kwargs)
-        context['title'] = "Cart"
+        context['title'] = self.request.user.username + "'s Cart"
         vendors = []
         fees = []
         for i in CartItem.objects.filter(user=self.request.user):
@@ -470,7 +500,7 @@ class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(CartItemUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Edit Item"
+        context['title'] = "Edit Cart Item"
         return context
     
     def form_valid(self, form):
@@ -883,6 +913,7 @@ def AddReviewPage(request, pk):
         if order.status == "Received":
             items = OrderItem.objects.filter(order=order)
             context = {
+                'title':'Add Review',
                 'order':order,
                 'items':items,
             }

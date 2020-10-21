@@ -17,11 +17,11 @@ from main.models import (
 from .models import (
     Product, ServiceItem, Service, Category, ProductCategory, ServiceCategory, 
     ServiceItemCategory, ProductReview, ServiceReview, ShippingRate, VendorShipping,
-    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup
+    CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup, Faq, Banner
 )
 from .forms import (
     ProductCreateForm, AssignCategoryForm, ServiceCreateForm, AssignServiceCategoryForm,
-    ServiceItemCreateForm, AssignItemCategoryForm
+    ServiceItemCreateForm, AssignItemCategoryForm, EditBannerForm
 )
 from .funcs import (
     unique_product_slug_generator, unique_store_slug_generator, 
@@ -52,7 +52,7 @@ class ProviderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['services'] = Service.objects.filter(provider=self.object).order_by('-date_created')
         context['items'] = ServiceItem.objects.filter(provider=self.object).order_by('-date_created')
         provider = ServiceProvider.objects.get(provider_id=self.kwargs['pk'])
-        context['title'] = provider.store_name
+        context['title'] = "Dashboard | " + provider.store_name
         context['reviews'] = ProviderReview.objects.filter(provider=self.object)
         return context
 
@@ -66,7 +66,7 @@ class ProviderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProviderUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Provider Edit"
+        context['title'] = "Dashboard | Provider Edit"
         return context
 
     def form_valid(self, form):
@@ -76,8 +76,7 @@ class ProviderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Service Provider information updated!')
         return reverse("provider-detail", kwargs={'pk': self.object.pk})
-
-    
+   
 class ProviderDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = ServiceProvider
 
@@ -86,7 +85,7 @@ class ProviderDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(ProviderDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Provider Delete"
+        context['title'] = "Dashboard | Provider Delete"
         return context
 
     def delete(self, *args, **kwargs):
@@ -113,7 +112,7 @@ class VendorListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         status = updateVendorStatus()
         if status:
             context['reminder'] = "There are vendors that have not been assigned to a shipping rate."
-        context['title'] = "Dashboard | Vendor"
+        context['title'] = "Dashboard | Vendors"
         return context
 
 class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -126,7 +125,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context = super(VendorDetailView, self).get_context_data(**kwargs)
         vendor = Vendor.objects.get(vendor_id=self.kwargs['pk'])
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
-        context['title'] = vendor.store_name
+        context['title'] = "Dashboard | " + vendor.store_name
         context['reviews'] = VendorReview.objects.filter(vendor=self.object)
         return context
 
@@ -140,7 +139,7 @@ class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(VendorUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Vendor Edit"
+        context['title'] = "Dashboard | Vendor Edit"
         return context
 
     def form_valid(self, form):
@@ -150,7 +149,6 @@ class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Vendor information updated!')
         return reverse("vendor-detail", kwargs={'pk': self.object.pk})
-
     
 class VendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Vendor
@@ -160,7 +158,7 @@ class VendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(VendorDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Vendor Delete"
+        context['title'] = "Dashboard | Vendor Delete"
         return context
 
     def delete(self, *args, **kwargs):
@@ -178,7 +176,7 @@ class VendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def ProductCreateView(request, pk=None):
     if request.user.groups.filter(name='Admin').exists():
         if request.method == "POST":
-            p_form = ProductCreateForm(request.POST)
+            p_form = ProductCreateForm(request.POST, request.FILES)
             c_form = AssignCategoryForm(request.POST)
 
             if p_form.is_valid() and c_form.is_valid():
@@ -200,7 +198,7 @@ def ProductCreateView(request, pk=None):
         context = {
             'p_form': p_form,
             'c_form': c_form,
-            'title':'New Product',
+            'title':'Dashboard | New Product',
         }
 
         return render(request, 'admins/vendors/products/product_form.html', context)
@@ -219,7 +217,7 @@ class ProductDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
         if ProductCategory.objects.get(product=self.object):
             context['category'] = ProductCategory.objects.get(product=self.object)
-        context['title'] = self.object.name
+        context['title'] = "Dashboard | " + self.object.name
         context['reviews'] = ProductReview.objects.filter(product=self.object)
         return context
 
@@ -229,9 +227,9 @@ def ProductUpdateView(request, pk=None):
         product = Product.objects.get(product_id=pk)
         category = ProductCategory.objects.get(product=product)
         if request.method == "POST":
-            p_form = ProductCreateForm(request.POST, instance=product)
+            p_form = ProductCreateForm(request.POST,request.FILES, instance=product)
             c_form = AssignCategoryForm(request.POST, instance=category)
-
+            print(request.POST)
             if p_form.is_valid() and c_form.is_valid():
                 p_form.instance.slug = unique_product_slug_generator(p_form.instance)
                 new_prod = p_form.save()
@@ -245,7 +243,7 @@ def ProductUpdateView(request, pk=None):
         context = {
             'p_form': p_form,
             'c_form': c_form,
-            'title':'Update Product',
+            'title':'Dashboard | Update Product',
         }
 
         return render(request, 'admins/vendors/products/product_update.html', context)
@@ -260,7 +258,7 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Product Delete"
+        context['title'] = "Dashboard | Product Delete"
         return context
 
     def form_valid(self, form):
@@ -279,7 +277,7 @@ def ServiceItemCreateView(request, pk=None):
     provider = ServiceProvider.objects.get(provider_id=pk)
     if request.user.groups.filter(name='Admin').exists():
         if request.method == "POST":
-            i_form = ServiceItemCreateForm(request.POST)
+            i_form = ServiceItemCreateForm(request.POST, request.FILES)
             c_form = AssignItemCategoryForm(request.POST)
 
             if i_form.is_valid() and c_form.is_valid():
@@ -300,12 +298,11 @@ def ServiceItemCreateView(request, pk=None):
         context = {
             'i_form': i_form,
             'c_form': c_form,
-            'title':'New Service Item',
+            'title':'Dashboard | New Service Item',
         }
         return render(request, 'admins/providers/items/service_item_form.html', context)
     else:
         return redirect('home')
-
 
 class ServiceItemDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = ServiceItem
@@ -318,7 +315,7 @@ class ServiceItemDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
         context['items'] = ServiceItem.objects.filter(provider=self.object.provider).order_by('-date_created').exclude(item_id=self.object.item_id)
         if ServiceItemCategory.objects.get(service_item=self.object):
             context['category'] = ServiceItemCategory.objects.get(service_item=self.object)
-        context['title'] = self.object.name
+        context['title'] = "Dashboard | " + self.object.name
         return context
 
 @login_required
@@ -327,7 +324,7 @@ def ServiceItemUpdateView(request, pk=None):
         item = ServiceItem.objects.get(item_id=pk)
         category = ServiceItemCategory.objects.get(service_item=item)
         if request.method == "POST":
-            i_form = ServiceItemCreateForm(request.POST, instance=item)
+            i_form = ServiceItemCreateForm(request.POST, request.FILES, instance=item)
             c_form = AssignItemCategoryForm(request.POST, instance=category)
 
             if i_form.is_valid() and c_form.is_valid():
@@ -343,7 +340,7 @@ def ServiceItemUpdateView(request, pk=None):
         context = {
             'i_form': i_form,
             'c_form': c_form,
-            'title':'Update Service Item',
+            'title':'Dashboard | Update Service Item',
         }
         return render(request, 'admins/providers/items/service_item_update.html', context)
     else:
@@ -357,7 +354,7 @@ class ServiceItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
 
     def get_context_data(self, **kwargs):
         context = super(ServiceItemDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Item Delete"
+        context['title'] = "Dashboard | Item Delete"
         return context
 
     def form_valid(self, form):
@@ -376,7 +373,7 @@ def ServiceCreateView(request, pk=None):
     provider = ServiceProvider.objects.get(provider_id=pk)
     if request.user.groups.filter(name='Admin').exists():
         if request.method == "POST":
-            s_form = ServiceCreateForm(request.POST)
+            s_form = ServiceCreateForm(request.POST, request.FILES)
             c_form = AssignServiceCategoryForm(request.POST)
 
             if s_form.is_valid() and c_form.is_valid():
@@ -397,12 +394,11 @@ def ServiceCreateView(request, pk=None):
         context = {
             's_form': s_form,
             'c_form': c_form,
-            'title':'New Service',
+            'title':'Dashboard | New Service',
         }
         return render(request, 'admins/providers/services/service_form.html', context)
     else:
         return redirect('home')
-
 
 class ServiceDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Service
@@ -415,7 +411,7 @@ class ServiceDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['services'] = Service.objects.filter(provider=self.object.provider).order_by('-date_created').exclude(service_id=self.object.service_id)
         if ServiceCategory.objects.get(service=self.object):
             context['category'] = ServiceCategory.objects.get(service=self.object)
-        context['title'] = self.object.name
+        context['title'] = "Dashboard | " + self.object.name
         return context
 
 @login_required
@@ -424,7 +420,7 @@ def ServiceUpdateView(request, pk=None):
         service = Service.objects.get(service_id=pk)
         category = ServiceCategory.objects.get(service=service)
         if request.method == "POST":
-            s_form = ServiceCreateForm(request.POST, instance=service)
+            s_form = ServiceCreateForm(request.POST,request.FILES,instance=service)
             c_form = AssignServiceCategoryForm(request.POST, instance=category)
 
             if s_form.is_valid() and c_form.is_valid():
@@ -440,7 +436,7 @@ def ServiceUpdateView(request, pk=None):
         context = {
             's_form': s_form,
             'c_form': c_form,
-            'title':'Update Service',
+            'title':'Dashboard | Service Update',
         }
         return render(request, 'admins/providers/services/service_update.html', context)
     else:
@@ -454,7 +450,7 @@ class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(ServiceDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Service Delete"
+        context['title'] = "Dashboard | Service Delete"
         return context
 
     def form_valid(self, form):
@@ -491,7 +487,7 @@ class VendorCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(VendorCreateView, self).get_context_data(**kwargs)
-        context['title'] = "New Store"
+        context['title'] = "Dashboard | New Store"
         return context
 
     def form_valid(self, form):
@@ -515,7 +511,7 @@ class ProviderCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProviderCreateView, self).get_context_data(**kwargs)
-        context['title'] = "New Service Store"
+        context['title'] = "Dashboard | New Service Store"
         return context
 
     def form_valid(self, form):
@@ -547,7 +543,7 @@ def GiveAdmin(request,pk):
 
         context = {
             'form': form,
-            'title': 'Give Admin',
+            'title': 'Dashboard | Give Admin',
             'user' : user
         }
         return render(request, 'admins/users/roles/make_admin.html', context)
@@ -571,7 +567,7 @@ def RemoveAdmin(request,pk):
 
         context = {
             'form': form,
-            'title': 'Remove Admin',
+            'title': 'Dashboard | Remove Admin',
             'user' : user
         }
         return render(request, 'admins/users/roles/remove_admin.html', context)
@@ -594,7 +590,7 @@ class WishlistView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super(WishlistView, self).get_context_data(**kwargs)
         user = User.objects.get(id=self.kwargs['pk'])
         context['user'] = user
-        context['title'] = user.username + "'s Wishlist"
+        context['title'] = "Dashboard | " + user.username + "'s Wishlist"
         return context
 
 class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -613,7 +609,7 @@ class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super(CartView, self).get_context_data(**kwargs)
         user = User.objects.get(id=self.kwargs['pk'])
         context['user'] = user
-        context['title'] = user.username + "'s Cart"
+        context['title'] = "Dashboard | " + user.username + "'s Cart"
         return context
 
 @login_required
@@ -675,7 +671,7 @@ class OrderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Order Edit"
+        context['title'] = "Dashboard | Order Edit"
         return context
 
     def form_valid(self, form):
@@ -698,7 +694,7 @@ class OrderDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Delete Order"
+        context['title'] = "Dashboard | Delete Order"
         return context
 
     def delete(self, *args, **kwargs):
@@ -871,7 +867,7 @@ class OrderItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def Settings(request):
     if request.user.groups.filter(name='Admin').exists():
         context = {
-            'title' : 'Settings | Dashboard'
+            'title' : 'Dashboard | Settings'
         }
         return render(request, 'admins/settings/settings.html', context)
     else:
@@ -879,14 +875,14 @@ def Settings(request):
 
 class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Category
-    fields = ['name']
+    fields = ['name', 'image']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(CategoryCreateView, self).get_context_data(**kwargs)
-        context['title'] = "New Category"
+        context['title'] = "Settings | New Category"
         context['categories'] = Category.objects.all()
         return context
 
@@ -903,14 +899,14 @@ class CategoryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 class CategoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Category
-    fields = ['name']
+    fields = ['name', 'image']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
 
     def get_context_data(self, **kwargs):
         context = super(CategoryUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Update Category"
+        context['title'] = "Settings | Update Category"
         return context
 
     def form_valid(self, form):
@@ -933,7 +929,7 @@ class CategoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Category Delete"
+        context['title'] = "Settings | Category Delete"
         return context
 
     def get_success_url(self, **kwargs):
@@ -949,7 +945,7 @@ class PaymentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(PaymentCreateView, self).get_context_data(**kwargs)
-        context['title'] = "Edit Payment Methods"
+        context['title'] = "Settings | Edit Payment Methods"
         context['payments'] = PaymentMethod.objects.all()
         return context
 
@@ -973,7 +969,7 @@ class PaymentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PaymentUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Update Payment Method"
+        context['title'] = "Settings | Update Payment Method"
         return context
 
     def form_valid(self, form):
@@ -996,7 +992,7 @@ class PaymentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(PaymentDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Delete Payment Method"
+        context['title'] = "Settings | Delete Payment Method"
         return context
 
     def get_success_url(self, **kwargs):
@@ -1012,7 +1008,7 @@ class ShippingRateCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
 
     def get_context_data(self, **kwargs):
         context = super(ShippingRateCreateView, self).get_context_data(**kwargs)
-        context['title'] = "Edit Shipping Rates"
+        context['title'] = "Settings | Edit Shipping Rates"
         context['rates'] = ShippingRate.objects.all()
         vendors = Vendor.objects.all()
         for v in vendors:
@@ -1041,7 +1037,7 @@ class ShippingRateUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
 
     def get_context_data(self, **kwargs):
         context = super(ShippingRateUpdateView, self).get_context_data(**kwargs)
-        context['title'] = "Update Shipping Rate"
+        context['title'] = "Settings | Update Shipping Rate"
         return context
 
     def form_valid(self, form):
@@ -1064,7 +1060,7 @@ class ShippingRateDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
     def get_context_data(self, **kwargs):
         context = super(ShippingRateDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Delete Shipping Rate"
+        context['title'] = "Settings | Delete Shipping Rate"
         return context
 
     def get_success_url(self, **kwargs):
@@ -1085,7 +1081,7 @@ class ShippingVendorsListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
     
     def get_context_data(self, **kwargs):
         context = super(ShippingVendorsListView, self).get_context_data(**kwargs)
-        context['title'] = "Shipping Rate Vendors | Dashboard"
+        context['title'] = "Settings | Shipping Rate Vendors"
         rate = ShippingRate.objects.get(id=self.kwargs['pk'])
         context['rate'] = rate
         r_vendors = VendorShipping.objects.filter(rate=rate)
@@ -1106,7 +1102,7 @@ class AssignVendortoRate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(AssignVendortoRate, self).get_context_data(**kwargs)
-        context['title'] = "Add Vendor to Rate"
+        context['title'] = "Settings | Add Vendor to Rate"
         context['rate'] = ShippingRate.objects.get(id=self.kwargs['pk'])
         context['vendor'] = Vendor.objects.get(vendor_id=self.kwargs['vendor_pk'])
         return context
@@ -1134,7 +1130,7 @@ class ShippingVendorDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVi
 
     def get_context_data(self, **kwargs):
         context = super(ShippingVendorDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Remove Vendor from Rate"
+        context['title'] = "Settings | Remove Vendor from Rate"
         return context
 
     def get_success_url(self, **kwargs):
@@ -1320,8 +1316,91 @@ class ProductGuideDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
-        messages.success(self.request, 'New post created!')
+        messages.success(self.request, 'Product guide deleted!')
         return reverse("product-guides")
+
+class FaqListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Faq
+    context_object_name = 'faqs'
+    paginate_by = 6
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+    
+    def get_context_data(self, **kwargs):
+        context = super(FaqListView, self).get_context_data(**kwargs)
+        context['title'] = "Settings | FAQs"
+        return context
+
+class FaqCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Faq
+    fields = ['title', 'content']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqCreateView, self).get_context_data(**kwargs)
+        context['title'] = "FAQs | New Post"
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New post created!')
+        return reverse("faq-detail", kwargs={'pk': self.object.pk})
+
+class FaqDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Faq
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqDetailView, self).get_context_data(**kwargs)
+        context['title'] = f'FAQs | {self.object.title}'
+        return context
+
+class FaqUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Faq
+    fields = ['title', 'content']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqUpdateView, self).get_context_data(**kwargs)
+        context['title'] = 'FAQs | Update Post'
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'New post created!')
+        return reverse("faq-detail", kwargs={'pk': self.object.pk})
+
+class FaqDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Faq
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(FaqDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "FAQs | Delete Post"
+        return context
+
+    def form_valid(self, form):
+        form.instance.slug = unique_post_slug_generator(form.instance)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        messages.success(self.request, 'FAQ deleted!')
+        return reverse("faqs")
 
 class DisplayGroupCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = DisplayGroup
@@ -1436,8 +1515,23 @@ def AddProductsToGroup(request, pk):
     else:
         return reverse('home')
 
+def EditBanner(request):
+    if request.user.groups.filter(name='Admin').exists():
+        banner = Banner.objects.all().first()
+        if request.method == "POST":
+            form = EditBannerForm(request.POST, request.FILES, instance=banner)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f'Banner successfully updated.')
+                return redirect('edit-banner')
+        else:
+            form = EditBannerForm(instance=banner)
 
-
-
-
-
+        context = {
+            'form': form,
+            'title': 'Edit Banner',
+            'banner': banner
+        }
+        return render(request, 'admins/settings/banner.html', context)
+    else:
+        return reverse('home')

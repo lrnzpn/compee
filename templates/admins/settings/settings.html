@@ -2,7 +2,9 @@
 {% block content %}
     {%include 'admins/partials/_dashboard_nav.html' %}
     <hr>
+    <a href="{% url 'edit-banner' %}" class="btn btn-primary">Home Banner</a>
     <a href="{% url 'product-guides' %}" class="btn btn-primary">Product Guides</a>
+    <a href="{% url 'faqs' %}" class="btn btn-primary">Frequently Asked Questions</a>
     <a href="{% url 'display-groups' %}" class="btn btn-primary">Display Groups</a>
     <a href="{% url 'category-create' %}" class="btn btn-primary">Category List</a>
     <a href="{% url 'payment-methods' %}" class="btn btn-primary">Payment Methods</a>

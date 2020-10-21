@@ -1,7 +1,17 @@
 {% extends "base.html" %}
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/cares.css' %}">
+{% endblock stylesheets %}
 {% block content %}
-    <h1>Compee Cares Page</h1>
-    <div class="jumbotron">
-        helo
+
+    <div class="jumbotron compee-cares">
+        <div class="content d-flex justify-content-center align-items-center">
+    <img src="/static/img/icons/Compee Cares Logo.svg" class="img-fluid">
+    <h1>Compee Cares</h1>
+        </div>
     </div>
+
+
+    
 {% endblock content %}
