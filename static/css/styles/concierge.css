@@ -1,7 +1,8 @@
 .jumbotron {
     background-color: #000000;
-    
+
 }
+
 .compee-concierge {
     width: 100%;
 }
@@ -61,36 +62,37 @@ h3 {
     width: 100%;
 }
 
-/* fqa */
+/* faq */
+.compee-faq h3 {
+    font-weight: 700;
+}
+
 .question-item {
-    height: 150px;
     width: 100%;
     border-bottom: 1px solid #202020;
-    padding: 10px 0;
+    padding: 1em 0 2em;
 }
 
 .question-details {
     height: 100%;
     width: 100%;
-
 }
 
 .question-header {
     display: block;
+    cursor: pointer;
 }
 
-.question-header .question-title {
-    font-weight: 500;
-    line-height: 24px;
+.question-header span {
+    font-weight: 600;
     color: #000000;
-
+    font-size: 1.5em;
 }
 
-.question-content {
-    font-size: 0.8em;
+.question-header i {
+    font-size: 1.25em;
 }
 
-.question-content {
-    width: 100%;
+.question-content p {
+    width: 95%;
 }
-

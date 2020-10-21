@@ -72,3 +72,8 @@ $("#order-filter").change(function () {
       }
     });
   });
+
+
+$('.question-header').click(function() { 
+    $(this).find('i').toggleClass('fas fa-plus fas fa-minus'); 
+}); 
