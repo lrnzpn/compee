@@ -1,0 +1,96 @@
+.jumbotron {
+    background-color: #000000;
+    
+}
+.compee-concierge {
+    width: 100%;
+}
+
+.content h1 {
+    color: #ffffff;
+    font-size: 75px;
+}
+
+.content .img-fluid {
+    width: 15%;
+    margin: 0 20px;
+}
+
+h3 {
+    padding: 10px 0;
+}
+
+/* blog posts */
+.blog-item {
+    height: 150px;
+    width: 100%;
+    border-bottom: 1px solid #202020;
+    padding: 10px 0;
+}
+
+.blog-img img {
+    height: 130px;
+    width: auto;
+}
+
+.blog-details {
+    height: 100%;
+    width: 100%;
+    margin-left: 20px;
+}
+
+.blog-header span {
+    display: block;
+}
+
+.blog-header span.blog-title {
+    font-weight: 500;
+    line-height: 24px;
+}
+
+.blog-header span.blog-author {
+    font-weight: 700;
+    font-size: 0.9em;
+}
+
+.blog-published span {
+    font-size: 0.8em;
+}
+
+.blog-published {
+    width: 100%;
+}
+
+/* fqa */
+.question-item {
+    height: 150px;
+    width: 100%;
+    border-bottom: 1px solid #202020;
+    padding: 10px 0;
+}
+
+.question-details {
+    height: 100%;
+    width: 100%;
+
+}
+
+.question-header {
+    display: block;
+}
+
+.question-header .question-title {
+    font-weight: 500;
+    line-height: 24px;
+    color: #000000;
+
+}
+
+.question-content {
+    font-size: 0.8em;
+}
+
+.question-content {
+    width: 100%;
+}
+

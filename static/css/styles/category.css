@@ -1,13 +1,12 @@
 /* cat nav */
-
-.category-nav {
+.link-nav {
     color: #159ABD;
 }
 
-.category-nav a:last-child {
+.link-nav span:last-child {
     color: #159ABD;
 }
 
-.category-nav a:not(:last-child) {
+.link-nav a {
     color: #CECDCD;
 }

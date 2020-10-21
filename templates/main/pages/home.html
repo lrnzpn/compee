@@ -11,7 +11,7 @@
             {% include 'main/partials/_categories.html' %}
             <div class="col-md-9">
                 <div class="d-flex justify-content-end align-items-end">
-                    <a href="" class="btn btn-navy d-flex justify-content-center align-items-center">
+                    <a href="{% url 'compee-cares' %}" class="btn btn-navy d-flex justify-content-center align-items-center">
                         <div class="compee-cares icon"></div>
                         <span>Compee Cares</span>
                     </a>
@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="sellers-services d-flex justify-content-between align-items-center">
-                    <a href="" class="sellers btn-navy">
+                    <a href="{% url 'vendors-main' %}" class="sellers btn-navy">
                         <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="sellers-icon icon"></div>
                             <span>Sellers</span>
@@ -32,7 +32,7 @@
                             Reach out and sell to our community of buyers.<br>Register with Compee as a Seller now!
                         </p>
                     </a>
-                    <a href="" class="services btn-navy">
+                    <a href="{% url 'services-main' %}" class="services btn-navy">
                         <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="services-icon icon"></div>
                             <span>Services</span>
@@ -58,7 +58,7 @@
                 <img src="../../../static/img/icons/Categories.svg" alt="categories">
                 <span>Categories</span>
             </a>
-            <a href="" class="overlay-icon d-flex align-items-center">
+            <a href="#blogs" class="overlay-icon d-flex align-items-center">
                 <img src="../../../static/img/icons/Blogs.svg" alt="blogs">
                 <span>Compee Blogs</span>
             </a>
@@ -69,7 +69,6 @@
     <!-- OPTIONAL PRODUCT GROUP DISPLAY -->
     {% if groups %}
         {% for group in groups %}
-            <section>
                 <h3>{{ group.title }}</h3>
                 <ul>
                     {% for i in group.products %}
@@ -78,13 +77,6 @@
                 </ul>
         {% endfor %}
     {% endif %}
-    </section>
-
-    <section class="popular">
-        <h3>Most Popular</h3>
-        {% for prod in products %}
-        <p>{{prod}}</p>
-        {% endfor %}
     </section>
 
     <section class="categories">
@@ -105,7 +97,7 @@
         <h3>Just For You</h3>
     </section>
 
-    <section class="compee-blogs">
+    <section class="compee-blogs" id="blogs">
         <h3>Compee Blogs</h3>
         <div class="blog-container">
             {% for i in '123'|make_list %}

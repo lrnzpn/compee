@@ -37,25 +37,28 @@
 
 .sellers-services .ss-wrapper span {
     color: #fff;
-    font-size: 3.5em;
+    font-size: 3em;
     margin-left: 20px;
 }
 
+/* compee overlay buttons in the side */
 .compee-overlay {
     position: fixed;
     display: inline-block;
     bottom: 10%;
     left: 0;
-
+    z-index: 999;
 }
 
 .overlay-icon {
-    background-color: #159ABD;
+    background-color: #005F7B;
+    ;
     color: #fff;
     font-weight: 500;
     max-width: calc(.75em + 1.75em);
     width: auto;
-    border: 1px solid #159ABD;
+    border: 1px solid #005F7B;
+    ;
     align-items: center;
     overflow: hidden;
     -webkit-transition: max-width 0.5s;
@@ -97,6 +100,16 @@ a.overlay-icon {
     width: 1.75em;
     height: 1.75em;
     margin: .35em;
+}
+
+/* COMPEE SLIDER */
+.compee-banner {
+    padding: .75em 0 1.5em;
+}
+
+.compee-banner img {
+    height: 300px;
+    width: 100%;
 }
 
 /* side nav */
