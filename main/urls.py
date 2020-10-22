@@ -37,16 +37,17 @@ urlpatterns = [
         template_name="main/vendors/vendors.html"), name='vendors-main'),
     path('shop/<str:slug>/', v.VendorDetailView.as_view(
         template_name='main/vendors/vendor_detail.html'), name='vendor-detail-main'),
+    path('shop/<str:vendor>/<str:category>/', v.VendorCategoryProductsListView, name='vendor-category'),
     path('product/<str:slug>/', v.ProductDetailView.as_view(
         template_name='main/vendors/vendor_product.html'), name='vendor-product'),
 
     path('wishlist/add', v.AddToWishlist, name='wishlist-add'),
-    path('wishlist/', v.WishlistView.as_view(
-        template_name="main/user/wishlist/wishlist.html"), name='wishlist'),
+    path('wishlist/', v.WishlistView, name='wishlist'),
+    path('wishlist/<str:pk>/', v.SharedWishlistView.as_view(
+        template_name='main/user/wishlist/shared_wishlist.html'), name='share-wishlist'),
+    path('wishlist/share/pdf/', v.wishlist_render_pdf_view, name='share-wishlist-pdf'),
     path('wishlist/<int:pk>/remove/', v.WishlistItemDeleteView.as_view(
         template_name="main/user/wishlist/wishlist_confirm_delete.html"), name='wishlist-remove'),
-    path('wishlist/share/',v.ShareWishlist, name='share-wishlist'),
-    path('wishlist/share/pdf/', v.wishlist_render_pdf_view, name='share-wishlist-pdf'),
 
     path('cart/add/', v.AddToCart, name='cart-add'),
     path('cart/', v.CartView.as_view(

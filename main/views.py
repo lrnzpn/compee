@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
 from django.template.loader import get_template
-from admins.funcs import updateVendorStatus, get_ref_id
+from admins.funcs import updateVendorStatus, get_ref_id, get_wish_ref_id
 from django.shortcuts import render, get_object_or_404, reverse, redirect
 from django.views.generic import (
     ListView, CreateView, DetailView, UpdateView, DeleteView)
@@ -16,7 +16,7 @@ from taggit.models import Tag
 from .forms import RenewalForm
 from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
 from .models import (
-    WishlistItem, CartItem, SiteOrder, OrderItem, CompeeCaresRenewal)
+    WishlistItem, SharedWishlist, CartItem, SiteOrder, OrderItem, CompeeCaresRenewal)
 from admins.models import (
     Product, ProductCategory, Category, Service, ServiceCategory, ServiceItem, 
     ServiceItemCategory, ProductReview, ServiceReview, VendorShipping, 
@@ -28,7 +28,6 @@ def SearchBar(request):
         query = request.GET.get('search')
         context = {
             'title':"Search results for " + query,
-            'is_seller': True,
             'query':query
         }
         queries = query.split(" ")
@@ -158,14 +157,12 @@ def TagProductsListView(request, name):
         'services':services,
         'items':items,
         'tag' : tag,
-        'title' : f"Search for '{tag}'",
-        'is_seller': True
+        'title' : f"Search for '{tag}'"
     }
     return render(request, 'main/filters/tag_detail.html', context )
 
 def CategoryProductsListView(request, name):
     category = Category.objects.get(name=name)
-
     product_cats = ProductCategory.objects.filter(category=category)
     for p in product_cats:
         if p.product.vendor.status == "Inactive":
@@ -187,10 +184,9 @@ def CategoryProductsListView(request, name):
         'services' : services,
         'items' : items,
         'category' : category,
-        'title' : f"Search for '{category}'",
-        'is_seller': True
+        'title' : f"Search for '{category}'"
     }
-    return render(request, 'main/filters/category_detail.html', context )
+    return render(request, 'main/filters/category_detail.html', context)
 
 class VendorListView(ListView):
     model = Vendor
@@ -205,6 +201,20 @@ class VendorListView(ListView):
         updateVendorStatus()
         context['title'] = "Vendors"
         context['categories'] = Category.objects.all()
+        vendors = Vendor.objects.filter(status="Active")
+        final = []
+        for i in vendors:
+            vendor = {
+                'vendor': i.vendor_id,
+                'categories': []
+            }
+            products = Product.objects.filter(vendor=i)
+            for j in products:
+                cat = ProductCategory.objects.get(product=j)
+                if cat.category not in vendor['categories']:
+                    vendor['categories'].append(cat.category)
+            final.append(vendor)
+        context['vendor_cats'] = final
         return context
 
 class VendorDetailView(DetailView):
@@ -216,11 +226,52 @@ class VendorDetailView(DetailView):
         context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
         context['title'] = vendor.store_name
         context['categories'] = Category.objects.all()
-        context['is_seller'] = True
-        context['reviews'] = VendorReview.objects.filter(vendor=self.object)
+        d1 = self.object.date_joined
+        d2 = timezone.now()
+        months = (d2-d1).days/30
+        days = int((months-int(months))*30)
+        context['join_date'] = f'{int(months)} months and {days} days ago'
+        revs = VendorReview.objects.filter(vendor=self.object)
+        if revs:
+            context['reviews'] = revs
+            context['review_count'] = len(revs)
         if self.object.status == "Inactive":
             context['inactive'] = True
         return context
+
+def VendorCategoryProductsListView(request, vendor, category):
+    category = Category.objects.get(name=category)
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        product_cats = ProductCategory.objects.filter(category=category)
+        products = []
+        for p in product_cats:
+            if p.product.vendor == vendor:
+                products.append(p.product)
+        context = {
+            'products' : products,
+            'category' : category,
+            'title' : f"Search for '{category}' in {vendor.store_name} ",
+        }
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        service_cats = ServiceCategory.objects.filter(category=category)
+        service_item_cats = ServiceItemCategory.objects.filter(category=category)
+        services = []
+        for i in service_cats:
+            if i.service.provider == provider:
+                services.append(i.service)
+        items = []
+        for i in service_item_cats:
+            if i.service_item.provider == provider:
+                items.append(i.service_item)
+        context = {
+            'services' : services,
+            'items' : items,
+            'category' : category,
+            'title' : f"Search for '{category}' in {provider.store_name} ",
+        }
+    return render(request, 'main/filters/vendor_category.html', context)
 
 class ProductDetailView(DetailView):
     model = Product
@@ -233,7 +284,6 @@ class ProductDetailView(DetailView):
             context['inactive'] = True
         else:
             context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
-            context['is_seller'] = True
             context['reviews'] = ProductReview.objects.filter(product=self.object)
 
             if ProductCategory.objects.filter(product=self.object).exists():
@@ -256,8 +306,7 @@ def PriceComparison(request, name):
     context = {
         'products' : products,
         'name' : name,
-        'title' : f"Prices for '{name}'",
-        'is_seller': True
+        'title' : f"Prices for '{name}'"
     }
     return render(request, 'main/filters/price_comparison.html', context)
 
@@ -331,50 +380,47 @@ def AddToWishlist(request):
             messages.success(request, 'Item added to wishlist')
     return render(request, 'main/user/wishlist/wishlist.html')
 
-class WishlistView(LoginRequiredMixin, ListView):
-    model = WishlistItem
-    context_object_name = 'items'
-    paginate_by = 6
-
-    def get_queryset(self):
-        return WishlistItem.objects.filter(user=self.request.user)
-    
-    def get_context_data(self, **kwargs):
-        context = super(WishlistView, self).get_context_data(**kwargs)
-        context['title'] = self.request.user.username + "'s Wishlist"
-        return context
-
-class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = WishlistItem
-
-    def test_func(self):
-        item = WishlistItem.objects.get(id=self.kwargs['pk'])
-        return self.request.user == item.user or self.request.user.groups.filter(name='Admin').exists()
-
-    def get_context_data(self, **kwargs):
-        context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
-        context['title'] = "Delete Wishlist Item"
-        return context
-
-    def get_success_url(self, **kwargs):
-        if self.request.user.groups.filter(name='Admin').exists():
-            messages.success(self.request, 'Item has been removed from their wishlist')
-            return reverse("user-wishlist", kwargs={'pk':self.kwargs['pk']})
-        else:
-            messages.success(self.request, 'Item has been removed from your wishlist')
-            return reverse('wishlist')
-
 @login_required
-def ShareWishlist(request):
+def WishlistView(request):
     if request.method == "POST":
         data = request.POST
-        request.session['note'] = data['w-message']
-        return redirect('share-wishlist-pdf')
+        if data['submit-btn'] == "pdf":
+            request.session['note'] = data['w-message']
+            return redirect('share-wishlist-pdf')
+        else:
+            if SharedWishlist.objects.filter(user=request.user).exists():
+                s_list = SharedWishlist.objects.get(user=request.user)
+                s_list.note = data['w-message']
+                s_list.save()
+            else:
+                n_id = get_wish_ref_id()
+                while SharedWishlist.objects.get(ref_id=n_id).exists():
+                    n_id = get_wish_ref_id()
+
+                s_list = SharedWishlist(
+                        user=request.user, 
+                        ref_id=n_id, 
+                        note=data['w-message']
+                    )
+                s_list.save()
+            return redirect('share-wishlist', s_list.ref_id)
     context = {
-        'title': "Share Wishlist"
+        'title': request.user.username + "'s Wishlist",
+        'items': WishlistItem.objects.filter(user=request.user)
     }
-    return render(request, 'main/user/wishlist/share_wishlist.html', context)
-    
+    return render(request, 'main/user/wishlist/wishlist.html', context)
+
+class SharedWishlistView(DetailView):
+    model = SharedWishlist
+
+    def get_context_data(self, **kwargs):
+        context = super(SharedWishlistView, self).get_context_data(**kwargs)
+        context['title'] = self.object.user.username + "'s Wishlist"
+        context['items'] = WishlistItem.objects.filter(user=self.object.user)
+        if self.object.user == self.request.user:
+            context['own'] = True
+        return context
+
 @login_required
 def wishlist_render_pdf_view(request):
     user = User.objects.get(username=request.user)
@@ -400,6 +446,26 @@ def wishlist_render_pdf_view(request):
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
+
+class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = WishlistItem
+
+    def test_func(self):
+        item = WishlistItem.objects.get(id=self.kwargs['pk'])
+        return self.request.user == item.user or self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Wishlist Item"
+        return context
+
+    def get_success_url(self, **kwargs):
+        if self.request.user.groups.filter(name='Admin').exists():
+            messages.success(self.request, 'Item has been removed from their wishlist')
+            return reverse("user-wishlist", kwargs={'pk':self.kwargs['pk']})
+        else:
+            messages.success(self.request, 'Item has been removed from your wishlist')
+            return reverse('wishlist')
 
 @login_required
 def AddToCart(request):

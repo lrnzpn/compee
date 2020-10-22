@@ -25,12 +25,13 @@ SECRET_KEY = 'j6&_q=9*v*_f%w+@n*%vkbr8e5^cau@$p=p(zl$!a!d%)gtsq+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_social_share',
     'xhtml2pdf',
     'taggit',
     'crispy_forms',
