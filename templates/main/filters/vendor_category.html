@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/category.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+    <p class="category-nav">
+        <a href="">Home</a> > <a href="{% url 'all-categories' %}">Categories</a> > <a href="">{{category.name}}</a>
+    </p>
+
+    <div class="row">
+        <div class="col-md-9">
+            {% if products or services or items %}
+            {% if products %}
+                <h2>Showing products for '{{ category.name }}'</h2>
+                {%include 'main/partials/_products.html' %}
+            {% endif %}
+
+            {% if services %}
+                <h2>Showing services under '{{ category.name }}'</h2>
+                {%include 'main/partials/_services.html' %}
+            {% endif %}
+
+            {% if items %}
+                <h2>Showing items required by services under '{{ category.name }}'</h2>
+                {% include 'main/partials/_service_items.html' %}
+            {% endif %}
+
+        {% else %}
+            <h2>There are no products to display.</h2>
+        {% endif %}
+        </div>
+    </div>
+
+{% endblock content %}

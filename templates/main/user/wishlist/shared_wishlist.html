@@ -1,10 +1,17 @@
 {% extends "base.html" %}
+{% load social_share %}
 {% block content %}
+    {% if own %}
+        {% post_to_facebook object 'Post on Facebook' %}
+        {% post_to_twitter "{{ object.user.username }}'s Compee Wishlist" object 'Post on Twitter' %}
+    {% endif %}
+    <h1>{{ object.user.username }}'s Wishlist</h1>
+    <p>{{ object.note }}</p>
     {% if items %}
         <table border="1">
             <thead>
                 <th></th>
-                <th>Name</th>
+                <th>Item</th>
                 <th>Price</th>
                 <th>Vendor</th>
             </thead>
@@ -24,24 +31,11 @@
                         <td>{{item.service.provider.store_name}}</td>
                         <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
                     {% endif %}
-                    <td><a href="{% url 'wishlist-remove' item.id %}">x</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-        <p>Add a Personal Note</p>
-        <form method = "POST">
-            {% csrf_token %}
-            <fieldset class = "form-group">
-                <textarea id="w-message" name="w-message" rows="4">Type your message here.. </textarea>
-            </fieldset>
-            <div class ="form-group">
-                <button class = "btn btn-primary" type="submit" name="submit-btn" value="pdf">Download PDF</button>
-                <button class = "btn btn-primary" type="submit" name="submit-btn" value="social-media">Share</button>
-            </div>
-        </form>
     {% else %}
-        <h3>You have nothing in your wishlist!</h3>
+        <h3>This person has nothing in their wishlist!</h3>
     {% endif %}
 {% endblock content %}

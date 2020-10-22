@@ -24,6 +24,7 @@ class Vendor(models.Model):
     contact_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
     secondary_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
     image = models.ImageField(default='default.jpg', upload_to='store_pics')
+    about_image = models.ImageField(blank=True, null=True, upload_to='store_pics')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=8, choices=STATUS_CHOICES, default = ('Inactive'))
 

@@ -67,3 +67,7 @@ def updateVendorStatus():
 def get_ref_id():
     ref_id = datetime.datetime.now().strftime('%y%m%d%H%M%S') + str(uuid.uuid4().hex[:6].upper())
     return ref_id
+
+def get_wish_ref_id():
+    ref_id = str(uuid.uuid4().hex[:6].upper())
+    return ref_id
