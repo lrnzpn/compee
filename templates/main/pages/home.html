@@ -58,7 +58,7 @@
                 <img src="../../../static/img/icons/Categories.svg" alt="categories">
                 <span>Categories</span>
             </a>
-            <a href="#blogs" class="overlay-icon d-flex align-items-center">
+            <a href="" class="overlay-icon d-flex align-items-center">
                 <img src="../../../static/img/icons/Blogs.svg" alt="blogs">
                 <span>Compee Blogs</span>
             </a>
@@ -84,7 +84,7 @@
         <div class="container categories-container">
             {% for cat in categories %}
                 {% if forloop.first %}<div class="row">{% endif %}
-                <a href="#" class="col-md-4 cat-item cat-item--{{forloop.counter}} d-flex justify-content-start align-items-center">       
+                <a href="{% url 'category-filter' cat.name %}" class="col-md-4 cat-item cat-item--{{forloop.counter}} d-flex justify-content-start align-items-center">       
                     <img src="https://via.placeholder.com/150" alt=""><span>{{ cat }}</span>                    
                 </a>
                 {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}

@@ -9,12 +9,12 @@
     {% if inactive %}
     <h4>This vendor is inactive.</h4>
     {% else %}
-    <div class="vendor-container">
-        <div class="vendor-details">
+    <div class="ss-container">
+        <div class="ss-details">
             <div class="ss-desc">
                 <div class="row">
                    <div class="col-md-6">
-                        <div class="d-flex justify-content-center align-items-center">
+                        <div class="d-flex justify-content-start align-items-center">
                             <div class="ss-img">
                                 <img src="{{ object.image.url }}" alt="" width="120px" height="120px">
                             </div>
@@ -42,18 +42,21 @@
                             </div>
                         </div>
                    </div>
-                   <div class="col-md-6">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <span>Joined: <span>{{ join_date }}</span></span>
+                   <div class="col-md-6 d-flex justify-content-center align-items-center">
+                    <div class="ss-add-desc">
+                        <span class="d-block">Products: <span>{{products.count}}</span></span>
+                        <span class="d-block">Joined: <span>{{object.date_joined}}</span></span>
                     </div>
                    </div>
                 </div>
             </div>
+
             <div class="ss-abt">
                 <span>About Shop</span>
+                <hr>
                 <div class="row">
                     <div class="col-md-6">
-
+                        <img src="https://via.placeholder.com/150" alt="">
                     </div>
                     <div class="col-md-6">
                         <p>{{object.store_info}}</p>
@@ -62,7 +65,8 @@
             </div>
         </div>
 
-        <div class="vendor-items">
+        <div class="ss-items">
+            <h3>All Products</h3>
             {% include 'main/partials/_products.html' %}
         </div>
     </div>

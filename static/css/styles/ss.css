@@ -24,8 +24,18 @@
 }
 
 /* indiv pages */
+
+.ss-details>div {
+    margin-bottom: 30px;
+}
+
 .ss-desc {
     border: 1px solid #202020;
+    padding: 1em 2em;
+}
+
+.ss-desc-content {
+    margin-left: 20px;
 }
 
 .ss-desc-content>span {
@@ -44,4 +54,32 @@
 
 .ss-socmed a span {
     margin-left: 5px;
+}
+
+.ss-add-desc {
+    width: 100%;
+}
+
+.ss-add-desc span>span {
+    font-weight: 500;
+}
+
+.ss-abt {
+    border: 1px solid #202020;
+    border-radius: 2px;
+    padding: 1em 2em;
+}
+
+.ss-abt hr {
+    border-top: 1px solid #CECDCD;
+    margin: .25em 0 1em;
+}
+
+.ss-abt span {
+    font-weight: 500;
+    font-size: 1.5em;
+}
+
+.ss-container>div {
+    margin-bottom: 20px;
 }

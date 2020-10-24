@@ -3,7 +3,7 @@
     <div class="container">
         <div class="navbar-nav nav-top ml-auto d-flex justify-content-center align-items-center">
             <div class="compee-cares-btn">
-                <a href=""><span>?</span> Ask Help From Compee Cares</a>
+                <a href="{% url 'compee-concierge' %}"><span>?</span> Need help? Visit Compee Concierge</a>
             </div>
 
             {% if user.is_authenticated %}
