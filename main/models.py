@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from admins.models import Product, Service, ShippingRate
+from django.shortcuts import reverse
 from django.utils import timezone
 import datetime
 import uuid
@@ -13,6 +14,14 @@ class WishlistItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
+
+class SharedWishlist(models.Model):
+    ref_id = models.CharField(max_length=100, blank=True, unique=True, primary_key=True)
+    note = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        return reverse('share-wishlist', kwargs={'pk':self.ref_id})
 
 class CartItem(models.Model):
     id = models.AutoField(primary_key=True)
