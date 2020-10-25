@@ -36,6 +36,13 @@
         {% endfor %}
     {% endif %}
 
+    <!-- service categories -->
+    <ul>
+        {% for cat in service_cats %}
+            <li><a href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a></li>
+        {% endfor %}
+    </ul>
+
     <!-- Products here -->
     <h3>Store Products</h3>
     <h3>Services:</h3>
