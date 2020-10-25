@@ -51,6 +51,14 @@
                 </div>
             </div>
 
+            <div class="ss-nav">
+                {{object.vendor_id}}
+                {{object.vendor_cats}}
+                {% for cat in object.categories %}
+                    {{cat}}
+                {% endfor %}
+            </div>
+
             <div class="ss-abt">
                 <span>About Shop</span>
                 <hr>
