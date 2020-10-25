@@ -188,6 +188,39 @@ def CategoryProductsListView(request, name):
     }
     return render(request, 'main/filters/category_detail.html', context)
 
+def VendorCategoryProductsListView(request, vendor, category):
+    category = Category.objects.get(name=category)
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        product_cats = ProductCategory.objects.filter(category=category)
+        products = []
+        for p in product_cats:
+            if p.product.vendor == vendor:
+                products.append(p.product)
+        context = {
+            'products' : products,
+            'category' : category,
+            'title' : f"Search for '{category}' in {vendor.store_name} ",
+        }
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        service_cats = ServiceCategory.objects.filter(category=category)
+        service_item_cats = ServiceItemCategory.objects.filter(category=category)
+        services = []
+        for i in service_cats:
+            if i.service.provider == provider:
+                services.append(i.service)
+        items = []
+        for i in service_item_cats:
+            if i.service_item.provider == provider:
+                items.append(i.service_item)
+        context = {
+            'services' : services,
+            'items' : items,
+            'category' : category,
+            'title' : f"Search for '{category}' in {provider.store_name} ",
+        }
+    return render(request, 'main/filters/vendor_category.html', context)
 class VendorListView(ListView):
     model = Vendor
     context_object_name = 'vendors'
@@ -223,7 +256,8 @@ class VendorDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(VendorDetailView, self).get_context_data(**kwargs)
         vendor = Vendor.objects.get(slug=self.kwargs['slug'])
-        context['products'] = Product.objects.filter(vendor=vendor).order_by('-date_created')
+        products = Product.objects.filter(vendor=vendor)
+        context['products'] = products.order_by('-date_created')
         context['title'] = vendor.store_name
         context['categories'] = Category.objects.all()
         d1 = self.object.date_joined
@@ -237,41 +271,14 @@ class VendorDetailView(DetailView):
             context['review_count'] = len(revs)
         if self.object.status == "Inactive":
             context['inactive'] = True
-        return context
 
-def VendorCategoryProductsListView(request, vendor, category):
-    category = Category.objects.get(name=category)
-    if Vendor.objects.filter(slug=vendor).exists():
-        vendor = Vendor.objects.get(slug=vendor)
-        product_cats = ProductCategory.objects.filter(category=category)
-        products = []
-        for p in product_cats:
-            if p.product.vendor == vendor:
-                products.append(p.product)
-        context = {
-            'products' : products,
-            'category' : category,
-            'title' : f"Search for '{category}' in {vendor.store_name} ",
-        }
-    elif ServiceProvider.objects.filter(slug=vendor).exists():
-        provider = ServiceProvider.objects.get(slug=vendor)
-        service_cats = ServiceCategory.objects.filter(category=category)
-        service_item_cats = ServiceItemCategory.objects.filter(category=category)
-        services = []
-        for i in service_cats:
-            if i.service.provider == provider:
-                services.append(i.service)
-        items = []
-        for i in service_item_cats:
-            if i.service_item.provider == provider:
-                items.append(i.service_item)
-        context = {
-            'services' : services,
-            'items' : items,
-            'category' : category,
-            'title' : f"Search for '{category}' in {provider.store_name} ",
-        }
-    return render(request, 'main/filters/vendor_category.html', context)
+        categories = []
+        for j in products:
+            cat = ProductCategory.objects.get(product=j)
+            if cat.category not in categories:
+                categories.append(cat.category)
+        context['vendor_cats'] = categories
+        return context
 
 class ProductDetailView(DetailView):
     model = Product
@@ -319,6 +326,20 @@ class ProviderListView(ListView):
         context = super(ProviderListView, self).get_context_data(**kwargs)
         context['title'] = "Services"
         context['categories'] = Category.objects.all()
+        providers = ServiceProvider.objects.all()
+        final = []
+        for i in providers:
+            provider = {
+                'provider': i.provider_id,
+                'categories': []
+            }
+            services = Service.objects.filter(provider=i)
+            for j in services:
+                cat = ServiceCategory.objects.get(service=j)
+                if cat.category not in provider['categories']:
+                    provider['categories'].append(cat.category)
+            final.append(provider)
+        context['service_cats'] = final
         return context
 
 class ProviderDetailView(DetailView):
@@ -327,11 +348,20 @@ class ProviderDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProviderDetailView, self).get_context_data(**kwargs)
         provider = ServiceProvider.objects.get(slug=self.kwargs['slug'])
-        context['services'] = Service.objects.filter(provider=provider).order_by('-date_created')
-        context['items'] = ServiceItem.objects.filter(provider=provider).order_by('-date_created')
+        services = Service.objects.filter(provider=provider)
+        items = ServiceItem.objects.fitler(provider=provider)
+        context['services'] = services.order_by('-date_created')
+        context['items'] = items.order_by('-date_created')
         context['title'] = provider.store_name
         context['categories'] = Category.objects.all()
         context['reviews'] = ProviderReview.objects.filter(provider=self.object)
+
+        categories = []
+        for j in services:
+            cat = ServiceCategory.objects.get(service=j)
+            if cat.category not in categories:
+                categories.append(cat.category)
+        context['service_cats'] = categories
         return context
 
 class ServiceItemDetailView(DetailView):
@@ -663,7 +693,6 @@ def CompeeCaresForm(request):
     else:
         return reverse('home')
         
-
 class Checkout(LoginRequiredMixin, CreateView):
     model = SiteOrder
     fields = ['contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
@@ -874,7 +903,6 @@ class Checkout(LoginRequiredMixin, CreateView):
             return reverse("my-orders")
         else:
             return reverse("other-payment", kwargs={'pk':self.object.ref_id})
-
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = SiteOrder

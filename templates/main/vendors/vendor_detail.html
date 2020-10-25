@@ -64,7 +64,12 @@
                 </div>
             </div>
         </div>
-
+        <!-- seller categories -->
+        <ul>
+            {% for cat in vendor_cats %}
+                <li><a href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a></li>
+            {% endfor %}
+        </ul>
         <div class="ss-items">
             <h3>All Products</h3>
             {% include 'main/partials/_products.html' %}
