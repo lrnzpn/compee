@@ -5,4 +5,10 @@
             <li class="list-group-item"><a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a></li>
         {% endfor %}
     </ul>
+
+    <div class="cat-nav">
+        {% for cat in categories %}
+            <a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a>
+        {% endfor %}
+    </div>
 </div>

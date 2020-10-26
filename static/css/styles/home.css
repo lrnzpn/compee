@@ -38,6 +38,10 @@ h3 {
     padding: 1.5% 2.5%;
 }
 
+.sellers-services a:first-child {
+    margin-right: 20px;
+}
+
 .sellers-services p {
     color: #fff;
     text-align: center;
@@ -47,6 +51,10 @@ h3 {
     color: #fff;
     font-size: 3em;
     margin-left: 20px;
+}
+
+.banner-menu .ss-content>div {
+    margin-bottom: 20px;
 }
 
 /* compee overlay buttons in the side */
@@ -161,6 +169,7 @@ ul li a {
     border-right: 1px solid #CECDCD;
 }
 
+
 /* blog posts */
 .blog-item {
     height: 150px;
@@ -210,4 +219,79 @@ ul li a {
     background-image: url('../../img/icons/share.svg');
     margin-left: 10px;
     margin-right: 0px !important;
+}
+
+.cat-nav {
+    display: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.cat-nav a {
+    color: #202020;
+    display: block;
+    white-space: nowrap;
+}
+
+.cat-nav a:hover {
+    text-decoration: none;
+}
+
+.cat-nav a:not(:last-child) {
+    margin-right: 20px;
+}
+
+@media screen and (max-width: 991px) {
+    .categories-container .row .cat-item {
+        border-right: 0px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .banner-menu .list-group {
+        display: none;
+    }
+
+    .cat-nav {
+        display: flex;
+    }
+
+    .sellers-services {
+        flex-direction: column;
+    }
+
+    .sellers-services a {
+        margin: 10px 0 !important;
+        width: 100%;
+    }
+
+    .ss-content>div:nth-child(1) {
+        order: 2;
+    }
+
+    .ss-content>div:nth-child(2) {
+        order: 1;
+    }
+
+    .ss-content>div:nth-child(3) {
+        order: 3;
+    }
+
+    .concierge-btn a {
+        width: 100%;
+    }
+
+    .categories-container .row .cat-item span {
+        font-size: 1.25em;
+    }
+
+    .blog-item {
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .blog-item .blog-details {
+        margin: 10px 0;
+    }
 }
