@@ -3,6 +3,7 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -52,11 +53,27 @@
             </div>
 
             <div class="ss-nav">
-                {{object.vendor_id}}
-                {{object.vendor_cats}}
-                {% for cat in object.categories %}
-                    {{cat}}
-                {% endfor %}
+                <div class="row">
+                    <div class="col-md-10 d-flex justify-content-start align-items-center">
+                        {% for cat in vendor_cats %}
+                            <a class="cat-item col-md-3" href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-end align-items-center">
+                        {% if vendor_cats_end.count != 0 %}
+                        <button class="btn btn-more" type="button" data-toggle="collapse" data-target="#more" aria-expanded="false" aria-controls="more">
+                            More <i class="fas fa-chevron-down"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="collapse" id="more">
+                        {% for cat in vendor_cats_end %}
+                            <a class="cat-item" href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
             <div class="ss-abt">
@@ -72,12 +89,7 @@
                 </div>
             </div>
         </div>
-        <!-- seller categories -->
-        <ul>
-            {% for cat in vendor_cats %}
-                <li><a href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a></li>
-            {% endfor %}
-        </ul>
+
         <div class="ss-items">
             <h3>All Products</h3>
             {% include 'main/partials/_products.html' %}
