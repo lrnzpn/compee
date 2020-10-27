@@ -150,14 +150,58 @@ a.btn>.icon {
     background-image: url('../img/icons/Heart.svg')
 }
 
+.navbar .form-control:focus,
+.navbar .form-control:active {
+    outline: 0;
+    border: 0 !important;
+    box-shadow: none;
+}
+
+@media screen and (max-width: 991px) {
+    .navbar-brand {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .nav-top {
+        justify-content: space-between !important;
+        font-size: .9em;
+    }
+
+    .nav-bot a span {
+        display: none;
+    }
+
+    .nav-bot a>.icon {
+        margin: 0;
+    }
+
+    .nav-bot .navbar-collapse {
+        margin: 0;
+    }
+
+}
+
+@media screen and (max-width: 575px) {
+
+    .navbar {
+        padding: .5rem 1rem !important;
+    }
+
+    .nav-top {
+        font-size: .8em;
+    }
+}
+
 /* footer */
 footer {
     bottom: 0;
-    background-color: #159ABD;
+    background-color: #202020;
 }
 
 .footer-content {
-    padding: 2.5% 0 !important;
+    padding: 3.5% 0 !important;
 }
 
 .footer-content>div>span {
@@ -208,6 +252,33 @@ footer {
     background-image: url('../img/icons/instagram-2\ 1.svg');
 }
 
+@media screen and (max-width: 991px) {
+    .footer-content>div>span {
+        font-size: 1em;
+    }
+
+    .footer-content>div li,
+    .footer-content>div li a {
+        font-size: .9em;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .footer-content>div>span {
+        font-size: 1.25em;
+        margin-top: 15px;
+    }
+
+    .footer-content>div li,
+    .footer-content>div li a {
+        font-size: 1em;
+    }
+}
+
 /* navbar */
 .navbar {
     padding: 0;
@@ -216,6 +287,12 @@ footer {
 /* override some bootstrap styles */
 .container {
     padding: 0px;
+}
+
+@media screen and (max-width: 575px) {
+    .container {
+        padding: 0 15px !important;
+    }
 }
 
 /* search filter */

@@ -1,20 +1,22 @@
 {% load static %}
-<nav class="navbar navbar-expand-md fixed-top flex-column bg-blue">
+<nav class="navbar navbar-expand fixed-top flex-column bg-blue">
     <div class="container">
-        <div class="navbar-nav nav-top ml-auto d-flex justify-content-center align-items-center">
+        <div class="navbar-nav nav-top ml-md-auto d-flex align-items-center justify-content-end w-100">
             <div class="compee-cares-btn">
                 <a href="{% url 'compee-concierge' %}"><span>?</span> Need help? Visit Compee Concierge</a>
             </div>
-
-            {% if user.is_authenticated %}
-            <a class = "nav-item nav-link" href = "{% url 'manage-account' %}">Profile</a>
+            
+            <div class="nav-user d-flex align-items-center justify-content-end">
+                {% if user.is_authenticated %}
+                <a class = "nav-item nav-link" href = "{% url 'manage-account' %}">Profile</a>
+                    <span class="nav-divider"></span>
+                <a class = "nav-item nav-link" href = "{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a class = "nav-item nav-link" href = "{% url 'register' %}">Sign Up</a> 
                 <span class="nav-divider"></span>
-            <a class = "nav-item nav-link" href = "{% url 'logout' %}">Logout</a>
-            {% else %}
-            <a class = "nav-item nav-link" href = "{% url 'register' %}">Sign Up</a> 
-            <span class="nav-divider"></span>
-            <a class = "nav-item nav-link" href = "{% url 'login' %}">Login</a>
-            {% endif %}
+                <a class = "nav-item nav-link" href = "{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>  
         </div>
     </div>
     <div class="container nav-bot pb-3">
@@ -29,7 +31,7 @@
             <form class="form-inline my-2 my-lg-0 input-group search-wrapper" action="{% url 'search-bar' %}" method="GET">
               <input class="form-control" type="search" placeholder="What do you need?" aria-label="Search">
               <div class="input-group-append btn-container">
-                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">
+                <button class="btn btn-outline-primary my-md-2 my-sm-0" type="submit">
                     <div class="search icon"></div>
                 </button>
               </div>

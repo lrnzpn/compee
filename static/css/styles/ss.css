@@ -21,12 +21,49 @@
 .item-row {
     border-bottom: 1px solid #202020;
     border-radius: 2px;
+    margin: 20px 0;
+}
+
+.item-row .item-wrapper {
+    padding: 0;
+}
+
+.item-row .item-wrapper .card {
+    padding: 0 15px;
+    border: 0;
+    border-radius: 0;
+    height: 95%;
+}
+
+.item-row .item-wrapper:not(:last-child) .card {
+    border-right: 1px solid #CECDCD;
+}
+
+.item-row .item-wrapper .card-body {
+    padding: 1.25em 0;
+}
+
+.item-row .item-wrapper .card-text {
+    font-weight: 500;
+}
+
+.item-row .item-wrapper .card-body li {
+    margin-bottom: 10px;
+}
+
+.item-row .item-wrapper .card-body li a {
+    background: #CECDCD;
+    border-radius: 18px;
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: 500;
+    font-size: .9em;
+    text-decoration: none;
 }
 
 /* indiv pages */
-
 .ss-details>div {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .ss-desc {
@@ -82,4 +119,37 @@
 
 .ss-container>div {
     margin-bottom: 20px;
+}
+
+/* ss nav */
+.ss-nav .row {
+    margin: 0;
+}
+
+.ss-nav .row>div {
+    padding: 0;
+}
+
+.ss-nav .cat-item {
+    border: 2px solid #159ABD;
+    padding: .5em 1em;
+}
+
+.ss-nav .cat-item:not(:last-child) {
+    margin-right: 15px;
+}
+
+.ss-nav a.cat-item {
+    color: #159ABD;
+    text-decoration: none;
+    text-align: center;
+}
+
+.ss-nav a.cat-item:hover {
+    background-color: #159ABD;
+    color: #fff;
+}
+
+.ss-nav .row:first-child {
+    margin-bottom: 10px;
 }

@@ -24,30 +24,32 @@
             <span>{{vendors.count}} Total Sellers</span>
             {% for vendor in vendors %}
                 {% if forloop.first %}<div class="row item-row">{% endif %}
-                <div class="col-md-3">
-                        <div class="card mb-4 shadow-sm">
+                <div class="col-md-3 item-wrapper">
+                    <div class="mb-4 card">
+                        <div class="d-flex justify-content-center align-items-center">
                             <img src="{{ vendor.image.url }}" width="100%" height="200px">
-                            <div class="card-body">
-                                <p class="card-text">{{ vendor.store_name }}</p>
-                                <!-- seller categories -->
-                                <ul>
-                                    {% for cat in vendor_cats %}
-                                        {% if cat.vendor == vendor.vendor_id %}
-                                            {% for i in cat.categories %}
-                                                <li><a href="{% url 'vendor-category' vendor.slug i.name %}">{{i.name}}</a></li>
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <a href="{% url 'vendor-detail-main' vendor.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
-                                    </div>
-                                    <small class="text-muted">{{ vendor.user.username }}</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ vendor.store_name }}</p>
+                            <!-- seller categories -->
+                            <ul>
+                                {% for cat in vendor_cats %}
+                                    {% if cat.vendor == vendor.vendor_id %}
+                                        {% for i in cat.categories %}
+                                            <li><a href="{% url 'vendor-category' vendor.slug i.name %}">{{i.name}}</a></li>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            <!-- <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <a href="{% url 'vendor-detail-main' vendor.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
                                 </div>
-                            </div>
+                                <small class="text-muted">{{ vendor.user.username }}</small>
+                            </div> -->
                         </div>
                     </div>
+                </div>
                 {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
                 {% if forloop.last %}</div>{% endif %}
             {% endfor %}

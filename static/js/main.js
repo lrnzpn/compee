@@ -73,7 +73,12 @@ $("#order-filter").change(function () {
     });
   });
 
-
+// for compee conceirge
 $('.question-header').click(function() { 
     $(this).find('i').toggleClass('fas fa-plus fas fa-minus'); 
+}); 
+
+// for indiv vendor
+$('.btn-more').click(function () { 
+    $(this).find('i').toggleClass('fas fa-chevron-down fas fa-chevron-up'); 
 }); 

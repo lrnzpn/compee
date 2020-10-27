@@ -9,21 +9,20 @@
     <section class="banner-menu">
         <div class="row">
             {% include 'main/partials/_categories.html' %}
-            <div class="col-md-9">
-                <div class="d-flex justify-content-end align-items-end">
+            <div class="col-md-9 d-flex flex-column ss-content">
+                <div class="concierge-btn d-flex justify-content-end align-items-end">
                     <a href="{% url 'compee-cares' %}" class="btn btn-navy d-flex justify-content-center align-items-center">
                         <div class="compee-cares icon"></div>
                         <span>Compee Cares</span>
                     </a>
                 </div>
 
-                <img src="{{ banner.image.url }}" width="100%" height="200px">
-                <div class="">
-
+                <div class="ss-banner">
+                    <img src="{{ banner.image.url }}" width="100%" height="300px">
                 </div>
 
                 <div class="sellers-services d-flex justify-content-between align-items-center">
-                    <a href="{% url 'vendors-main' %}" class="sellers btn-navy">
+                    <a href="{% url 'vendors-main' %}" class="sellers btn btn-navy">
                         <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="sellers-icon icon"></div>
                             <span>Sellers</span>
@@ -32,7 +31,7 @@
                             Reach out and sell to our community of buyers.<br>Register with Compee as a Seller now!
                         </p>
                     </a>
-                    <a href="{% url 'services-main' %}" class="services btn-navy">
+                    <a href="{% url 'services-main' %}" class="services btn btn-navy">
                         <div class="ss-wrapper d-flex justify-content-center align-items-center">
                             <div class="services-icon icon"></div>
                             <span>Services</span>
@@ -83,19 +82,19 @@
         <h3>Categories</h3>
         <div class="container categories-container">
             {% for cat in categories %}
-                {% if forloop.first %}<div class="row">{% endif %}
-                <a href="{% url 'category-filter' cat.name %}" class="col-md-4 cat-item cat-item--{{forloop.counter}} d-flex justify-content-start align-items-center">       
-                    <img src="https://via.placeholder.com/150" alt=""><span>{{ cat }}</span>                    
-                </a>
-                {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
-                {% if forloop.last %}</div>{% endif %}
-            {% endfor %}    
+                    {% if forloop.first %}<div class="row">{% endif %}
+                    <a href="{% url 'category-filter' cat.name %}" class="col-lg-4 cat-item cat-item--{{forloop.counter}} d-flex justify-content-start align-items-center">       
+                        <img src="https://via.placeholder.com/150" alt=""><span>{{ cat }}</span>                    
+                    </a>
+                    {% if forloop.counter|divisibleby:"3" %}</div><div class="row">{% endif %}
+                    {% if forloop.last %}</div>{% endif %}
+                {% endfor %}
         </div>
     </section>
 
-    <section class="just-for-you">
+    <!-- <section class="just-for-you">
         <h3>Just For You</h3>
-    </section>
+    </section> -->
 
     <section class="compee-blogs" id="blogs">
         <h3>Compee Blogs</h3>

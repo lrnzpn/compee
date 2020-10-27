@@ -9,4 +9,9 @@
 
 .link-nav a {
     color: #CECDCD;
+    text-decoration: none;
+}
+
+.link-nav a:hover {
+    color: #159ABD;
 }
