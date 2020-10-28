@@ -247,7 +247,8 @@ class VendorListView(ListView):
                 if cat.category not in vendor['categories']:
                     vendor['categories'].append(cat.category)
             final.append(vendor)
-        context['vendor_cats'] = final
+        context['vendor_cats'] = final[:4]
+        context['vendor_cats_end'] = final[4:]
         return context
 
 class VendorDetailView(DetailView):
