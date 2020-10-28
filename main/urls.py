@@ -3,6 +3,7 @@ import main.views as v
 
 urlpatterns = [
     path('search/', v.SearchBar, name='search-bar'),
+    path('search/filter/', v.SearchFilter, name='search-filter'),
     path('', v.Home, name='home'),
     path('about/', v.About, name='about'),
     path('contact/', v.Contact, name='contact'),

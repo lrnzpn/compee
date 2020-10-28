@@ -31,8 +31,13 @@ def SearchBar(request):
             'query':query
         }
         queries = query.split(" ")
+
         products = []
         vendors = []
+        services = []
+        service_items = []
+        providers = []
+
         for q in queries:
             prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
             if prods:
@@ -44,12 +49,178 @@ def SearchBar(request):
             if sellers:
                 for vendor in sellers:
                     vendors.append(vendor)
-        
+
+            servs = Service.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            if servs:
+                for serv in servs:
+                    services.append(serv)
+
+            items = ServiceItem.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            if items:
+                for item in items:
+                    service_items.append(item)
+
+            s_provs = ServiceProvider.objects.filter(Q(store_name__icontains=q) | Q(provider_info__icontains=q)).distinct()
+            if s_provs:
+                for prov in s_provs:
+                    providers.append(prov)
+
+        context = {'title': 'Search'}
         if products:
             context.update({'products':list(set(products))})
         if vendors:
             context.update({'vendors':list(set(vendors))})
+
+        if services:
+            context.update({'services':list(set(services))})
+        if service_items:
+            context.update({'items':list(set(items))})
+        if providers:
+            context.update({'providers':list(set(providers))})
         return render(request, 'main/filters/search_result.html', context )
+
+def filterProduct(i_type, item, ratings):
+    if i_type == "product":
+        if item.vendor.status == "Active":
+            if ratings:
+                if ProductReview.objects.filter(product=item).exists():
+                    rev = ProductReview.objects.get(product=item)
+                    return rev.rating in ratings
+                else:
+                    return 0 in ratings
+            else:
+                return True
+        else:
+            return False
+    elif i_type == "service":
+        if ratings:
+            if ServiceReview.objects.filter(service=item).exists():
+                rev = ServiceReview.objects.get(service=item)
+                return rev.rating in ratings
+            else:
+                return 0 in ratings
+        else:
+            return True
+    
+
+def SearchFilter(request):
+    if request.method == "GET":
+        query = request.GET
+        print(query)
+        products = []
+        services = []
+
+        pricemin = ''
+        pricemax = ''
+        if query['pricemin']:
+            pricemin = float(query['pricemin'])
+        if query['pricemax']:
+            pricemax = float(query['pricemax'])
+        
+        ratings = []
+        if 'rating' in query:
+            rating = request.GET.getlist('rating')
+            for i in rating:
+                ratings.append(int(i))
+
+        if len(query) == 2 or (len(query) == 3 and ratings):
+            prods = Product.objects.all()
+            servs = Service.objects.all()
+
+            if pricemin and pricemax:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemin <= prod.price <= pricemax:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemin <= serv.price <= pricemax:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            elif pricemin:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemin <= prod.price:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemin <= serv.price:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            elif pricemax:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemax >= prod.price:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemax >= serv.price:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            else:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if filterProduct("product", prod, ratings):
+                            products.append(prod)
+                for serv in servs:
+                    if filterProduct("service", serv, ratings):
+                        services.append(serv)
+
+        else:
+            for i in query:
+                if i != "pricemin" and i != "pricemax" and i != 'rating':
+                    q = query[i]
+                    prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+                    if prods:
+                        if pricemin and pricemax:
+                            for prod in prods:
+                                if pricemin <= prod.price <= pricemax:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        elif pricemin:
+                            for prod in prods:
+                                if pricemin <= prod.price:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        elif pricemax:
+                            for prod in prods:
+                                if pricemax >= prod.price:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        else:
+                            for prod in prods:
+                                if filterProduct("product", prod, ratings):
+                                    products.append(prod)
+
+                    servs = Service.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+                    if servs:
+                        if pricemin and pricemax:
+                            for serv in servs:
+                                if pricemin <= serv.price <= pricemax:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        elif pricemin:
+                            for serv in servs:
+                                if pricemin <= serv.price:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        elif pricemax:
+                            for serv in servs:
+                                if pricemax >= serv.price:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        else:
+                            for serv in servs:
+                                if filterProduct("service", serv, ratings):
+                                    services.append(serv)   
+
+        context = {'title': 'Search'}
+        if products:
+            context.update({'products':list(set(products))})
+        if services:
+            context.update({'services':list(set(services))})
+                
+        return render(request, 'main/filters/search_result.html', context)
 
 def Home(request):
     categories = Category.objects.all()
