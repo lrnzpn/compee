@@ -35,16 +35,22 @@
     height: 95%;
 }
 
+.item-row .item-wrapper .card a:hover {
+    text-decoration: none;
+}
+
 .item-row .item-wrapper:not(:last-child) .card {
     border-right: 1px solid #CECDCD;
 }
 
 .item-row .item-wrapper .card-body {
-    padding: 1.25em 0;
+    padding: 0;
 }
 
 .item-row .item-wrapper .card-text {
     font-weight: 500;
+    color: #202020;
+    padding: 1em 0;
 }
 
 .item-row .item-wrapper .card-body li {
