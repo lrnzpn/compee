@@ -188,39 +188,6 @@ def CategoryProductsListView(request, name):
     }
     return render(request, 'main/filters/category_detail.html', context)
 
-def VendorCategoryProductsListView(request, vendor, category):
-    category = Category.objects.get(name=category)
-    if Vendor.objects.filter(slug=vendor).exists():
-        vendor = Vendor.objects.get(slug=vendor)
-        product_cats = ProductCategory.objects.filter(category=category)
-        products = []
-        for p in product_cats:
-            if p.product.vendor == vendor:
-                products.append(p.product)
-        context = {
-            'products' : products,
-            'category' : category,
-            'title' : f"Search for '{category}' in {vendor.store_name} ",
-        }
-    elif ServiceProvider.objects.filter(slug=vendor).exists():
-        provider = ServiceProvider.objects.get(slug=vendor)
-        service_cats = ServiceCategory.objects.filter(category=category)
-        service_item_cats = ServiceItemCategory.objects.filter(category=category)
-        services = []
-        for i in service_cats:
-            if i.service.provider == provider:
-                services.append(i.service)
-        items = []
-        for i in service_item_cats:
-            if i.service_item.provider == provider:
-                items.append(i.service_item)
-        context = {
-            'services' : services,
-            'items' : items,
-            'category' : category,
-            'title' : f"Search for '{category}' in {provider.store_name} ",
-        }
-    return render(request, 'main/filters/vendor_category.html', context)
 class VendorListView(ListView):
     model = Vendor
     context_object_name = 'vendors'
@@ -388,6 +355,95 @@ class ServiceDetailView(DetailView):
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         return context
+
+def VendorProductsListView(request, vendor):
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        if vendor.status == "Active":
+            context = {
+                'products' : Product.objects.filter(vendor=vendor),
+                'vendor': vendor,
+                'title' : f"{vendor.store_name} | All Products",
+            }
+        else:
+            return redirect('home')
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        context = {
+            'services' : Service.objects.filter(provider=provider),
+            'items' : ServiceItem.objects.filter(provider=provider),
+            'provider': provider,
+            'title' : f"{provider.store_name} | All Products",
+        }
+    return render(request, 'main/filters/vendor_products.html', context)
+
+def VendorCategoryProductsListView(request, vendor, category):
+    category = Category.objects.get(name=category)
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        product_cats = ProductCategory.objects.filter(category=category)
+        products = []
+        for p in product_cats:
+            if p.product.vendor == vendor:
+                products.append(p.product)
+        context = {
+            'products' : products,
+            'category' : category,
+            'title' : f"Search for '{category}' in {vendor.store_name} ",
+        }
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        service_cats = ServiceCategory.objects.filter(category=category)
+        service_item_cats = ServiceItemCategory.objects.filter(category=category)
+        services = []
+        for i in service_cats:
+            if i.service.provider == provider:
+                services.append(i.service)
+        items = []
+        for i in service_item_cats:
+            if i.service_item.provider == provider:
+                items.append(i.service_item)
+        context = {
+            'services' : services,
+            'items' : items,
+            'category' : category,
+            'title' : f"Search for '{category}' in {provider.store_name} ",
+        }
+    return render(request, 'main/vendors/vendor_category.html', context)
+
+def VendorCategoryProductsListView(request, vendor, category):
+    category = Category.objects.get(name=category)
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        product_cats = ProductCategory.objects.filter(category=category)
+        products = []
+        for p in product_cats:
+            if p.product.vendor == vendor:
+                products.append(p.product)
+        context = {
+            'products' : products,
+            'category' : category,
+            'title' : f"Search for '{category}' in {vendor.store_name} ",
+        }
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        service_cats = ServiceCategory.objects.filter(category=category)
+        service_item_cats = ServiceItemCategory.objects.filter(category=category)
+        services = []
+        for i in service_cats:
+            if i.service.provider == provider:
+                services.append(i.service)
+        items = []
+        for i in service_item_cats:
+            if i.service_item.provider == provider:
+                items.append(i.service_item)
+        context = {
+            'services' : services,
+            'items' : items,
+            'category' : category,
+            'title' : f"Search for '{category}' in {provider.store_name} ",
+        }
+    return render(request, 'main/filters/vendor_category.html', context)
 
 @login_required
 def AddToWishlist(request):
