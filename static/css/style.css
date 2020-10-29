@@ -17,6 +17,7 @@ body {
     min-height: 100%;
     position: relative;
     font-family: 'Jost', sans-serif;
+    
 }
 
 main {
@@ -251,6 +252,34 @@ footer {
 .ig {
     background-image: url('../img/icons/instagram-2\ 1.svg');
 }
+
+/*admin sidenav*/
+.sidenav {
+    height: 100%; 
+    width: 150px; 
+    position: fixed;
+    z-index: 1; 
+    top: 0; 
+    left: 0;
+    background-color: #ffffff; 
+    overflow-x: hidden; 
+    margin-top: 120px;
+    border-right: 1px solid #000000;
+  }
+
+  .sidenav a {
+    padding: 20px 10px;
+    margin: 0 5%;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+  }
+
+  .sidenav a:hover {
+    color: #000000;
+  }
+
 
 @media screen and (max-width: 991px) {
     .footer-content>div>span {

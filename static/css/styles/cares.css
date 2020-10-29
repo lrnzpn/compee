@@ -39,6 +39,26 @@ h3 {
    
 }
 
+.cares-item {
+    width: 100%;
+    border-bottom: 1px solid #202020;
+    padding: 1em 0 2em;
+}
+
+.cares-details {
+    height: 100%;
+    width: 100%;
+}
+
+.cares-header {
+    display: block;
+    cursor: pointer;
+}
+
+.cares-header i {
+    font-size: 1.25em;
+}
+
 /* media queries */
 @media (max-width: 992px) {
     .compee-cares h1 {
