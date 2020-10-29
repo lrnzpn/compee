@@ -24,10 +24,16 @@
     text-align: center;
 }
 
-.concierge-desc p {
+.concierge-desc-logo {
+    height: 250px;
+    width: auto;
+    margin: 0;
+}
+
+.concierge-desc span p {
     color: #000000;
     font-size: 15px;
-    margin: 0 50px;
+    margin: 30px;
    
 }
 
@@ -134,7 +140,7 @@ h3 {
         font-size: 1em;
         text-align: center;
     }
-    .concierge-desc span {
+    .concierge-desc  {
         padding: 3em;
         margin: 0;
            
@@ -165,7 +171,7 @@ h3 {
         padding: 1em;
        
     }
-    .concierge-desc p span {
+    .concierge-desc {
         font-size: 1em;
         margin: 0;
         

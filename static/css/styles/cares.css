@@ -1,9 +1,13 @@
-.jumbotron {
+.compee-cares .jumbotron {
     background-color: #005F7B;
+    margin: 0;
+    
     
 }
-.compee-cares {
-    width: 100%;
+.cares-about .jumbotron {
+    background-color: #159ABD;
+    margin: 0;
+    margin-bottom: 50px;
 }
 
 .content h1 {
@@ -11,7 +15,66 @@
     font-size: 75px;
 }
 
-.content .img-fluid {
+.cares-item {
+    padding: 1em;
+    margin: 10px;
+}
+
+h3 {
+    color: #ffffff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.compee-cares .img-fluid {
     width: 15%;
     margin: 0 20px;
+}
+
+.cares-about .img-fluid {
+    width: 10%;
+   
+}
+
+/* media queries */
+@media (max-width: 992px) {
+    .compee-cares h1 {
+        font-size: 4em;
+    }
+
+}
+
+@media (max-width: 768px) {
+    .compree-cares h1 {
+        font-size: 3em;
+    }
+    .cares-about h3 {
+        font-size: 1em;
+        text-align: center;
+    }
+    .cares-header span h4 {
+        font-size: 1em;
+    }
+    .cares-content p {
+        font-size: .8em;
+    }
+}
+
+@media (max-width: 576px) {
+    .compee-cares h1 {
+        font-size: 2em;
+    }
+    .cares-about p {
+        font-size: .8em;
+        text-align: center;
+    }
+    .cares-header span h4 {
+        font-size: .8em;
+    }
+    .cares-content p {
+        font-size: .7em;
+    }
 }
