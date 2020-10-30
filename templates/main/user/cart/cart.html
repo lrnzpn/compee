@@ -3,11 +3,126 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{% static 'css/styles/purchase.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
 {% endblock stylesheets %}
 
 {% block content %}
     {% if items %}
-        
+        <h2 class="d-flex justify-content-start align-items-center">
+            My Shopping Cart
+            <div class="cart icon"></div>
+        </h2>
+        <div class="row">
+            <div class="col-md-8">
+                {% for item in items %}
+                    {% if item.product %}
+                        <div class="cart-item-wrapper">
+                            <div class="cart-store">
+                                <span>{{item.product.vendor.store_name}}</span>
+                            </div>
+                            <div class="cart-item">
+                                <div class="row">
+                                    <div class="col-md-3 col-xs-6">
+                                        <img src="{{item.product.image.url}}" width="100px" height="100px">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-name">
+                                            <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-price">
+                                            <span>{{item.product.price}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-qty">
+                                            {{item.quantity}}
+                                        </div>
+                                        <div class="cart-item-ud d-flex justify-content-end align-items-center">
+                                            <a href="{% url 'cart-edit' item.id %}">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'cart-remove' item.id %}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="cart-item-wrapper">
+                            <div class="cart-store">
+                                <span>{{item.service.vendor.store_name}}</span>
+                            </div>
+                            <div class="cart-item">
+                                <div class="row">
+                                    <div class="col-md-3 col-xs-6">
+                                        <img src="{{item.service.image.url}}" width="100px" height="100px">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-name">
+                                            <a href="{% url 'vendor-product' item.service.slug %}">{{item.service.name}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-price">
+                                            <span>{{item.service.price}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="cart-item-qty">
+                                            {{item.quantity}}
+                                            <div class="cart-item-ud d-flex justify-content-end align-items-center">
+                                                <a href="{% url 'cart-edit' item.id %}">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'cart-remove' item.id %}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="col-md-4">
+                <div class="cart-order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="order-summary">
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Subtotal (3 Items)</span>
+                            <span>Php 69.00</span>
+                        </p>
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Shipping Fee</span>
+                            <span>Php 69.00</span>
+                        </p>
+                    </div>
+                    <div class="hr d-flex justify-content-end align-items-center">
+                        <hr>
+                    </div>
+                    <div class="order-total">
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Total:</span>
+                            <span>Php 69.00</span>
+                        </p>
+                    </div>
+
+                    {% if fees or s_only %}
+                    <div class="checkout-btn">
+                        <a href="{% url 'checkout-compee-cares' %}" class="btn btn-blue">Proceed to Checkout</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {%include 'admins/partials/_paginate.html' %}
     {% else %}
         <h3>You have nothing in your cart!</h3>
     {% endif %}
@@ -44,8 +159,5 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
-{%include 'admins/partials/_paginate.html' %}
-{% if fees or s_only %}
-<a href="{% url 'checkout-compee-cares' %}" class="btn btn-primary">Checkout</a>
-{% endif %} -->
+</table> -->
+
