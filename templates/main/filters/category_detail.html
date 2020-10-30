@@ -118,25 +118,21 @@
         </div>
 
         <div class="col-md-9">
-            {% if products or services or items %}
-            {% if products %}
-                <h2>{{ category.name }}</h2>
-                {%include 'main/partials/_products.html' %}
-            {% endif %}
+            {% if products or services %}
 
-            {% if services %}
-                <h2>Showing services under '{{ category.name }}'</h2>
-                {%include 'main/partials/_services.html' %}
-            {% endif %}
+                {% if products %}
+                    <h2>{{ category.name }}</h2>
+                    {%include 'main/partials/_products.html' %}
+                {% endif %}
 
-            {% if items %}
-                <h2>Showing items required by services under '{{ category.name }}'</h2>
-                {% include 'main/partials/_service_items.html' %}
-            {% endif %}
+                {% if services %}
+                    <h2>Showing services under '{{ category.name }}'</h2>
+                    {%include 'main/partials/_services.html' %}
+                {% endif %}
 
-        {% else %}
-            <h2>There are no products to display.</h2>
-        {% endif %}
+            {% else %}
+                <h2>There are no products to display.</h2>
+            {% endif %}
         </div>
     </div>
 
