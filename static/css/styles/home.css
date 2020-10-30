@@ -172,14 +172,14 @@ ul li a {
 
 /* blog posts */
 .blog-item {
-    height: 150px;
+    height: 180px;
     width: 100%;
     border-bottom: 1px solid #202020;
-    padding: 10px 0;
+    padding: 20px 0;
 }
 
 .blog-img img {
-    height: 130px;
+    height: 140px;
     width: auto;
 }
 

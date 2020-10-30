@@ -24,12 +24,15 @@
             <span>{{providers.count}} Total Services</span>
             {% for p in providers %}
                 {% if forloop.first %}<div class="row item-row">{% endif %}
-                <div class="col-md-3">
-                    <div class="card mb-4 shadow-sm">
-                        <img src="{{ p.image.url }}" width="100%" height="200px">
-                        <div class="card-body">
+                <div class="col-md-3 item-wrapper">
+                    <div class="mb-4 card">
+                        <a href="{% url 'provider-detail-main' p.slug %}">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="{{ p.image.url }}" width="100%" height="200px">
+                            </div>
                             <p class="card-text">{{ p.store_name }}</p>
-                            <!-- service categories -->
+                        </a>
+                        <div class="card-body">
                             <ul>
                                 {% for cat in service_cats %}
                                     {% if cat.provider == p.provider_id %}
@@ -39,14 +42,8 @@
                                     {% endif %}
                                 {% endfor %}
                             </ul>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <a href="{% url 'provider-detail-main' p.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
-                                </div>
-                                <small class="text-muted">{{ p.user.username }}</small>
-                            </div>
                         </div>
-                    </div>  
+                    </div>
                 </div>
                 {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
                 {% if forloop.last %}</div>{% endif %}
@@ -55,3 +52,27 @@
     </div>
     
 {% endblock content %}
+
+<!-- <div class="col-md-3">
+    <div class="card mb-4 shadow-sm">
+        <img src="{{ p.image.url }}" width="100%" height="200px">
+        <div class="card-body">
+            <p class="card-text">{{ p.store_name }}</p>
+            <ul>
+                {% for cat in service_cats %}
+                    {% if cat.provider == p.provider_id %}
+                        {% for i in cat.categories %}
+                            <li><a href="{% url 'vendor-category' p.slug i.name %}">{{i.name}}</a></li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <a href="{% url 'provider-detail-main' p.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+                <small class="text-muted">{{ p.user.username }}</small>
+            </div>
+        </div>
+    </div>  
+</div> -->

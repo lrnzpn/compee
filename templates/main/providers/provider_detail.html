@@ -1,25 +1,105 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    {%include 'main/partials/_categories.html' %}
-    <h3>{{ object.store_name }}</h3>
-    <div class="row">
-        <div class="col-md-8">
-            <h5>Store Description: </h5>
-            <p>{{ object.store_info }}</p>
-            <h5>Location: </h5>
-            <p>{{ object.address_line }}, {{ object.city }}, {{ object.state }} {{ object.zip_code }}</p>
-            <h5>Contact Numbers: </h5>
-            <p>{{ object.contact_no }}/{{ object.secondary_no }}</p>
-            <h5>Date Joined: </h5>
-            <p>{{ object.date_joined }}</p>
+    {% if inactive %}
+    <h4>This vendor is inactive.</h4>
+    {% else %}
+    <div class="ss-container">
+        <div class="ss-details">
+            <div class="ss-desc">
+                <div class="row">
+                   <div class="col-md-6">
+                        <div class="d-flex justify-content-start align-items-center">
+                            <div class="ss-img">
+                                <img src="{{ object.image.url }}" alt="" width="120px" height="120px">
+                            </div>
+
+                            <div class="ss-desc-content">
+                                <span>{{ object.store_name }}</span>
+                                <div class="ss-socmed d-flex justify-content-center align-items-start">
+                                    <span>Connect with us:</span>
+                                    <a href="#" class="d-flex justify-content-start align-content-center">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 10C20 4.47656 15.5234 0 10 0C4.47656 0 0 4.47656 0 10C0 15.5234 4.47656 20 10 20C10.0586 20 10.1172 20 10.1758 19.9961V12.2148H8.02734V9.71094H10.1758V7.86719C10.1758 5.73047 11.4805 4.56641 13.3867 4.56641C14.3008 4.56641 15.0859 4.63281 15.3125 4.66406V6.89844H14C12.9648 6.89844 12.7617 7.39062 12.7617 8.11328V9.70703H15.2422L14.918 12.2109H12.7617V19.6133C16.9414 18.4141 20 14.5664 20 10Z" fill="#159ABD"/>
+                                        </svg>
+                                        <span>Facebook</span>
+                                    </a>
+                                    <a href="#" class="d-flex justify-content-start align-content-center">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.9141 10C11.9141 11.0571 11.0571 11.9141 10 11.9141C8.94287 11.9141 8.08594 11.0571 8.08594 10C8.08594 8.94287 8.94287 8.08594 10 8.08594C11.0571 8.08594 11.9141 8.94287 11.9141 10Z" fill="#159ABD"/>
+                                        <path d="M14.4764 6.61392C14.3844 6.36459 14.2376 6.13892 14.0469 5.95367C13.8617 5.76294 13.6361 5.61615 13.3867 5.52414C13.1843 5.44556 12.8804 5.35202 12.3205 5.32654C11.7149 5.29892 11.5333 5.29297 10.0001 5.29297C8.46677 5.29297 8.28519 5.29877 7.67972 5.32639C7.11987 5.35202 6.81577 5.44556 6.61359 5.52414C6.36411 5.61615 6.13843 5.76294 5.95334 5.95367C5.7626 6.13892 5.61581 6.36444 5.52365 6.61392C5.44507 6.81625 5.35153 7.12036 5.32605 7.68021C5.29843 8.28568 5.29248 8.46725 5.29248 10.0006C5.29248 11.5338 5.29843 11.7154 5.32605 12.321C5.35153 12.8809 5.44507 13.1848 5.52365 13.3871C5.61581 13.6366 5.76245 13.8622 5.95319 14.0474C6.13843 14.2381 6.36395 14.3849 6.61343 14.4769C6.81577 14.5557 7.11987 14.6492 7.67972 14.6747C8.28519 14.7023 8.46661 14.7081 9.99997 14.7081C11.5335 14.7081 11.7151 14.7023 12.3204 14.6747C12.8802 14.6492 13.1843 14.5557 13.3867 14.4769C13.8875 14.2838 14.2833 13.8879 14.4764 13.3871C14.555 13.1848 14.6486 12.8809 14.6742 12.321C14.7018 11.7154 14.7076 11.5338 14.7076 10.0006C14.7076 8.46725 14.7018 8.28568 14.6742 7.68021C14.6487 7.12036 14.5552 6.81625 14.4764 6.61392ZM10.0001 12.9491C8.37155 12.9491 7.05136 11.629 7.05136 10.0005C7.05136 8.37189 8.37155 7.05185 10.0001 7.05185C11.6285 7.05185 12.9487 8.37189 12.9487 10.0005C12.9487 11.629 11.6285 12.9491 10.0001 12.9491ZM13.0653 7.62436C12.6848 7.62436 12.3762 7.31583 12.3762 6.93527C12.3762 6.55472 12.6848 6.24619 13.0653 6.24619C13.4459 6.24619 13.7544 6.55472 13.7544 6.93527C13.7542 7.31583 13.4459 7.62436 13.0653 7.62436Z" fill="#159ABD"/>
+                                        <path d="M10 0C4.478 0 0 4.478 0 10C0 15.522 4.478 20 10 20C15.522 20 20 15.522 20 10C20 4.478 15.522 0 10 0ZM15.7076 12.3674C15.6798 12.9787 15.5826 13.396 15.4407 13.7613C15.1424 14.5326 14.5326 15.1424 13.7613 15.4407C13.3961 15.5826 12.9787 15.6796 12.3676 15.7076C11.7552 15.7355 11.5596 15.7422 10.0002 15.7422C8.44055 15.7422 8.24509 15.7355 7.6326 15.7076C7.02148 15.6796 6.604 15.5826 6.23886 15.4407C5.85556 15.2965 5.50858 15.0705 5.22171 14.7783C4.92966 14.4916 4.70367 14.1444 4.55948 13.7613C4.41757 13.3961 4.32037 12.9787 4.2926 12.3676C4.26437 11.7551 4.25781 11.5594 4.25781 10C4.25781 8.44055 4.26437 8.24493 4.29245 7.6326C4.32022 7.02133 4.41727 6.604 4.55917 6.23871C4.70337 5.85556 4.9295 5.50842 5.22171 5.22171C5.50842 4.9295 5.85556 4.70352 6.23871 4.55933C6.604 4.41742 7.02133 4.32037 7.6326 4.29245C8.24493 4.26453 8.44055 4.25781 10 4.25781C11.5594 4.25781 11.7551 4.26453 12.3674 4.2926C12.9787 4.32037 13.396 4.41742 13.7613 4.55917C14.1444 4.70337 14.4916 4.9295 14.7784 5.22171C15.0705 5.50858 15.2966 5.85556 15.4407 6.23871C15.5827 6.604 15.6798 7.02133 15.7077 7.6326C15.7356 8.24493 15.7422 8.44055 15.7422 10C15.7422 11.5594 15.7356 11.7551 15.7076 12.3674Z" fill="#159ABD"/>
+                                        </svg>
+
+                                        <span>Instagram</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                   <div class="col-md-6 d-flex justify-content-center align-items-center">
+                    <div class="ss-add-desc">
+                        <span class="d-block">Products: <span>{{products.count}}</span></span>
+                        <span class="d-block">Joined: <span>{{object.date_joined}}</span></span>
+                    </div>
+                   </div>
+                </div>
+            </div>
+
+            <div class="ss-nav">
+                <div class="row">
+                    <div class="col-md-10 d-flex justify-content-start align-items-center">
+                        {% for cat in vendor_cats %}
+                            <a class="cat-item col-md-3" href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-end align-items-center">
+                        {% if service_cats_end|length != 0 %}
+                        <button class="btn btn-more" type="button" data-toggle="collapse" data-target="#more" aria-expanded="false" aria-controls="more">
+                            More <i class="fas fa-chevron-down"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="collapse" id="more">
+                        {% for cat in service_cats_end %}
+                            <a class="cat-item" href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="ss-abt">
+                <span>About Shop</span>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="https://via.placeholder.com/150" alt="">
+                    </div>
+                    <div class="col-md-6">
+                        <p>{{object.store_info}}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <img src="{{ object.image.url }}" width="100%" height="200px">
-            <p><b>Username: </b> {{ object.user.username }}</p>
+
+        <div class="ss-items">
+            <h3>All Products</h3>
+            {% include 'main/partials/_products.html' %}
         </div>
     </div>
+    {% endif %}
+{% endblock content %}
 
-    {% if reviews %}
+
+<!-- {% if reviews %}
         <h3>Reviews</h3>
         {% for r in reviews %}
             <ul>
@@ -34,28 +114,4 @@
                 {% endif %}
             </ul>
         {% endfor %}
-    {% endif %}
-
-    <!-- service categories -->
-    <ul>
-        {% for cat in service_cats %}
-            <li><a href="{% url 'vendor-category' object.slug cat.name %}">{{cat.name}}</a></li>
-        {% endfor %}
-    </ul>
-
-    <!-- Products here -->
-    <h3>Store Products</h3>
-    <h3>Services:</h3>
-    {% if services %}
-        {%include 'main/partials/_services.html' %}
-    {% else %}
-        <h4>This provider has not posted any services!</h4>
-    {% endif %}
-
-    <h3>Items Needed:</h3>
-    {% if items %}
-        {%include 'main/partials/_service_items.html' %}
-    {% else %}
-        <h4>This provider has not posted any required items!</h4>
-    {% endif %}
-{% endblock content %}
+    {% endif %} -->
