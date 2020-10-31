@@ -1,15 +1,40 @@
-.jumbotron {
+.compee-concierge .jumbotron  {
     background-color: #000000;
-
-}
-
-.compee-concierge {
     width: 100%;
+    margin: 0;
 }
 
+.concierge-about .jumbotron {
+    background-color: #159ABD;
+    margin: 0;
+}
+
+.concierge-desc {
+    margin: 30px;
+}
+    
 .content h1 {
     color: #ffffff;
     font-size: 75px;
+}
+
+.concierge-about p {
+    color: #ffffff;
+    font-size: 20px;
+    text-align: center;
+}
+
+.concierge-desc-logo {
+    height: 250px;
+    width: auto;
+    margin: 0;
+}
+
+.concierge-desc span p {
+    color: #000000;
+    font-size: 15px;
+    margin: 30px;
+   
 }
 
 .content .img-fluid {
@@ -19,7 +44,9 @@
 
 h3 {
     padding: 10px 0;
+    font-weight: 700;
 }
+
 
 /* blog posts */
 .blog-item {
@@ -96,3 +123,70 @@ h3 {
 .question-content p {
     width: 95%;
 }
+
+/* media queries */
+@media (max-width: 992px) {
+    .content h1 {
+        font-size: 4em;
+    }
+
+}
+
+@media (max-width: 768px) {
+    .content h1 {
+        font-size: 3em;
+    }
+    .concierge-about p {
+        font-size: 1em;
+        text-align: center;
+    }
+    .concierge-desc  {
+        padding: 3em;
+        margin: 0;
+           
+    }
+    h3 {
+        font-size: 1.5em;
+    }
+    .compee-blogs p {
+        font-size: 1em;
+    }
+    .question-header span {
+        font-size: 1em;
+    }
+    .question-content p {
+        font-size: .8em;
+    }
+}
+
+@media (max-width: 576px) {
+    .content h1 {
+        font-size: 2em;
+    }
+    .concierge-about p {
+        font-size: .8em;
+        text-align: center;
+    }
+    .concierge-desc img {
+        padding: 1em;
+       
+    }
+    .concierge-desc {
+        font-size: 1em;
+        margin: 0;
+        
+    }
+    h3 {
+        font-size: 1em;
+    }
+    .compee-blogs p {
+        font-size: .8em;
+    }
+    .question-header span {
+        font-size: .8em;
+    }
+    .question-content p {
+        font-size: .7em;
+    }
+}
+
