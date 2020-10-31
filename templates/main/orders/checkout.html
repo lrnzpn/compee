@@ -13,66 +13,130 @@
         <div class="cart icon"></div>
     </h2>
     {% if items %}
-        {% for item in items %}
-            {% if item.product %}
-            <div class="cart-item-wrapper">
-                <div class="cart-store">
-                    <span>{{item.product.vendor.store_name}}</span>
-                </div>
-                <div class="cart-item">
-                    <div class="row">
-                        <div class="col-md-3 col-xs-6">
-                            <img src="{{item.product.image.url}}" width="100px" height="100px">
-                        </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-name">
-                                <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-price">
-                                <span>{{item.product.price}}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-qty">
-                                {{item.quantity}}
-                            </div>
-                        </div>
+        <div class="checkout-wrapper">
+            <div class="cart-item-header">
+                <div class="row">
+                    <div class="col-sm-6 col-5">
+                        <span>Products Ordered</span>
+                    </div>
+                    <div class="col-sm-2 col-3">
+                        <span>Unit Price</span>
+                    </div>
+                    <div class="col-2">
+                        <span>Quantity</span>
+                    </div>
+                    <div class="col-2">
+                        <span>Subtotal</span>
                     </div>
                 </div>
             </div>
-            {% else %}
-            <div class="cart-item-wrapper">
-                <div class="cart-store">
-                    <span>{{item.service.vendor.store_name}}</span>
-                </div>
-                <div class="cart-item">
-                    <div class="row">
-                        <div class="col-md-3 col-xs-6">
-                            <img src="{{item.service.image.url}}" width="100px" height="100px">
-                        </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-name">
-                                <a href="{% url 'vendor-product' item.service..slug %}">{{item.service.name}}</a>
+            <div class="cart-item-body">
+                {% for item in items %}
+                    {% if item.product %}
+                        <div class="cart-item">
+                            <div class="row">
+                                <div class="col-md-2 col-xs-6">
+                                    <img src="{{item.product.image.url}}" width="100px" height="100px">
+                                </div>
+                                <div class="col-md-4 col-xs-6">
+                                    <div class="cart-item-name">
+                                        <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-price">
+                                        <span>{{item.product.price}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-qty">
+                                        {{item.quantity}}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-price">
+                                        <span>{{item.product.price}}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-price">
-                                <span>{{item.service.price}}</span>
-                                
-                            </div>
+                    {% else %}
+                    <div class="cart-item-wrapper">
+                        <div class="cart-store">
+                            <span>{{item.service.vendor.store_name}}</span>
                         </div>
-                        <div class="col-md-3 col-6">
-                            <div class="cart-item-qty">
-                                {{item.quantity}}
+                        <div class="cart-item">
+                            <div class="row">
+                                <div class="col-md-2 col-xs-6">
+                                    <img src="{{item.service.image.url}}" width="100px" height="100px">
+                                </div>
+                                <div class="col-md-4 col-xs-6">
+                                    <div class="cart-item-name">
+                                        <a href="{% url 'vendor-product' item.service.slug %}">{{item.service.name}}</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-price">
+                                        <span>{{item.service.price}}</span>
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-qty">
+                                        {{item.quantity}}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <div class="cart-item-price">
+                                        <span>{{item.product.price}}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        {% if fees %}
+            <h4>Included shipping fees:</h4>
+            <table border='1'>
+                <thead>
+                    <th>Store</th>
+                    <th>Fee</th>
+                </thead>
+                <tbody>
+                    {% for f in fees %}
+                        <tr>
+                            <td>{{ f.vendor.store_name }}</td>
+                            <td>{{ f.rate.rate }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if cc_total %}
+                <h4>Included Compee Cares Fee:</h4>
+                <p>{{cc_total}} for {{cc_count}} item/s in cart</p>
+                </table>
+            {% endif %}
+            
+            {% if fees or s_only %}
+            <div class="content-section">
+                <form method = "POST" enctype = "multipart/form-data">
+                    {% csrf_token %}
+                    <fieldset class = "form-group">
+                        <legend class = "border-bottom mb-4">Order Details</legend>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class = "btn btn-outline-info" type = "submit">Checkout</button>
+                    </div>
+                </form>
             </div>
             {% endif %}
-        {% endfor %}
+
     {% else %}
         <h2>Your cart is empty!</h2>
     {% endif %}

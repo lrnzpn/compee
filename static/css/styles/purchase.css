@@ -40,6 +40,7 @@ h2 {
 .cart-order-summary {
     border: 1px solid #202020;
     padding: 20px;
+    top: 150px;
 }
 
 .order-summary p span:last-child {
@@ -98,4 +99,33 @@ form .order-total p span {
 form .order-total p span:last-child {
     color: #005F7B;
     font-size: 1.25em;
+}
+
+/* main checkout (/checkout/)*/
+.checkout-wrapper {
+    border: 1px solid #202020;
+    border-radius: 2px;
+}
+
+.cart-item-header {
+    padding: 20px;
+    border-bottom: 1px solid #202020;
+}
+
+.cart-item-header span {
+    font-weight: 600;
+    font-size: 1.25em;
+    color: #CECDCD;
+}
+
+.cart-item-header .row div:first-child span {
+    color: #005F7B;
+}
+
+.cart-item-body .cart-item {
+    padding: 20px;
+}
+
+.cart-item-body .cart-item:not(:last-child) {
+    border-bottom: 1px solid #202020;
 }
