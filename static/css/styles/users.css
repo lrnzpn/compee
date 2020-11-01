@@ -7,6 +7,7 @@
 legend {
     font-weight: bold;
     text-align: center;
+    font-size: 2em;
 }
 
 .login-container {
@@ -23,4 +24,34 @@ legend {
     padding-top: 2.5%;
     display: flex;
     justify-content: center;
+    font-size: 1.3em;
+}
+
+/* media queries */
+@media (max-width: 992px) {
+    
+
+}
+
+@media (max-width: 768px) {
+    legend {
+        font-size: 1.8em;
+     }
+}
+
+@media (max-width: 576px) {
+    legend {
+        font-size: 1.5em;
+     }
+
+     .form-group button {
+         width: 100%;
+         display: block;
+         font-size: 1em;
+         
+     }
+
+     .text-muted {
+         font-size: 1em;
+     }
 }
