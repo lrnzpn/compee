@@ -26,12 +26,13 @@
                 {% if forloop.first %}<div class="row item-row">{% endif %}
                 <div class="col-md-3 item-wrapper">
                     <div class="mb-4 card">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <img src="{{ vendor.image.url }}" width="100%" height="200px">
-                        </div>
-                        <div class="card-body">
+                        <a href="{% url 'vendor-detail-main' vendor.slug %}">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="{{ vendor.image.url }}" width="100%" height="200px">
+                            </div>
                             <p class="card-text">{{ vendor.store_name }}</p>
-                            <!-- seller categories -->
+                        </a>
+                        <div class="card-body">
                             <ul>
                                 {% for cat in vendor_cats %}
                                     {% if cat.vendor == vendor.vendor_id %}
@@ -41,12 +42,6 @@
                                     {% endif %}
                                 {% endfor %}
                             </ul>
-                            <!-- <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <a href="{% url 'vendor-detail-main' vendor.slug  %}" class="btn btn-sm btn-outline-secondary">View</a>
-                                </div>
-                                <small class="text-muted">{{ vendor.user.username }}</small>
-                            </div> -->
                         </div>
                     </div>
                 </div>

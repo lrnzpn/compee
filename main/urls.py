@@ -3,6 +3,7 @@ import main.views as v
 
 urlpatterns = [
     path('search/', v.SearchBar, name='search-bar'),
+    path('search/filter/', v.SearchFilter, name='search-filter'),
     path('', v.Home, name='home'),
     path('about/', v.About, name='about'),
     path('contact/', v.Contact, name='contact'),
@@ -13,10 +14,6 @@ urlpatterns = [
         template_name='main/pages/concierge/product_guides.html'), name='product-guides-main'),
     path('product-guides/post/<str:slug>', v.ProductGuideDetailView.as_view(
         template_name='main/pages/concierge/product_guide.html'), name='product-guide'),
-    path('faqs/', v.FaqListView.as_view(
-        template_name='main/pages/concierge/faqs.html'), name='faqs-main'),
-    path('faqs/post/<str:slug>', v.FaqDetailView.as_view(
-        template_name='main/pages/concierge/faq.html'), name='faq-guide'),
 
     path('categories/', v.CategoryListView.as_view(
         template_name='main/filters/categories.html'), name='all-categories'),
@@ -37,6 +34,7 @@ urlpatterns = [
         template_name="main/vendors/vendors.html"), name='vendors-main'),
     path('shop/<str:slug>/', v.VendorDetailView.as_view(
         template_name='main/vendors/vendor_detail.html'), name='vendor-detail-main'),
+            path('shop/<str:vendor>/products/', v.VendorProductsListView, name='vendor-products'),
     path('shop/<str:vendor>/<str:category>/', v.VendorCategoryProductsListView, name='vendor-category'),
     path('product/<str:slug>/', v.ProductDetailView.as_view(
         template_name='main/vendors/vendor_product.html'), name='vendor-product'),

@@ -31,8 +31,13 @@ def SearchBar(request):
             'query':query
         }
         queries = query.split(" ")
+
         products = []
         vendors = []
+        services = []
+        service_items = []
+        providers = []
+
         for q in queries:
             prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
             if prods:
@@ -44,12 +49,176 @@ def SearchBar(request):
             if sellers:
                 for vendor in sellers:
                     vendors.append(vendor)
-        
+
+            servs = Service.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            if servs:
+                for serv in servs:
+                    services.append(serv)
+
+            items = ServiceItem.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            if items:
+                for item in items:
+                    service_items.append(item)
+
+            s_provs = ServiceProvider.objects.filter(Q(store_name__icontains=q) | Q(provider_info__icontains=q)).distinct()
+            if s_provs:
+                for prov in s_provs:
+                    providers.append(prov)
+
+        context = {'title': 'Search'}
         if products:
             context.update({'products':list(set(products))})
         if vendors:
             context.update({'vendors':list(set(vendors))})
+
+        if services:
+            context.update({'services':list(set(services))})
+        if service_items:
+            context.update({'items':list(set(items))})
+        if providers:
+            context.update({'providers':list(set(providers))})
         return render(request, 'main/filters/search_result.html', context )
+
+def filterProduct(i_type, item, ratings):
+    if i_type == "product":
+        if item.vendor.status == "Active":
+            if ratings:
+                if ProductReview.objects.filter(product=item).exists():
+                    rev = ProductReview.objects.get(product=item)
+                    return rev.rating in ratings
+                else:
+                    return 0 in ratings
+            else:
+                return True
+        else:
+            return False
+    elif i_type == "service":
+        if ratings:
+            if ServiceReview.objects.filter(service=item).exists():
+                rev = ServiceReview.objects.get(service=item)
+                return rev.rating in ratings
+            else:
+                return 0 in ratings
+        else:
+            return True
+    
+def SearchFilter(request):
+    if request.method == "GET":
+        query = request.GET
+        products = []
+        services = []
+
+        pricemin = ''
+        pricemax = ''
+        if query['pricemin']:
+            pricemin = float(query['pricemin'])
+        if query['pricemax']:
+            pricemax = float(query['pricemax'])
+        
+        ratings = []
+        if 'rating' in query:
+            rating = request.GET.getlist('rating')
+            for i in rating:
+                ratings.append(int(i))
+
+        if len(query) == 2 or (len(query) == 3 and ratings):
+            prods = Product.objects.all()
+            servs = Service.objects.all()
+
+            if pricemin and pricemax:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemin <= prod.price <= pricemax:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemin <= serv.price <= pricemax:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            elif pricemin:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemin <= prod.price:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemin <= serv.price:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            elif pricemax:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if pricemax >= prod.price:
+                            if filterProduct("product", prod, ratings):
+                                products.append(prod)
+                for serv in servs:
+                    if pricemax >= serv.price:
+                        if filterProduct("service", serv, ratings):
+                            services.append(serv)
+            else:
+                for prod in prods:
+                    if prod.vendor.status == "Active":
+                        if filterProduct("product", prod, ratings):
+                            products.append(prod)
+                for serv in servs:
+                    if filterProduct("service", serv, ratings):
+                        services.append(serv)
+
+        else:
+            for i in query:
+                if i != "pricemin" and i != "pricemax" and i != 'rating':
+                    q = query[i]
+                    prods = Product.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+                    if prods:
+                        if pricemin and pricemax:
+                            for prod in prods:
+                                if pricemin <= prod.price <= pricemax:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        elif pricemin:
+                            for prod in prods:
+                                if pricemin <= prod.price:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        elif pricemax:
+                            for prod in prods:
+                                if pricemax >= prod.price:
+                                    if filterProduct("product", prod, ratings):
+                                        products.append(prod)
+                        else:
+                            for prod in prods:
+                                if filterProduct("product", prod, ratings):
+                                    products.append(prod)
+
+                    servs = Service.objects.filter(Q(name__icontains=q) | Q(description__icontains=q) | Q(tags__name__icontains=q)).distinct()
+                    if servs:
+                        if pricemin and pricemax:
+                            for serv in servs:
+                                if pricemin <= serv.price <= pricemax:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        elif pricemin:
+                            for serv in servs:
+                                if pricemin <= serv.price:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        elif pricemax:
+                            for serv in servs:
+                                if pricemax >= serv.price:
+                                    if filterProduct("service", serv, ratings):
+                                        services.append(serv)
+                        else:
+                            for serv in servs:
+                                if filterProduct("service", serv, ratings):
+                                    services.append(serv)   
+
+        context = {'title': 'Search'}
+        if products:
+            context.update({'products':list(set(products))})
+        if services:
+            context.update({'services':list(set(services))})
+                
+        return render(request, 'main/filters/search_result.html', context)
 
 def Home(request):
     categories = Category.objects.all()
@@ -86,7 +255,7 @@ def CompeeConcierge(request):
     context = {
         'title': 'Compee Concierge', 
         'guides' : ProductGuide.objects.all()[:3],
-        'faqs': Faq.objects.all()[:3]
+        'faqs': Faq.objects.all()
     }
     return render(request, 'main/pages/concierge/concierge.html', context)
 
@@ -112,24 +281,6 @@ class ProductGuideDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductGuideDetailView, self).get_context_data(**kwargs)
         context['title'] = f'Product Guides | {self.object.title}'
-        return context
-
-class FaqListView(ListView):
-    model = Faq
-    context_object_name = 'faqs'
-    paginate_by = 6
-
-    def get_context_data(self, **kwargs):
-        context = super(FaqListView, self).get_context_data(**kwargs)
-        context['title'] = "Frequently Asked Questions"
-        return context
-
-class FaqDetailView(DetailView):
-    model = Faq
-
-    def get_context_data(self, **kwargs):
-        context = super(FaqDetailView, self).get_context_data(**kwargs)
-        context['title'] = f'FAQs | {self.object.title}'
         return context
 
 class CategoryListView(ListView):
@@ -168,7 +319,7 @@ def CategoryProductsListView(request, name):
         if p.product.vendor.status == "Inactive":
             product_cats = product_cats.exclude(product=p.product)
     service_cats = ServiceCategory.objects.filter(category=category)
-    service_item_cats = ServiceItemCategory.objects.filter(category=category)
+    # service_item_cats = ServiceItemCategory.objects.filter(category=category)
 
     products = []
     for i in product_cats:
@@ -176,51 +327,19 @@ def CategoryProductsListView(request, name):
     services = []
     for i in service_cats:
         services.append(i.service)
-    items = []
-    for i in service_item_cats:
-        items.append(i.service_item)
+    # items = []
+    # for i in service_item_cats:
+    #     items.append(i.service_item)
+
     context = {
         'products' : products,
         'services' : services,
-        'items' : items,
+        # 'items' : items,
         'category' : category,
         'title' : f"Search for '{category}'"
     }
     return render(request, 'main/filters/category_detail.html', context)
 
-def VendorCategoryProductsListView(request, vendor, category):
-    category = Category.objects.get(name=category)
-    if Vendor.objects.filter(slug=vendor).exists():
-        vendor = Vendor.objects.get(slug=vendor)
-        product_cats = ProductCategory.objects.filter(category=category)
-        products = []
-        for p in product_cats:
-            if p.product.vendor == vendor:
-                products.append(p.product)
-        context = {
-            'products' : products,
-            'category' : category,
-            'title' : f"Search for '{category}' in {vendor.store_name} ",
-        }
-    elif ServiceProvider.objects.filter(slug=vendor).exists():
-        provider = ServiceProvider.objects.get(slug=vendor)
-        service_cats = ServiceCategory.objects.filter(category=category)
-        service_item_cats = ServiceItemCategory.objects.filter(category=category)
-        services = []
-        for i in service_cats:
-            if i.service.provider == provider:
-                services.append(i.service)
-        items = []
-        for i in service_item_cats:
-            if i.service_item.provider == provider:
-                items.append(i.service_item)
-        context = {
-            'services' : services,
-            'items' : items,
-            'category' : category,
-            'title' : f"Search for '{category}' in {provider.store_name} ",
-        }
-    return render(request, 'main/filters/vendor_category.html', context)
 class VendorListView(ListView):
     model = Vendor
     context_object_name = 'vendors'
@@ -388,6 +507,61 @@ class ServiceDetailView(DetailView):
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
         return context
+
+def VendorProductsListView(request, vendor):
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        if vendor.status == "Active":
+            context = {
+                'products' : Product.objects.filter(vendor=vendor),
+                'vendor': vendor,
+                'title' : f"{vendor.store_name} | All Products",
+            }
+        else:
+            return redirect('home')
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        context = {
+            'services' : Service.objects.filter(provider=provider),
+            'items' : ServiceItem.objects.filter(provider=provider),
+            'provider': provider,
+            'title' : f"{provider.store_name} | All Products",
+        }
+    return render(request, 'main/filters/vendor_products.html', context)
+
+def VendorCategoryProductsListView(request, vendor, category):
+    category = Category.objects.get(name=category)
+    if Vendor.objects.filter(slug=vendor).exists():
+        vendor = Vendor.objects.get(slug=vendor)
+        product_cats = ProductCategory.objects.filter(category=category)
+        products = []
+        for p in product_cats:
+            if p.product.vendor == vendor:
+                products.append(p.product)
+        context = {
+            'products' : products,
+            'category' : category,
+            'title' : f"Search for '{category}' in {vendor.store_name} ",
+        }
+    elif ServiceProvider.objects.filter(slug=vendor).exists():
+        provider = ServiceProvider.objects.get(slug=vendor)
+        service_cats = ServiceCategory.objects.filter(category=category)
+        service_item_cats = ServiceItemCategory.objects.filter(category=category)
+        services = []
+        for i in service_cats:
+            if i.service.provider == provider:
+                services.append(i.service)
+        items = []
+        for i in service_item_cats:
+            if i.service_item.provider == provider:
+                items.append(i.service_item)
+        context = {
+            'services' : services,
+            'items' : items,
+            'category' : category,
+            'title' : f"Search for '{category}' in {provider.store_name} ",
+        }
+    return render(request, 'main/filters/vendor_category.html', context)
 
 @login_required
 def AddToWishlist(request):
@@ -571,6 +745,8 @@ class CartView(LoginRequiredMixin, ListView):
         context['title'] = self.request.user.username + "'s Cart"
         vendors = []
         fees = []
+        subtotal = decimal.Decimal(0.00)
+        total = decimal.Decimal(0.00)
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -578,6 +754,10 @@ class CartView(LoginRequiredMixin, ListView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
+                subtotal = subtotal + i.product.price
+            else:
+                subtotal = subtotal + i.service.price
+        
         if vendors == []:
             context['s_only'] = True
 
@@ -585,6 +765,11 @@ class CartView(LoginRequiredMixin, ListView):
             context['fees'] = fees
         else:
             messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
+
+        for i in fees:
+            total = total + i.rate.rate
+        context['subtotal'] = subtotal
+        context['total'] = total + subtotal
         return context
 
 class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -704,13 +889,17 @@ class Checkout(LoginRequiredMixin, CreateView):
         items = CartItem.objects.filter(user=self.request.user)
         context['items'] = items
         items = items.filter(c_cares=True)
+        cc_total = decimal.Decimal(0.00)
         if items:
-            context['cc_total'] = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            cc_total = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            context['cc_total'] = cc_total
             context['cc_count'] = len(items)
 
         vendors = []
         providers = []
-        fees = []                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+        fees = []
+        subtotal = decimal.Decimal(0.00)
+        total = decimal.Decimal(0.00)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -718,10 +907,12 @@ class Checkout(LoginRequiredMixin, CreateView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
+                subtotal = subtotal + i.product.price
             else:
                 if i.service.provider.provider_id not in providers:
                     provider = ServiceProvider.objects.get(provider_id=i.service.provider.provider_id)
                     providers.append(i.service.provider.provider_id)
+                subtotal = subtotal + i.service.price
         
         if vendors == []:
             context['s_only'] = True
@@ -733,6 +924,11 @@ class Checkout(LoginRequiredMixin, CreateView):
             context['fees'] = fees
         else:
             messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
+
+        for i in fees:
+            total = total + i.rate.rate
+        context['subtotal'] = subtotal
+        context['total'] = total + subtotal + cc_total
         return context
 
     def form_valid(self, form):

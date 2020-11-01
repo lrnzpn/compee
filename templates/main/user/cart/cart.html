@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
     {% if items %}
+        <p>subtotal: {{ subtotal }}</p>
+        <p>shipping fees:</p>
+        <ul>
+            {% for i in fees %}
+                <li>{{ i.rate.rate }} ({{i.vendor.store_name}})</li>
+            {% endfor %}
+        </ul>
+        <p>Total: {{ total }}</p>
         <table border="1">
             <thead>
                 <th></th>
