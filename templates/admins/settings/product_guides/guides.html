@@ -8,6 +8,7 @@
             <h2><a href="{% url 'guide-detail' post.id %}">{{ post.title }}</a></h2>
             <p>{{ post.content|safe|truncatewords:"30"|linebreaks }}</p>
         {% endfor %}
+        {%include 'admins/partials/_paginate.html' %}
     {% else %}
         <p>There are no posts to display!</p>
     {% endif %}

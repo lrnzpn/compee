@@ -630,7 +630,7 @@ def get_sort_orders(request):
 class OrderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = SiteOrder
     context_object_name = 'orders'
-    paginate_by = 6
+    # paginate_by = 6
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()

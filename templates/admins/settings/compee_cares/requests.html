@@ -27,6 +27,8 @@
                 </tr>
             </tbody>
         </table>
+        {%include 'admins/partials/_paginate.html' %}
+
     {% else %}
         <p>No requests have been made.</p>
     {% endif %}
