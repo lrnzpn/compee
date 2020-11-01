@@ -1,4 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/about.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    <h1>Contact Page</h1>
+<div class="container about-container">
+	<div class="row">
+		<div class="col-md-8">
+			<h1>How can I contact Compee?</h1>
+			<h3>You may reach us via:</h3>
+            <p>Calls: 00 0 000 0000 (Weekdays 7:00 AM to10:00 PM, Weekends 7:00 AM to 7:00 PM)</p>
+            <p>Email: compee@gmail.com</p>
+            <p>Facebook: <a href="https://www.facebook.com/Compee-105678154492898">Compee PH</a></p>
+            
+
+		</div>
+		<div class="col-md-4 d-flex justify-content-center align-content-center">
+			<img src="/static/img/logos/Logo 2@4x.png" class="about-logo">
+		</div>	
+	</div>
+	</div>
 {% endblock content %}
