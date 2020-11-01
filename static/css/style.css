@@ -112,6 +112,17 @@ ul {
     color: #fff;
 }
 
+.btn-blue-outline {
+    border: 1px solid #159ABD;
+    color: #159ABD;
+    background: #fff;
+}
+
+.btn-blue-outline:hover {
+    color: #fff;
+    background: #159ABD;
+}
+
 .btn-white {
     color: #202020;
     background-color: #fff;

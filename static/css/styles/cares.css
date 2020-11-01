@@ -1,9 +1,22 @@
+/* override some of the main styles */
+body {
+    overflow-x: hidden;
+}
+
+.header-spacer {
+    height: 5em;
+}
+
+/**/
 .compee-cares .jumbotron {
     background-color: #005F7B;
     margin: 0;
-    
-    
 }
+
+.compee-cares, .cares-about {
+    margin: 0 -50%;
+}
+
 .cares-about .jumbotron {
     background-color: #159ABD;
     margin: 0;
@@ -12,7 +25,7 @@
 
 .content h1 {
     color: #ffffff;
-    font-size: 75px;
+    font-size: 5em;
 }
 
 .cares-item {
@@ -30,13 +43,8 @@ h3 {
 }
 
 .compee-cares .img-fluid {
-    width: 15%;
+    width: 200px;
     margin: 0 20px;
-}
-
-.cares-about .img-fluid {
-    width: 10%;
-   
 }
 
 .cares-item {
@@ -60,20 +68,32 @@ h3 {
 }
 
 /* media queries */
-@media (max-width: 992px) {
-    .compee-cares h1 {
+@media screen and (max-width: 991px) {
+    .content h1 {
         font-size: 4em;
     }
 
+    .compee-cares .img-fluid {
+        width: 150px;
+    }
 }
 
-@media (max-width: 768px) {
-    .compree-cares h1 {
+@media screen and (max-width: 768px) {
+
+    .compee-cares .img-fluid {
+        width: 125px;
+    }
+
+    .content h1 {
         font-size: 3em;
+        margin: 0;
+
     }
     .cares-about h3 {
         font-size: 1em;
         text-align: center;
+        width: 500px;
+        margin: 1em auto;
     }
     .cares-header span h4 {
         font-size: 1em;
@@ -83,10 +103,21 @@ h3 {
     }
 }
 
-@media (max-width: 576px) {
-    .compee-cares h1 {
-        font-size: 2em;
+@media screen and (max-width: 575px) {
+
+    .compee-cares .img-fluid {
+        width: 100px;
     }
+
+    .content h1 {
+        font-size: 2em;
+        margin: 0;
+    }
+
+    .cares-about h3 {
+        width: 350px;
+    }
+
     .cares-about p {
         font-size: .8em;
         text-align: center;
