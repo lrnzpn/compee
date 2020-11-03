@@ -9,6 +9,10 @@
     color: #159ABD;
 }
 
+.link-nav div:last-child {
+    color: #159ABD;
+}
+
 .link-nav a {
     color: #CECDCD;
 }
@@ -158,6 +162,76 @@
 
 .ss-nav .row:first-child {
     margin-bottom: 10px;
+}
+
+/* ss indiv product */
+.shipping {
+    background-image: url('../../img/icons/delivery.svg');
+    width: 2em;
+    height: 2em;
+}
+
+.ss-item-wrapper > div {
+    margin-bottom: 30px;
+}
+
+.ss-item-wrapper .ss-name span{
+    font-size: 1.5em;
+    font-weight: 700;
+    line-height: 2em;
+}
+
+.ss-item-wrapper .ss-price {
+    border: 1px solid #202020;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+.ss-item-wrapper .ss-price span {
+    font-weight: 700;
+    font-size: 1.75em;
+    color: #159ABD;
+}
+
+.ss-shipping .shipping-txt {
+    margin-left: 2em;
+}
+
+.ss-shipping .shipping-txt-container {
+    margin-left: 1em;
+}
+
+.ss-options button:last-child {
+    margin-left: 40px;
+}
+
+.ss-options button span {
+    margin-left: 10px;
+}
+
+/* SS PRODUCT INFO */
+.ss-help a {
+    color: #159ABD;
+}
+
+.ss-help a span:last-child {
+    text-decoration: underline;
+    margin-left: 10px;
+}
+
+.ss-product-body {
+    padding: 2em;
+    border: 1px solid #202020;
+    border-radius: 2px;
+}
+
+/* reviews */
+.rev-wrapper span i{
+    color: #FFD600;
+}
+
+.rev-wrapper p {
+    font-size: 1.25em;
 }
 
 /* category filter */

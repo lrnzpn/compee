@@ -55,7 +55,7 @@ ul {
     margin-right: 10px;
 }
 
-.compee-cares-btn span {
+.compee-cares-btn span:first-child {
     color: white;
     background-color: #202020;
     padding: .125em .375em;
@@ -123,6 +123,11 @@ ul {
     background: #159ABD;
 }
 
+.btn-blue-outline:hover path {
+    fill: #fff;
+    transition: fill .15s ease-in-out;
+}
+
 .btn-white {
     color: #202020;
     background-color: #fff;
@@ -140,6 +145,16 @@ ul {
 
 .btn-white:hover path {
     fill: #fff;
+}
+
+.btn-orange {
+    background-color: #EC7357;
+    color: #fff;
+}
+
+.btn-orange:hover {
+    background-color: #ed8167;
+    color: #fff;
 }
 
 a.btn>.icon {
