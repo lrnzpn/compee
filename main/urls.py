@@ -14,10 +14,6 @@ urlpatterns = [
         template_name='main/pages/concierge/product_guides.html'), name='product-guides-main'),
     path('product-guides/post/<str:slug>', v.ProductGuideDetailView.as_view(
         template_name='main/pages/concierge/product_guide.html'), name='product-guide'),
-    path('faqs/', v.FaqListView.as_view(
-        template_name='main/pages/concierge/faqs.html'), name='faqs-main'),
-    path('faqs/post/<str:slug>', v.FaqDetailView.as_view(
-        template_name='main/pages/concierge/faq.html'), name='faq-guide'),
 
     path('categories/', v.CategoryListView.as_view(
         template_name='main/filters/categories.html'), name='all-categories'),

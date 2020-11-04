@@ -255,7 +255,7 @@ def CompeeConcierge(request):
     context = {
         'title': 'Compee Concierge', 
         'guides' : ProductGuide.objects.all()[:3],
-        'faqs': Faq.objects.all()[:3]
+        'faqs': Faq.objects.all()
     }
     return render(request, 'main/pages/concierge/concierge.html', context)
 
@@ -281,24 +281,6 @@ class ProductGuideDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductGuideDetailView, self).get_context_data(**kwargs)
         context['title'] = f'Product Guides | {self.object.title}'
-        return context
-
-class FaqListView(ListView):
-    model = Faq
-    context_object_name = 'faqs'
-    paginate_by = 6
-
-    def get_context_data(self, **kwargs):
-        context = super(FaqListView, self).get_context_data(**kwargs)
-        context['title'] = "Frequently Asked Questions"
-        return context
-
-class FaqDetailView(DetailView):
-    model = Faq
-
-    def get_context_data(self, **kwargs):
-        context = super(FaqDetailView, self).get_context_data(**kwargs)
-        context['title'] = f'FAQs | {self.object.title}'
         return context
 
 class CategoryListView(ListView):
@@ -766,6 +748,8 @@ class CartView(LoginRequiredMixin, ListView):
         context['title'] = self.request.user.username + "'s Cart"
         vendors = []
         fees = []
+        subtotal = decimal.Decimal(0.00)
+        total = decimal.Decimal(0.00)
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -773,6 +757,10 @@ class CartView(LoginRequiredMixin, ListView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
+                subtotal = subtotal + i.product.price
+            else:
+                subtotal = subtotal + i.service.price
+        
         if vendors == []:
             context['s_only'] = True
 
@@ -780,6 +768,11 @@ class CartView(LoginRequiredMixin, ListView):
             context['fees'] = fees
         else:
             messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
+
+        for i in fees:
+            total = total + i.rate.rate
+        context['subtotal'] = subtotal
+        context['total'] = total + subtotal
         return context
 
 class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -899,13 +892,17 @@ class Checkout(LoginRequiredMixin, CreateView):
         items = CartItem.objects.filter(user=self.request.user)
         context['items'] = items
         items = items.filter(c_cares=True)
+        cc_total = decimal.Decimal(0.00)
         if items:
-            context['cc_total'] = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            cc_total = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            context['cc_total'] = cc_total
             context['cc_count'] = len(items)
 
         vendors = []
         providers = []
-        fees = []                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+        fees = []
+        subtotal = decimal.Decimal(0.00)
+        total = decimal.Decimal(0.00)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -913,10 +910,12 @@ class Checkout(LoginRequiredMixin, CreateView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
+                subtotal = subtotal + i.product.price
             else:
                 if i.service.provider.provider_id not in providers:
                     provider = ServiceProvider.objects.get(provider_id=i.service.provider.provider_id)
                     providers.append(i.service.provider.provider_id)
+                subtotal = subtotal + i.service.price
         
         if vendors == []:
             context['s_only'] = True
@@ -928,6 +927,11 @@ class Checkout(LoginRequiredMixin, CreateView):
             context['fees'] = fees
         else:
             messages.error(self.request, 'At least one of the selected vendors have not set a shipping rate.')
+
+        for i in fees:
+            total = total + i.rate.rate
+        context['subtotal'] = subtotal
+        context['total'] = total + subtotal + cc_total
         return context
 
     def form_valid(self, form):

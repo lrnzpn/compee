@@ -131,6 +131,15 @@
 {% endblock content %}
 
 <!-- <table border="1">
+
+    <p>subtotal: {{ subtotal }}</p>
+        <p>shipping fees:</p>
+        <ul>
+            {% for i in fees %}
+                <li>{{ i.rate.rate }} ({{i.vendor.store_name}})</li>
+            {% endfor %}
+        </ul>
+        <p>Total: {{ total }}</p>
     <thead>
         <th></th>
         <th>Name</th>
