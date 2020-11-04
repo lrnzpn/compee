@@ -1,11 +1,157 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/category.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+{% endblock stylesheets %}
+
+
 {% load logged_in %}
 {% block content %}
-    {%include 'main/partials/_categories.html' %}
     {% if inactive %}
         <h3>The vendor who sells this product is inactive.</h3>
     {% else %}
-        <h3>{{ object.name }}</h3>
+        <p class="link-nav">
+            <a href="{% url 'home' %}">Home</a> > <a href="{% url 'all-categories' %}">Categories</a> > <a href="{% url 'category-filter' category.category.name %}">{{category.category.name}}</a> 
+            > <span>{{object.name}}</span>
+        </p>
+        <div class="row">
+            <div class="col-md-4 d-flex justify-content-start align-items-center">
+                <img src="{{ object.image.url }}" width="100%" height="200px">
+            </div>
+            <div class="col-md-8 ss-item-wrapper">
+                 <div class="ss-name">
+                     <span>{{object.name}}</span>
+                 </div>
+                 <div>
+                     Avg Rating - Total Ratings - Total Sold
+                 </div>
+                 <div class="ss-price">
+                    <span>Php {{ object.price }}</span>
+                 </div>
+                 <div class="ss-shipping d-flex">
+                     <span>Shipping</span>
+                     <div class="shipping-txt d-flex">
+                        <div class="shipping icon"></div>
+                        <div class="shipping-txt-container">
+                            <div><span>Shipping To</span></div>
+                            <div><span>Shipping From </span></div>
+                        </div>
+                     </div>
+                 </div>
+                 <div class="ss-qty">
+                    <span>Quantity</span>
+                   <span>{% if object.item_stock > 1 %}{{ object.item_stock }} Pieces {% else %}1 Piece {% endif %} Available</span>
+                 </div>
+
+                 <div class="ss-options d-flex">
+                    {% if not wishlist_item %}
+                    <button id="AddWishlist" class="btn btn-sm btn-orange d-flex justify-content-center align-items-center" value='{% url "wishlist-add" %}' onclick='addToWishlist("{{ object.product_id }}","product")'>
+                        <svg width="20" height="20" viewBox="0 0 29 28" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M26.6994 2.70297C25.1982 0.959968 23.1384 0 20.8988 0C19.2248 0 17.6918 0.566554 16.3421 1.68379C15.6611 2.24774 15.0441 2.9377 14.5 3.743C13.9562 2.93793 13.3389 2.24774 12.6576 1.68379C11.3082 0.566554 9.77515 0 8.10116 0C5.86164 0 3.80156 0.959968 2.30036 2.70297C0.817085 4.42561 0 6.77899 0 9.3299C0 11.9554 0.913994 14.3588 2.87628 16.8936C4.6317 19.161 7.15464 21.4627 10.0763 24.128C11.0739 25.0383 12.2047 26.07 13.3789 27.169C13.6891 27.4599 14.0871 27.62 14.5 27.62C14.9126 27.62 15.3109 27.4599 15.6206 27.1695C16.7948 26.0702 17.9263 25.038 18.9244 24.1273C21.8456 21.4625 24.3685 19.161 26.1239 16.8934C28.0862 14.3588 29 11.9554 29 9.32967C29 6.77899 28.1829 4.42561 26.6994 2.70297Z" fill="#fff"/>
+                            </svg>
+                            
+                        <span>Add to My Wishlist</span>
+                    </button>
+                    {% endif %}
+
+                    <button id="AddCart" class="btn btn-sm btn-navy d-flex justify-content-center align-items-center" value='{% url "cart-add" %}' onclick='addToCart("{{ object.product_id }}", "product")'>
+                        <svg width="20" height="20" viewBox="0 0 33 32" fill=" #fff" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#fff" d="M31.6978 22.5933H9.79222L10.8921 20.1874L29.167 20.1518C29.785 20.1518 30.3147 19.6778 30.425 19.022L32.9559 3.80834C33.0221 3.40934 32.9228 2.99848 32.68 2.68638C32.56 2.53279 32.4103 2.40906 32.2413 2.32379C32.0724 2.23852 31.8882 2.19374 31.7015 2.19256L8.45324 2.1096L8.2546 1.10616C8.12953 0.466167 7.59246 0 6.98183 0H1.29852C0.954129 0 0.623846 0.146925 0.380327 0.408454C0.136808 0.669983 0 1.02469 0 1.39455C0 1.76441 0.136808 2.11912 0.380327 2.38064C0.623846 2.64217 0.954129 2.7891 1.29852 2.7891H5.92977L6.7979 7.22163L8.93512 18.3346L6.18359 23.1582C6.0407 23.3653 5.95464 23.6113 5.93513 23.8682C5.91563 24.1251 5.96347 24.3828 6.07324 24.612C6.29395 25.0821 6.73905 25.3784 7.23197 25.3784H9.54208C9.04959 26.0809 8.78358 26.9366 8.78431 27.8159C8.78431 30.0519 10.4764 31.8692 12.5585 31.8692C14.6405 31.8692 16.3326 30.0519 16.3326 27.8159C16.3326 26.935 16.0604 26.0777 15.5749 25.3784H21.5009C21.0085 26.0809 20.7425 26.9366 20.7432 27.8159C20.7432 30.0519 22.4353 31.8692 24.5173 31.8692C26.5994 31.8692 28.2915 30.0519 28.2915 27.8159C28.2915 26.935 28.0193 26.0777 27.5337 25.3784H31.7015C32.4151 25.3784 33 24.7542 33 23.9839C32.9979 23.6144 32.8597 23.2608 32.6158 23.0003C32.3718 22.7398 32.0418 22.5935 31.6978 22.5933ZM8.99398 4.8592L30.1749 4.93426L28.1002 17.4101L11.4623 17.4417L8.99398 4.8592ZM12.5585 29.0643C11.9184 29.0643 11.3961 28.5033 11.3961 27.8159C11.3961 27.1285 11.9184 26.5676 12.5585 26.5676C13.1985 26.5676 13.7209 27.1285 13.7209 27.8159C13.7209 28.147 13.5984 28.4646 13.3804 28.6987C13.1624 28.9328 12.8668 29.0643 12.5585 29.0643ZM24.5173 29.0643C23.8773 29.0643 23.3549 28.5033 23.3549 27.8159C23.3549 27.1285 23.8773 26.5676 24.5173 26.5676C25.1574 26.5676 25.6797 27.1285 25.6797 27.8159C25.6797 28.147 25.5573 28.4646 25.3393 28.6987C25.1213 28.9328 24.8256 29.0643 24.5173 29.0643Z" />
+                        </svg>    
+                        <span>Add to My Cart</span>
+                    </button>
+                 </div>
+            </div>
+        </div>
+
+        <div class="ss-desc mb-4">
+            <div class="row">
+               <div class="col-md-6">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <div class="ss-img">
+                            <img src="{{ object.vendor.image.url }}" alt="{{ object.vendor.store_name }}" width="120px" height="120px">
+                        </div>
+
+                        <div class="ss-desc-content">
+                            <span>{{object.vendor.store_name}}</span>
+                            <a href="{% url 'vendor-detail-main' object.vendor.slug %}" class="btn btn-blue-outline">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M23.9563 5.72916L22.242 0.586305C22.1254 0.236099 21.7977 -0.000100414 21.4286 3.20245e-08H2.57143C2.20234 -0.000100414 1.87463 0.236099 1.75801 0.586305L0.0436942 5.72916C0.0172768 5.80921 0.00251116 5.89264 0 5.97686C0 5.98545 0 5.99142 0 6.00001V6.85717C0.00311384 8.20014 0.638186 9.46335 1.71427 10.2669C1.71427 10.2738 1.71427 10.2789 1.71427 10.2857V21.4286C1.71427 22.8487 2.86553 24 4.28569 24H19.7143C21.1344 24 22.2857 22.8487 22.2857 21.4286V10.2857C22.2857 10.2788 22.2857 10.2737 22.2857 10.2669C23.3618 9.46335 23.9969 8.20014 24 6.85717V6.00001C24 5.99142 24 5.98545 24 5.97686C23.9974 5.89258 23.9827 5.80916 23.9563 5.72916ZM18 1.71427H20.8106L21.954 5.14285H18V1.71427ZM12.8571 1.71427H16.2857V5.14285H12.8571V1.71427ZM7.71428 1.71427H11.1429V5.14285H7.71428V1.71427ZM3.18942 1.71427H6.00001V5.14285H2.04599L3.18942 1.71427ZM13.7143 22.2857H10.2857V15.4286H13.7143V22.2857ZM20.5714 21.4286C20.5714 21.902 20.1877 22.2857 19.7143 22.2857H15.4286V14.5715C15.4286 14.098 15.0448 13.7143 14.5714 13.7143H9.42855C8.95514 13.7143 8.57139 14.098 8.57139 14.5715V22.2857H4.28569C3.81229 22.2857 3.42854 21.902 3.42854 21.4286V11.0571C4.63143 11.3041 5.88229 11.017 6.85712 10.2703C8.38722 11.3941 10.4699 11.3941 12 10.2703C13.5301 11.3941 15.6127 11.3941 17.1428 10.2703C18.1177 11.0171 19.3685 11.3041 20.5714 11.0571V21.4286ZM19.7143 9.42855C18.973 9.4281 18.2691 9.10295 17.7882 8.53885C17.4768 8.18241 16.9353 8.14595 16.5788 8.45743C16.5499 8.4827 16.5227 8.50992 16.4974 8.53885C15.5443 9.60257 13.9095 9.69222 12.8457 8.73919C12.7754 8.6761 12.7085 8.60926 12.6454 8.53885C12.31 8.18241 11.7491 8.16533 11.3926 8.50083C11.3795 8.51313 11.3668 8.52579 11.3546 8.53885C10.4015 9.60257 8.76661 9.69222 7.70288 8.73919C7.63247 8.6761 7.56562 8.60926 7.50254 8.53885C7.1671 8.18241 6.60616 8.16533 6.24972 8.50083C6.23666 8.51313 6.22396 8.52579 6.2117 8.53885C5.73082 9.10295 5.02699 9.4281 4.28569 9.42855C2.86553 9.42855 1.71427 8.27728 1.71427 6.85712H22.2857C22.2857 8.27728 21.1344 9.42855 19.7143 9.42855Z" fill="#159ABD"/>
+                                </svg> 
+                                View Shop
+                            </a>
+                        </div>
+                    </div>
+               </div>
+               <div class="col-md-6 d-flex justify-content-center align-items-center">
+                <div class="ss-add-desc">
+                    <span class="d-block">Products: <span>{{products.count|add:"1" }}</span></span>
+                    <span class="d-block">Joined: <span>{{object.vendor.date_joined}}</span></span>
+                </div>
+               </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                <div class="ss-product-body mb-4">
+                    <div class="ss-product-header">
+                        <span>Product Information</span>
+                        <hr>
+                    </div>
+                    <div class="ss-product-info">
+                        <p>{{object.description}}</p>
+                    </div>
+                    <div class="ss-help mt-4">
+                        <div class="compee-cares-btn">
+                            <a href="{% url 'compee-concierge' %}"><span>?</span><span>Need help in choosing the right product for you? Click here to learn more!</span></a>
+                        </div>
+                    </div>
+                </div>
+                {% if reviews %}
+                <div class="ss-product-body">
+                    <div class="ss-product-header">
+                        <span>Product Ratings & Reviews</span>
+                        <hr>
+                    </div>
+                    <div class="ss-reviews">
+                        <div class="rev-wrapper">
+                            {% for r in reviews %}
+                            <span>{{r.author.username}}</span>
+                            <span>
+                                {% for i in r.rating %}
+                                <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </span>
+                            {% if r.description %}
+                                <p>{{r.description}}</p>
+                            {% endif %}
+                            {% if r.author == request.user or request.user|has_group:"Admin" %}
+                                <div class="d-flex">
+                                    <a class="mr-5" href='{% url "product-review-edit" r.review_id %}'>Edit</a>
+                                    <a href='{% url "product-review-delete" r.review_id %}'>Delete</a>
+                                </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-2 top-picks">
+
+            </div>
+        </div>
+        
+    {% endif %}
+    
+{% endblock content %}
+
+<!-- 
+<h3>{{ object.name }}</h3>
         <div class="row">
             <div class="col-md-8">
                 <h5>Description: </h5>
@@ -61,13 +207,10 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Products here -->
         <h3>Other Products</h3>
         {% if products %}
             {%include 'main/partials/_products.html' %}
         {% else %}
             <h4>This store has no other products!</h4>
         {% endif %}
-    {% endif %}
-    
-{% endblock content %}
+ -->

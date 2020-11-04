@@ -1,17 +1,131 @@
-.jumbotron {
-    background-color: #005F7B;
-    
+/* override some of the main styles */
+body {
+    overflow-x: hidden;
 }
-.compee-cares {
-    width: 100%;
+
+.header-spacer {
+    height: 5em;
+}
+
+/**/
+.compee-cares .jumbotron {
+    background-color: #005F7B;
+    margin: 0;
+}
+
+.compee-cares, .cares-about {
+    margin: 0 -50%;
+}
+
+.cares-about .jumbotron {
+    background-color: #159ABD;
+    margin: 0;
+    margin-bottom: 50px;
 }
 
 .content h1 {
     color: #ffffff;
-    font-size: 75px;
+    font-size: 5em;
 }
 
-.content .img-fluid {
-    width: 15%;
+.cares-item {
+    padding: 1em;
+    margin: 10px;
+}
+
+h3 {
+    color: #ffffff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.compee-cares .img-fluid {
+    width: 200px;
     margin: 0 20px;
+}
+
+.cares-item {
+    width: 100%;
+    border-bottom: 1px solid #202020;
+    padding: 1em 0 2em;
+}
+
+.cares-details {
+    height: 100%;
+    width: 100%;
+}
+
+.cares-header {
+    display: block;
+    cursor: pointer;
+}
+
+.cares-header i {
+    font-size: 1.25em;
+}
+
+/* media queries */
+@media screen and (max-width: 991px) {
+    .content h1 {
+        font-size: 4em;
+    }
+
+    .compee-cares .img-fluid {
+        width: 150px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .compee-cares .img-fluid {
+        width: 125px;
+    }
+
+    .content h1 {
+        font-size: 3em;
+        margin: 0;
+
+    }
+    .cares-about h3 {
+        font-size: 1em;
+        text-align: center;
+        width: 500px;
+        margin: 1em auto;
+    }
+    .cares-header span h4 {
+        font-size: 1em;
+    }
+    .cares-content p {
+        font-size: .8em;
+    }
+}
+
+@media screen and (max-width: 575px) {
+
+    .compee-cares .img-fluid {
+        width: 100px;
+    }
+
+    .content h1 {
+        font-size: 2em;
+        margin: 0;
+    }
+
+    .cares-about h3 {
+        width: 350px;
+    }
+
+    .cares-about p {
+        font-size: .8em;
+        text-align: center;
+    }
+    .cares-header span h4 {
+        font-size: .8em;
+    }
+    .cares-content p {
+        font-size: .7em;
+    }
 }

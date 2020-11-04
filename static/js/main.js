@@ -78,7 +78,15 @@ $('.question-header').click(function() {
     $(this).find('i').toggleClass('fas fa-plus fas fa-minus'); 
 }); 
 
+// for compee cares
+$('.cares-header').click(function() { 
+    $(this).find('i').toggleClass('fas fa-plus fas fa-minus'); 
+}); 
+
 // for indiv vendor
 $('.btn-more').click(function () { 
     $(this).find('i').toggleClass('fas fa-chevron-down fas fa-chevron-up'); 
 }); 
+
+
+

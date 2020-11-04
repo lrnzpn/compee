@@ -3,6 +3,7 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{% static 'css/styles/category.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
 <link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
 {% endblock stylesheets %}
 
@@ -12,121 +13,21 @@
     </p>
 
     <div class="row">
-         <div class="col-md-3">
+         <div class="col-md-2">
             <div class="search-filter sticky-top">
-                <h4>Search Filter</h4>
-                <form action="{% url 'search-filter' %}" method="GET">
-                    <!-- placeholders/hardcoded -->
-                    <div class="brand-filter">
-                        <span>brand</span>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="hp" name="hp">
-                            <label class="form-check-label" for="">hp</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="acer" name="acer">
-                            <label class="form-check-label" for="">acer</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="dell" name="dell">
-                            <label class="form-check-label" for="">dell</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="apple" name="apple">
-                            <label class="form-check-label" for="">apple</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="alienware" name="alienware">
-                            <label class="form-check-label" for="">alienware</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="aoc" name="aoc">
-                            <label class="form-check-label" for="">aoc</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="benq" name="benq">
-                            <label class="form-check-label" for="">benq</label>
-                        </div>                          
-                    </div>
-
-                    <div class="price-filter">
-                        <span>Price</span>
-                        <div class="form-group form-row">
-                            <div class="col-auto">
-                                <input class="form-control" type="number" id="pricemin" name="pricemin" min="1" placeholder="Min">
-                            </div>
-                            <div class="col-auto">
-                                <input class="form-control" type="number" id="pricemax" name="pricemax" min="1" placeholder="Max">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rating-filter">
-                        <span>Rating</span>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="5" name="rating">
-                            <label class="form-check-label" for="">
-                                {% for i in "12345"|make_list %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="4" name="rating">
-                            <label class="form-check-label" for="">
-                                {% for i in "1234"|make_list %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="3" name="rating">
-                            <label class="form-check-label" for="">
-                                {% for i in "123"|make_list %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="2" name="rating">
-                            <label class="form-check-label" for="">
-                                {% for i in "12"|make_list %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="1" name="rating">
-                            <label class="form-check-label" for="">
-                                {% for i in "1"|make_list %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="" value="0" name="rating">
-                            <label class="form-check-label" for="">
-                                No Rating
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-blue">
-                        <i class="fas fa-play"></i>
-                    </button>
-                </form>
+                {% include 'main/partials/_category_filter.html' %}
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-10">
             {% if products or services %}
-
                 {% if products %}
-                    <h2>{{ category.name }}</h2>
+                    <h2>Showing all products under {{ category.name }}</h2>
                     {%include 'main/partials/_products.html' %}
                 {% endif %}
 
                 {% if services %}
-                    <h2>Showing services under '{{ category.name }}'</h2>
+                    <h2>Showing all services under {{ category.name }}</h2>
                     {%include 'main/partials/_services.html' %}
                 {% endif %}
 
