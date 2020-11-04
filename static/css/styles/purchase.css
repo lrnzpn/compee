@@ -48,6 +48,12 @@ h2 {
     font-weight: 500;
 }
 
+.order-summary ul li {
+    color: #159ABD;
+    font-weight: 500;
+    text-align: right;
+}
+
 .order-summary .order-total p span:first-child {
     font-weight: 500;
 }

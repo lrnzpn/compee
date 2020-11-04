@@ -95,13 +95,17 @@
                     <h2>Order Summary</h2>
                     <div class="order-summary">
                         <p class="d-flex justify-content-between align-items-center">
-                            <span>Subtotal (3 Items)</span>
-                            <span>Php 69.00</span>
+                            <span>Subtotal ({% if items|length > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                            <span>Php {{ subtotal }}</span>
                         </p>
-                        <p class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-start">
                             <span>Shipping Fee</span>
-                            <span>Php 69.00</span>
-                        </p>
+                            <ul>
+                                {% for i in fees %}
+                                    <li>Php {{ i.rate.rate }} ({{i.vendor.store_name}})</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                     <div class="hr d-flex justify-content-end align-items-center">
                         <hr>
@@ -109,7 +113,7 @@
                     <div class="order-total">
                         <p class="d-flex justify-content-between align-items-center">
                             <span>Total:</span>
-                            <span>Php 69.00</span>
+                            <span>Php {{ total }}</span>
                         </p>
                     </div>
 
@@ -129,46 +133,3 @@
         </div>
     {% endif %}
 {% endblock content %}
-
-<!-- <table border="1">
-
-    <p>subtotal: {{ subtotal }}</p>
-        <p>shipping fees:</p>
-        <ul>
-            {% for i in fees %}
-                <li>{{ i.rate.rate }} ({{i.vendor.store_name}})</li>
-            {% endfor %}
-        </ul>
-        <p>Total: {{ total }}</p>
-    <thead>
-        <th></th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Vendor</th>
-        <th>Quantity</th>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            {% if item.product %}
-                <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
-                <td>{{item.product.name}}</td>
-                <td>{{item.product.price}}</td>
-                <td>{{item.product.vendor.store_name}}</td>
-                <td>{{item.quantity}}</td>
-                <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-            {% else %}
-                <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
-                <td>{{item.service.name}}</td>
-                <td>{{item.service.price}}</td>
-                <td>{{item.service.provider.store_name}}</td>
-                <td>{{item.quantity}}</td>
-                <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
-            {% endif %}
-            <td><a href="{% url 'cart-edit' item.id %}">Edit</a></td>
-            <td><a href="{% url 'cart-remove' item.id %}">x</a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
-
