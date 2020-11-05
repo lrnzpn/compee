@@ -122,9 +122,6 @@
             </div>
 
             <div class="col-md-4">
-
-
-
                 <div class="content-section order-details">
                     <h4>Order Summary</h4>
                     <div class="order-summary mb-4">
@@ -161,7 +158,40 @@
                 </div>
             </div>
             {% else %}
-
+            <div class="content-section order-details">
+                <h4>Order Summary</h4>
+                <div class="order-summary mb-4">
+                    <p class="d-flex justify-content-between align-items-center">
+                        <span>Subtotal ({% if items|length > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                        <span>Php {{ subtotal }}</span>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span>Shipping Fee</span>
+                        {% if fees %}
+                        <ul>
+                            {% for i in fees %}
+                                <li>
+                                    Php {{ i.rate.rate }}
+                                    <small>({{i.vendor.store_name}})</small>
+                                </li>           
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% if cc_total %}
+                    <p class="d-flex justify-content-between align-items-center">
+                        <span>Compee Cares Fee ({% if cc_count > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                        <span>Php {{cc_total}}</span>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="order-total">
+                    <p class="d-flex justify-content-between align-items-center">
+                        <span>Total:</span>
+                        <span>Php {{ total }}</span>
+                    </p>
+                </div>
+            </div>
             {% endif %}
 
         </div>

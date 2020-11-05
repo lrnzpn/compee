@@ -69,6 +69,12 @@ h2 {
     width: 100%;
 }
 
+.checkout-btn a:hover {
+    color: #159ABD;
+    background-color: #fff;
+    border: 1px solid #159ABD;
+}
+
 .cart-item-ud i {
     color: #CECDCD;
     font-size: 1.5em;

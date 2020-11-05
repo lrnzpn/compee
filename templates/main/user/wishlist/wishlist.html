@@ -1,47 +1,158 @@
 {% extends "base.html" %}
+
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/wishlist.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/purchase.css' %}">
+{% endblock stylesheets %}
+
+
 {% block content %}
     {% if items %}
-        <table border="1">
-            <thead>
-                <th></th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Vendor</th>
-            </thead>
-            <tbody> 
-                {% for item in items %}
-                <tr>
-                    {% if item.product %}
-                        <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
-                        <td>{{item.product.name}}</td>
-                        <td>{{item.product.price}}</td>
-                        <td>{{item.product.vendor.store_name}}</td>
-                        <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-                    {% else %}
-                        <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
-                        <td>{{item.service.name}}</td>
-                        <td>{{item.service.price}}</td>
-                        <td>{{item.service.provider.store_name}}</td>
-                        <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
-                    {% endif %}
-                    <td><a href="{% url 'wishlist-remove' item.id %}">x</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    
+        <h2 class="d-flex justify-content-start align-items-center">
+            <span class="mr-3">My Wishlist</span>
+            <div class="heart icon"></div>
+        </h2>
 
-        <p>Add a Personal Note</p>
-        <form method = "POST">
-            {% csrf_token %}
-            <fieldset class = "form-group">
-                <textarea id="w-message" name="w-message" rows="4">Type your message here.. </textarea>
-            </fieldset>
-            <div class ="form-group">
-                <button class = "btn btn-primary" type="submit" name="submit-btn" value="pdf">Download PDF</button>
-                <button class = "btn btn-primary" type="submit" name="submit-btn" value="social-media">Share</button>
-            </div>
-        </form>
+        {% for item in items %}
+            {% if item.product %}
+                <div class="cart-item-wrapper wishlist-item">
+                    <div class="cart-store">
+                        <span>{{item.product.vendor.store_name}}</span>
+                    </div>
+                    <div class="cart-item">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-xs-6">
+                                <img src="{{item.product.image.url}}" width="100px" height="100px">
+                            </div>
+                            <div class="col-lg-4 col-md-3 col-6">
+                                <div class="cart-item-name">
+                                    <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="cart-item-price">
+                                    <span>Php {{item.product.price}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
+                                    <span class="mr-5">Quantity: {{item.quantity}}</span>
+                                    <a href="{% url 'cart-remove' item.id %}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                                <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
+                                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.id }}", "product")'>
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="cart-item-wrapper">
+                    <div class="cart-store">
+                        <span>{{item.service.vendor.store_name}}</span>
+                    </div>
+                    <div class="cart-item">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-xs-6">
+                                <img src="{{item.service.image.url}}" width="100px" height="100px">
+                            </div>
+                            <div class="col-lg-4 col-md-3 col-6">
+                                <div class="cart-item-name">
+                                    <a href="{% url 'vendor-product' item.service.slug %}">{{item.service.name}}</a>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="cart-item-price">
+                                    <span>Php {{item.service.price}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="cart-item-qty">
+                                    <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
+                                        <span class="mr-5">Quantity: {{item.quantity}}</span>
+                                        <a href="{% url 'wishlist-remove' item.id %}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
+                                        <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.id }}", "service")'>
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="personal-message">
+            <span class="mb-2 d-block">Add a Personal Note: </span>
+            <form method = "POST">
+                {% csrf_token %}
+                <fieldset class = "form-group">
+                    <textarea id="w-message" name="w-message" rows="5" class="form-control" placeholder="E.g. Hello! My birthday is coming up, so here is my wish list for this year."></textarea>
+                </fieldset>
+
+                <div class="dl-share d-flex justify-content-end align-items-center">
+                    <button class = "btn btn-orange mr-3" type="submit" name="submit-btn" value="social-media"><i class="fas fa-share-square"></i> Share Wishlist</button>
+                    <button class = "btn btn-orange-outline" type="submit" name="submit-btn" value="pdf"><i class="fas fa-download"></i> Print PDF</button>
+                </div>
+            </form>
+        </div>
+
     {% else %}
         <h3>You have nothing in your wishlist!</h3>
     {% endif %}
 {% endblock content %}
+
+
+<!-- <table border="1">
+    <thead>
+        <th></th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Vendor</th>
+    </thead>
+    <tbody> 
+        {% for item in items %}
+        <tr>
+            {% if item.product %}
+                <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
+                <td>{{item.product.name}}</td>
+                <td>{{item.product.price}}</td>
+                <td>{{item.product.vendor.store_name}}</td>
+                <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
+            {% else %}
+                <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
+                <td>{{item.service.name}}</td>
+                <td>{{item.service.price}}</td>
+                <td>{{item.service.provider.store_name}}</td>
+                <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
+            {% endif %}
+            <td><a href="{% url 'wishlist-remove' item.id %}">x</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p>Add a Personal Note</p>
+<form method = "POST">
+    {% csrf_token %}
+    <fieldset class = "form-group">
+        <textarea id="w-message" name="w-message" rows="4">Type your message here.. </textarea>
+    </fieldset>
+    <div class ="form-group">
+        <button class = "btn btn-primary" type="submit" name="submit-btn" value="pdf">Download PDF</button>
+        <button class = "btn btn-primary" type="submit" name="submit-btn" value="social-media">Share</button>
+    </div>
+</form> -->

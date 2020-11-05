@@ -36,8 +36,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-6">
-                                        <div class="cart-item-qty">
-                                            {{item.quantity}}
+                                        <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
+                                            Quantity: {{item.quantity}}
                                         </div>
                                         <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
                                             <a href="{% url 'cart-edit' item.id %}">
@@ -73,7 +73,9 @@
                                     </div>
                                     <div class="col-md-3 col-6">
                                         <div class="cart-item-qty">
-                                            {{item.quantity}}
+                                            <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
+                                                Quantity: {{item.quantity}}
+                                            </div>
                                             <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
                                                 <a href="{% url 'cart-edit' item.id %}">
                                                     <i class="far fa-edit"></i>
