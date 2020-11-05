@@ -177,6 +177,13 @@ a.btn>.icon {
     background-image: url('../img/icons/Heart.svg')
 }
 
+.cc-icon {
+    background-image: url('../img/icons/cc-logo-blue.svg');
+    height: 1.5em;
+    width: 1.5em;
+    margin-left: 20px;
+}
+
 .navbar .form-control:focus,
 .navbar .form-control:active {
     outline: 0;

@@ -12,8 +12,11 @@
         Checkout
         <div class="cart icon"></div>
     </h2>
+    {% if multiple %}
+            <p>Reminder: For Paypal/Card payments, store orders must be paid separately. </p>
+        {% endif %}
     {% if items %}
-        <div class="checkout-wrapper">
+        <div class="checkout-wrapper mb-4">
             <div class="cart-item-header">
                 <div class="row">
                     <div class="col-sm-6 col-5">
@@ -45,22 +48,23 @@
                                 </div>
                                 <div class="col-md-2 col-6">
                                     <div class="cart-item-price">
-                                        <span>{{item.product.price}}</span>
+                                        <span>Php {{item.product.price}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 col-6">
                                     <div class="cart-item-qty">
-                                        {{item.quantity}}
+                                        <span>{{item.quantity}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 col-6">
                                     <div class="cart-item-price">
-                                        <span>{{item.product.price}}</span>
+                                        <span>Php {% widthratio item.product.price 1 item.quantity %}.00</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     {% else %}
+
                     <div class="cart-item-wrapper">
                         <div class="cart-store">
                             <span>{{item.service.vendor.store_name}}</span>
@@ -98,127 +102,72 @@
             {% endfor %}
             </div>
         </div>
-        {% if fees %}
-            <h4>Included shipping fees:</h4>
-            <table border='1'>
-                <thead>
-                    <th>Store</th>
-                    <th>Fee</th>
-                </thead>
-                <tbody>
-                    {% for f in fees %}
-                        <tr>
-                            <td>{{ f.vendor.store_name }}</td>
-                            <td>{{ f.rate.rate }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+        <div class="row">
+            {% if fees or s_only %}
+            <div class="col-md-8">
+                
+                <div class="content-section order-details">
+                    <form method = "POST" enctype = "multipart/form-data">
+                        {% csrf_token %}
+                        <fieldset class = "form-group">
+                            <legend class = "mb-3">Order Details</legend>
+                            {{ form|crispy }}
+                        </fieldset>
+                        <div class="form-group">
+                            <button class = "btn btn-navy" type = "submit">Checkout</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+
+
+
+                <div class="content-section order-details">
+                    <h4>Order Summary</h4>
+                    <div class="order-summary mb-4">
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Subtotal ({% if items|length > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                            <span>Php {{ subtotal }}</span>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span>Shipping Fee</span>
+                            {% if fees %}
+                            <ul>
+                                {% for i in fees %}
+                                    <li>
+                                        Php {{ i.rate.rate }}
+                                        <small>({{i.vendor.store_name}})</small>
+                                    </li>           
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        {% if cc_total %}
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Compee Cares Fee ({% if cc_count > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                            <span>Php {{cc_total}}</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="order-total">
+                        <p class="d-flex justify-content-between align-items-center">
+                            <span>Total:</span>
+                            <span>Php {{ total }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+
             {% endif %}
 
-            {% if cc_total %}
-                <h4>Included Compee Cares Fee:</h4>
-                <p>{{cc_total}} for {{cc_count}} item/s in cart</p>
-                </table>
-            {% endif %}
-            
-            {% if fees or s_only %}
-            <div class="content-section">
-                <form method = "POST" enctype = "multipart/form-data">
-                    {% csrf_token %}
-                    <fieldset class = "form-group">
-                        <legend class = "border-bottom mb-4">Order Details</legend>
-                        {{ form|crispy }}
-                    </fieldset>
-                    <div class="form-group">
-                        <button class = "btn btn-outline-info" type = "submit">Checkout</button>
-                    </div>
-                </form>
-            </div>
-            {% endif %}
+        </div>
+        
 
     {% else %}
         <h2>Your cart is empty!</h2>
     {% endif %}
 {% endblock content %}
-
-<!-- <h3>Order Review</h3>
-        {% if multiple %}
-            <p>Reminder: For Paypal/Card payments, store orders must be paid separately. </p>
-        {% endif %}
-
-
-        <p>subtotal: {{ subtotal }}</p>
-        <p>Total: {{ total }}</p>
-
-        <table border="1">
-            <thead>
-                <th></th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Vendor</th>
-                <th>Quantity</th>
-                <th>With Compee Cares?</th>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    {% if item.product %}
-                        <td><img src="{{item.product.image.url}}" width="100%" height="200px"></td>
-                        <td>{{item.product.name}}</td>
-                        <td>{{item.product.price}}</td>
-                        <td>{{item.product.vendor.store_name}}</td>
-                        <td>{{item.quantity}}</td>
-                        <td>{{item.c_cares}}</td>
-                        <td><a href="{% url 'vendor-product' item.product.slug %}">Go to Product</a></td>
-                    {% else %}
-                        <td><img src="{{item.service.image.url}}" width="100%" height="200px"></td>
-                        <td>{{item.service.name}}</td>
-                        <td>{{item.service.price}}</td>
-                        <td>{{item.service.provider.store_name}}</td>
-                        <td>{{item.quantity}}</td>
-                        <td>{{item.c_cares}}</td>
-                        <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
-                    {% endif %}
-                    <td><a href="{% url 'cart-edit' item.id  %}">Edit</a></td>
-                    <td><a href="{% url 'cart-remove' item.id %}">x</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% if fees %}
-        <h4>Included shipping fees:</h4>
-        <table border='1'>
-            <thead>
-                <th>Store</th>
-                <th>Fee</th>
-            </thead>
-            <tbody>
-                {% for f in fees %}
-                    <tr>
-                        <td>{{ f.vendor.store_name }}</td>
-                        <td>{{ f.rate.rate }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-        {% if cc_total %}
-            <h4>Included Compee Cares Fee:</h4>
-            <p>{{cc_total}} for {{cc_count}} item/s in cart</p>
-            </table>
-        {% endif %}
-        {% if fees or s_only %}
-        <div class="content-section">
-            <form method = "POST" enctype = "multipart/form-data">
-                {% csrf_token %}
-                <fieldset class = "form-group">
-                    <legend class = "border-bottom mb-4">Order Details</legend>
-                    {{ form|crispy }}
-                </fieldset>
-                <div class="form-group">
-                    <button class = "btn btn-outline-info" type = "submit">Checkout</button>
-                </div>
-            </form>
-        </div>
-        {% endif %} -->

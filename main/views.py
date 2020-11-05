@@ -874,8 +874,8 @@ def CompeeCaresForm(request):
             return redirect('checkout')
             
         context = {
-            'title': "Checkout | Compee Cares",
-            'items':items
+            'title': "Order Review | Compee Cares",
+            'items': items
         }
 
         return render(request, 'main/orders/compee_cares.html', context)

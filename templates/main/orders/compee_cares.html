@@ -10,14 +10,18 @@
 {% block content %}
     {% if items %}
         <h2 class="d-flex justify-content-start align-items-center">
-            Checkout
-            <div class="cart icon"></div>
+            Order Review
+            <div class="cc-icon icon"></div>
         </h2>
+        <p>
+            Please tick the check marks beside the items you would like to purchase with Compee Cares with.
+        </p>
         <form method="POST">
         {% csrf_token %}
         {% for item in items %}
             <div class="cart-item-wrapper">
-                <div class="cart-store">
+                <div class="cart-store d-flex justify-content-start align-items-center">
+                    <input type="checkbox" id="{{item.id}}" name="cares_{{item.id}}" value="True" class="mr-3">
                     <span>{{item.product.vendor.store_name}}</span>
                 </div>
                 <div class="cart-item">
@@ -44,31 +48,8 @@
                 </div>
             </div>
         {% endfor %}
-
-        <div class="order-summary">
-            <h2>Order Summary</h2>
             <hr>
-            <div class="order-summary">
-                <p class="d-flex justify-content-between align-items-center">
-                    <span>
-                        Subtotal ({% if items|length != 1%}{{items|length}} Items{%else%}1 Item{% endif %})
-                    </span>
-                    <span>Php 69.00</span>
-                </p>
-                <p class="d-flex justify-content-between align-items-center">
-                    <span>Shipping Fee</span>
-                    <span>Php 69.00</span>
-                </p>
-            </div>
-            
-            <div class="order-total">
-                <p class="d-flex justify-content-between align-items-center">
-                    <span>Total:</span>
-                    <span>Php 69.00</span>
-                </p>
-            </div>
-            <button class="btn btn-navy" type = "submit">Place Order</button>
-        </div>
+            <button class="btn btn-navy" type = "submit">Proceed to Checkout</button>
         </form>
     {% else %}
         <h2>Your cart is empty!</h2>
