@@ -11,7 +11,6 @@
 
 {% block content %}
     {% if items %}
-    
         <h2 class="d-flex justify-content-start align-items-center">
             <span class="mr-3">My Wishlist</span>
             <div class="heart icon"></div>
@@ -77,7 +76,7 @@
                             <div class="col-md-3 col-6">
                                 <div class="cart-item-qty">
                                     <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
-                                        <span class="mr-5">Quantity: {{item.quantity}}</span>
+                                        
                                         <a href="{% url 'wishlist-remove' item.id %}">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>

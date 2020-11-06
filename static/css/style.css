@@ -373,3 +373,31 @@ footer {
 .search-filter {
     top: 150px;
 }
+
+/* MODAL */
+.modal-blue {
+    background-color: #159ABD;
+    border: 1px solid #159ABD;
+}
+
+.modal-blue .modal-body .circle {
+    border-radius: 50%;
+    height: 5em;
+    width: 5em;
+    background-color: #005F7B;
+}
+
+.modal-blue .modal-body p {
+    color: #fff;
+    font-size: 1.25em;
+    margin: 1em 0;
+}
+
+.modal-blue .modal-body i {
+    font-size: 3em;
+    color: #fff;
+}
+
+.modal-blue > div {
+    border: 0;
+}

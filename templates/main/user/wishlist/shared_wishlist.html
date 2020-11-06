@@ -1,10 +1,93 @@
 {% extends "base.html" %}
 {% load social_share %}
+{% load static %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/wishlist.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/purchase.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    {% if own %}
+<h2 class="d-flex justify-content-start align-items-center">
+    <span class="mr-3">{{ object.user.first_name }}'s Wishlist</span>
+    <div class="heart icon"></div>
+</h2>
+<p>{{ object.note }}</p>
+{% if items %}
+    <div class="share-header">
+        <div class="row">
+            <div class="col-9">
+                <span>Item</span>
+            </div>
+            <div class="col-3">
+                <span>Price</span>
+            </div>
+        </div>
+    </div>
+    <div class="share-body">
+    {% for item in items %}
+        {% if items %}
+            <div class="row mb-3">
+                <div class="col-md-3 col-12">
+                    <img src="{{item.product.image.url}}" width="120px" height="120px">
+                </div>
+                <div class="col-md-6 col-9">
+                    <div class="cart-item-name">
+                        <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-3">
+                    <div class="cart-item-price">
+                        <span>Php {{item.product.price}}</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-3 col-12">
+                    <img src="{{item.service.image.url}}" width="120px" height="120px">
+                </div>
+                <div class="col-md-6 col-9">
+                    <div class="cart-item-name">
+                        <a href="{% url 'vendor-product' item.service.slug %}">{{item.product.name}}</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-3">
+                    <div class="cart-item-price">
+                        <span>Php {{item.service.price}}</span>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="row share-footer">
+    <div class="col-md-6">
+        <p>Wishlist made by {{ object.user.first_name }} {{ object.user.last_name }}</p>
+        <p>Purchase any item from this wishlist only at <a href="https://compee.com">compee.com</a></p>
+    </div>
+
+    <div class="col-md-6 d-flex justify-content-end align-items-center share-sm">
+        {% if own %}
+            {% post_to_facebook object 'Post on Facebook <i class="fab fa-facebook-f"></i>' %}
+            {% post_to_twitter "{{ object.user.username }}'s Compee Wishlist" object 'Post on Twitter <i class="fab fa-twitter"></i>' %}
+        {% endif %}
+    </div>
+</div>
+
+
+
+{% endif %}
+
+{% endblock content %}
+
+
+<!-- {% if own %}
         {% post_to_facebook object 'Post on Facebook' %}
         {% post_to_twitter "{{ object.user.username }}'s Compee Wishlist" object 'Post on Twitter' %}
     {% endif %}
+    
     <h1>{{ object.user.username }}'s Wishlist</h1>
     <p>{{ object.note }}</p>
     {% if items %}
@@ -37,5 +120,78 @@
         </table>
     {% else %}
         <h3>This person has nothing in their wishlist!</h3>
-    {% endif %}
-{% endblock content %}
+    {% endif %} -->
+
+
+
+    <!-- {% for item in items %}
+        {% if item.product %}
+            <div class="cart-item-wrapper shared-wishlist-item">
+                <div class="cart-store">
+                   <div class="row">
+                        <div class="col-md-9">
+                            <span>Item</span>
+                        </div>
+                        <div class="col-md-3">
+                            <span>Price</span>
+                        </div>
+                   </div>
+                </div>
+                <div class="cart-item">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-xs-6">
+                            <img src="{{item.product.image.url}}" width="100px" height="100px">
+                        </div>
+                        <div class="col-lg-6 col-md-3 col-6">
+                            <div class="cart-item-name">
+                                <a href="{% url 'vendor-product' item.product.slug %}">{{item.product.name}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="cart-item-price">
+                                <span>Php {{item.product.price}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="cart-item-wrapper">
+                <div class="cart-store">
+                    <span>{{item.service.vendor.store_name}}</span>
+                </div>
+                <div class="cart-item">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-xs-6">
+                            <img src="{{item.service.image.url}}" width="100px" height="100px">
+                        </div>
+                        <div class="col-lg-4 col-md-3 col-6">
+                            <div class="cart-item-name">
+                                <a href="{% url 'vendor-product' item.service.slug %}">{{item.service.name}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="cart-item-price">
+                                <span>Php {{item.service.price}}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="cart-item-qty">
+                                <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
+                                    
+                                    <a href="{% url 'wishlist-remove' item.id %}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                                <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
+                                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.id }}", "service")'>
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %} -->

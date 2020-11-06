@@ -37,3 +37,78 @@ h2 {
 .wishlist-item .cart-item .row > div:last-child a {
     color: #CECDCD;
 }
+
+/* shared wishlist */
+
+.share-header {
+    border: 1px solid #202020;
+    padding: 1em 2em;
+}
+
+.share-header span {
+    color: #202020;
+    font-weight: 400;
+    font-size: 1.25em;
+    text-transform: uppercase;
+}
+
+.share-body {
+    border: 1px solid #202020;
+    border-top: none;
+    padding: 1em 2em;
+}
+
+.share-body a {
+    font-weight: 600;
+    line-height: 1.5em;
+    color: #202020;
+}
+
+.share-body span {
+    color: #159ABD;
+    font-weight: 700;
+}
+
+.share-footer p:first-child {
+    margin-bottom: 0;
+    margin-top: 1em;
+}
+
+.share-footer p:last-child  {
+    font-weight: 600;
+}
+
+.share-footer p:last-child a {
+    color: #005F7B;
+    text-decoration: none;
+}
+
+.share-footer .share-sm a {
+    color: #fff;
+    text-decoration: none;
+    padding: .5em 1em;
+    border-radius: 5px;
+    margin: 0 1em;
+}
+
+.share-footer .share-sm .facebook-this a {
+    background: #4267B2;
+    border: 1px solid #4267B2;
+}
+
+.share-footer .share-sm .facebook-this a:hover {
+    color:  #4267B2;
+    border: 1px solid  #4267B2;
+    background: #fff;
+}
+
+.share-footer .share-sm .tweet-this a {
+    background: #1DA1F2;
+    border: 1px solid #1DA1F2;
+}
+
+.share-footer .share-sm .tweet-this a:hover {
+    background: #fff;
+    color:  #1DA1F2;
+    border: 1px solid  #1DA1F2;
+}
