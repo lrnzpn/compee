@@ -459,7 +459,8 @@ class ProviderListView(ListView):
                 if cat.category not in provider['categories']:
                     provider['categories'].append(cat.category)
             final.append(provider)
-        context['service_cats'] = final
+        context['service_cats'] = final[:4]
+        context['service_cats_end'] = final[4:]
         return context
 
 class ProviderDetailView(DetailView):
@@ -469,7 +470,7 @@ class ProviderDetailView(DetailView):
         context = super(ProviderDetailView, self).get_context_data(**kwargs)
         provider = ServiceProvider.objects.get(slug=self.kwargs['slug'])
         services = Service.objects.filter(provider=provider)
-        items = ServiceItem.objects.fitler(provider=provider)
+        items = ServiceItem.objects.filter(provider=provider)
         context['services'] = services.order_by('-date_created')
         context['items'] = items.order_by('-date_created')
         context['title'] = provider.store_name
@@ -541,6 +542,7 @@ def VendorCategoryProductsListView(request, vendor, category):
         context = {
             'products' : products,
             'category' : category,
+            'vendor' : vendor,
             'title' : f"Search for '{category}' in {vendor.store_name} ",
         }
     elif ServiceProvider.objects.filter(slug=vendor).exists():
@@ -561,7 +563,8 @@ def VendorCategoryProductsListView(request, vendor, category):
             'category' : category,
             'title' : f"Search for '{category}' in {provider.store_name} ",
         }
-    return render(request, 'main/filters/vendor_category.html', context)
+    return render(request, 'main/vendors/vendor_category.html', context)
+
 
 @login_required
 def AddToWishlist(request):

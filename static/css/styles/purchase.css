@@ -1,0 +1,137 @@
+h2 {
+    font-weight: 700;
+    height: 50px;
+}
+
+.cart {
+    background-image: url(../../img/icons/Cart.svg);
+    height: 1em;
+    width: 1em;
+    margin-left: 20px;
+}
+
+
+/* cart styles */
+.cart-item-wrapper {
+    border: 1px solid #202020;
+    border-radius: 2px;
+    margin-bottom: 30px;
+}
+
+.cart-item-wrapper .cart-store {
+    padding: 10px 20px;
+    border-bottom: 1px solid #202020;
+}
+
+.cart-item-wrapper .cart-store span{
+    color: #005F7B;
+    font-weight: 600;
+    font-size: 1.25em;
+}
+
+.cart-item-wrapper .cart-item {
+    padding: 20px;
+}
+
+.hr hr {
+    width: 30%;
+}
+
+.cart-order-summary {
+    border: 1px solid #202020;
+    padding: 20px;
+    top: 150px;
+}
+
+.order-summary p span:last-child {
+    color: #159ABD;
+    font-weight: 500;
+}
+
+.order-summary ul li {
+    color: #159ABD;
+    font-weight: 500;
+    text-align: right;
+}
+
+.order-summary .order-total p span:first-child {
+    font-weight: 500;
+}
+
+.order-summary {
+    padding-bottom: 10px;
+}
+
+.checkout-btn {
+    margin-top: 5em;
+}
+
+.checkout-btn a {
+    width: 100%;
+}
+
+.cart-item-ud i {
+    color: #CECDCD;
+    font-size: 1.5em;
+    margin-left: 10px;
+}
+
+.cart-item-ud a:first-child:hover i {
+    color: #202020;
+}
+
+.cart-item-ud a:last-child:hover i {
+    color: #EC7357
+}
+
+/* checkout */
+form .order-summary h2 {
+    color: #005F7B;
+    height: auto;
+}
+
+form hr {
+    border-bottom: 1px solid #202020;
+}
+
+form .order-summary button {
+    width: 100%;
+}
+
+form .order-total p span {
+    font-weight: 700 !important;
+}
+
+form .order-total p span:last-child {
+    color: #005F7B;
+    font-size: 1.25em;
+}
+
+/* main checkout (/checkout/)*/
+.checkout-wrapper {
+    border: 1px solid #202020;
+    border-radius: 2px;
+}
+
+.cart-item-header {
+    padding: 20px;
+    border-bottom: 1px solid #202020;
+}
+
+.cart-item-header span {
+    font-weight: 600;
+    font-size: 1.25em;
+    color: #CECDCD;
+}
+
+.cart-item-header .row div:first-child span {
+    color: #005F7B;
+}
+
+.cart-item-body .cart-item {
+    padding: 20px;
+}
+
+.cart-item-body .cart-item:not(:last-child) {
+    border-bottom: 1px solid #202020;
+}
