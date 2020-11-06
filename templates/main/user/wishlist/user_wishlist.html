@@ -3,35 +3,66 @@
         <title>{{ user }}'s Wishlist</title>
     </head>
     <body>
-        <p>{{note}}</p>
-        {% if items %}
-        <table border="1">
-            <thead>
-                <th></th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Vendor</th>
-            </thead>
-            <tbody> 
-                {% for item in items %}
-                <tr>
-                    {% if item.product %}
-                        <td><img src="{{ item.product.image.url|slice:'1:' }}" width="100%" height="200px"></td>
-                        <td>{{item.product.name}}</td>
-                        <td>{{item.product.price}}</td>
-                        <td>{{item.product.vendor.store_name}}</td>
-                    {% else %}
-                        <td><img src="{{item.service.image.url|slice:'1:' }}" width="100%" height="200px"></td>
-                        <td>{{item.service.name}}</td>
-                        <td>{{item.service.price}}</td>
-                        <td>{{item.service.provider.store_name}}</td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-         <p>Your wishlist is empty!</p>
-        {% endif%}
+
+        <style>
+            
+
+        </style>
+
+        <main>
+            <div style="display:flex;justify-content:flex-start;align-items:center;">
+                <span style="font-size:3em; font-weight:bold;">{{ user }}'s Wishlist</span>
+                <img style="padding-left:2em;" src="static/img/icons/Heart.png" alt="">    
+            </div>
+            <p style="font-size:1.5em;">{{note}}</p>
+    
+            {% if items %}
+            <div class="item-wrapper">
+                <table>
+                    <thead>
+                        <th>ITEM</th>
+                        <th></th>
+                        <th></th>
+                        <th>PRICE</th>
+                    </thead>
+                    <tbody> 
+                        {% for item in items %}
+                        <tr>
+                            {% if item.product %}
+                                <td><img src="{{ item.product.image.url|slice:'1:' }}" width="100%" height="200px"></td>
+                                <td>
+                                    {{item.product.name}}<br>
+                                    ({{item.product.vendor.store_name}})
+                                </td>
+                                <td></td>
+                                <td style="text-align: center"> Php{{item.product.price}}</td>
+                                
+                            {% else %}
+                                <td><img src="{{item.service.image.url|slice:'1:' }}" width="100%" height="200px"></td>
+                                <td>
+                                    {{item.service.name}}<br>
+                                    ({{item.service.provider.store_name}})
+                                </td>
+                                <td></td>
+                                <td style="text-align: center">Php {{item.service.price}}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Wishlist made by {{ user }}</p>
+            <p style="font-weight:600;font-size:1.25em;color:#202020;">
+                Purchase any item from this wishlist only at <a style="color:#005F7B;text-decoration:none;" href="https://compee.com">compee.com</a>.
+            </p>
+
+            <div align="right">
+                <img src="static/img/logos/Logo 2@4x 2.png">
+            </div>
+            {% else %}
+             <h1>Your wishlist is empty!</h1>
+            {% endif%}
+        </main>
     </body>
 </html>

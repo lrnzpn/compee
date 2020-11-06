@@ -15,7 +15,7 @@
                     <span>
                         Php {{ product.price }}
                     </span>
-                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product_id }}", "product")'>Add to Cart</button>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product_id }}", "product")' data-toggle="modal" data-target="#{{product.slug}}">Add to Cart</button>
                 </div>
 
                 <div class="vendor">
@@ -28,4 +28,7 @@
     </div>
     {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
     {% if forloop.last %}</div>{% endif %}
+    {% include 'main/partials/_cart_product_modal.html'%}
+
 {% endfor %}
+

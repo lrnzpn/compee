@@ -153,7 +153,19 @@ ul {
 }
 
 .btn-orange:hover {
-    background-color: #ed8167;
+    background-color: #fff;
+    color: #EC7357;
+    border: 1px solid #EC7357;
+}
+
+.btn-orange-outline {
+    border: 1px solid#EC7357;
+    color:  #EC7357;
+    background-color: #fff;
+}
+
+.btn-orange-outline:hover {
+    background-color: #EC7357;
     color: #fff;
 }
 
@@ -175,6 +187,13 @@ a.btn>.icon {
 
 .heart {
     background-image: url('../img/icons/Heart.svg')
+}
+
+.cc-icon {
+    background-image: url('../img/icons/cc-logo-blue.svg');
+    height: 1.5em;
+    width: 1.5em;
+    margin-left: 20px;
 }
 
 .navbar .form-control:focus,
@@ -353,4 +372,32 @@ footer {
 /* search filter */
 .search-filter {
     top: 150px;
+}
+
+/* MODAL */
+.modal-blue {
+    background-color: #159ABD;
+    border: 1px solid #159ABD;
+}
+
+.modal-blue .modal-body .circle {
+    border-radius: 50%;
+    height: 5em;
+    width: 5em;
+    background-color: #005F7B;
+}
+
+.modal-blue .modal-body p {
+    color: #fff;
+    font-size: 1.25em;
+    margin: 1em 0;
+}
+
+.modal-blue .modal-body i {
+    font-size: 3em;
+    color: #fff;
+}
+
+.modal-blue > div {
+    border: 0;
 }
