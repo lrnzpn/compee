@@ -16,7 +16,7 @@
                         Php {{ product.product.price }}
                     </span>
                     <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ product.product.product_id }}","product")'>Add to Wishlist</button>
-                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product.product_id }}", "product")'>Add to Cart</button>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product.product_id }}", "product")' data-toggle="modal" data-target="#{{product.slug}}">Add to Cart</button>
                 </div>
 
                 <div class="vendor">
@@ -30,4 +30,7 @@
     </div>
     {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
     {% if forloop.last %}</div>{% endif %}
+    {% include 'main/partials/_cart_product_modal.html'%}
+
 {% endfor %}
+

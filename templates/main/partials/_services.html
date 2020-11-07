@@ -16,7 +16,7 @@
                         Php {{ service.product.price }}
                     </span>
                     <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ service.product.service_id }}", "service")'>Add to Wishlist</button>
-                    <button id="AddCart" class="btn btn-sm btn-outline-secondary" value='{% url "cart-add" %}'onclick='addToCart("{{ service.product.service_id }}", "service")'>Add to Cart</button>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ service.product.service_id }}", "service")' data-toggle="modal" data-target="#{{service.slug}}>Add to Cart</button>
                 </div>
 
                 <div class="vendor">
