@@ -13,33 +13,35 @@
                     <a href="{% url 'home' %}">Home</a> > <span>Browse Sellers</span>
                 </p>
                 <h4>Seller Categories</h4>
-                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsam obcaecati asperiores pariatur temporibus unde consectetur recusandae reprehenderit eius animi, earum ad fugiat itaque suscipit nobis reiciendis in numquam odit atque!</p>
+                <ul>
+                    <li><a href="{% url 'vendors-main' %}">All Categories</a></li>
+                    {% for c in categories %}
+                        <li><a href="{% url 'vendors-category' c.name %}">{{ c.name }}</a></li>
+                    {% endfor %}
+                </ul>
+
                 <span>
-                    Want to be a Seller?<br>Contact us!
+                    Want to be a Seller?<br><a href="{% url 'contact' %}">Contact us!</a>
                 </span>
             </div>
         </div>
         <div class="col-md-9">
             <h2>All Sellers</h2>
-            <span>{{vendors.count}} Total Sellers</span>
+            <span>{{v_count}} Total Sellers</span>
             {% for vendor in vendors %}
                 {% if forloop.first %}<div class="row item-row">{% endif %}
                 <div class="col-md-3 item-wrapper">
                     <div class="mb-4 card">
-                        <a href="{% url 'vendor-detail-main' vendor.slug %}">
+                        <a href="{% url 'vendor-detail-main' vendor.vendor.slug %}">
                             <div class="d-flex justify-content-center align-items-center">
-                                <img src="{{ vendor.image.url }}" width="100%" height="200px">
+                                <img src="{{ vendor.vendor.image.url }}" width="100%" height="200px">
                             </div>
-                            <p class="card-text">{{ vendor.store_name }}</p>
+                            <p class="card-text">{{ vendor.vendor.store_name }}</p>
                         </a>
                         <div class="card-body">
                             <ul>
-                                {% for cat in vendor_cats %}
-                                    {% if cat.vendor == vendor.vendor_id %}
-                                        {% for i in cat.categories %}
-                                            <li><a href="{% url 'vendor-category' vendor.slug i.name %}">{{i.name}}</a></li>
-                                        {% endfor %}
-                                    {% endif %}
+                                {% for i in vendor.categories %}
+                                    <li><a href="{% url 'vendor-category' vendor.vendor.slug i %}">{{i}}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>

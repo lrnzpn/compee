@@ -47,13 +47,13 @@ class VendorUpdateForm(forms.ModelForm):
     class Meta:
         model = Vendor
         fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
-                'zip_code', 'contact_no', 'secondary_no', 'image']
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'about_image']
 
 class ProviderUpdateForm(forms.ModelForm):
     class Meta:
         model = ServiceProvider
         fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
-                'zip_code', 'contact_no', 'secondary_no', 'image']
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'about_image']
 
 class ProviderCreateForm(forms.ModelForm):
     class Meta:
