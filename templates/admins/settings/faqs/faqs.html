@@ -8,6 +8,7 @@
             <h2><a href="{% url 'faq-detail' faq.id %}">{{ faq.title }}</a></h2>
             <p>{{ faq.content|safe|truncatewords:"30"|linebreaks }}</p>
         {% endfor %}
+        {%include 'admins/partials/_paginate.html' %}
     {% else %}
         <p>There are no faq posts to display!</p>
     {% endif %}

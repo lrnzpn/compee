@@ -59,7 +59,7 @@ class ProviderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class ProviderUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = ServiceProvider
     fields = ['store_name', 'provider_info', 'address_line', 'city', 'state', 
-                'zip_code', 'contact_no', 'secondary_no', 'image']
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'about_image']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -132,7 +132,7 @@ class VendorDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class VendorUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Vendor
     fields = ['store_name', 'store_info', 'address_line', 'city', 'state', 
-                'zip_code', 'contact_no', 'secondary_no', 'image', 'user', 'status']
+                'zip_code', 'contact_no', 'secondary_no', 'image', 'about_image', 'user', 'status']
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()
@@ -630,7 +630,7 @@ def get_sort_orders(request):
 class OrderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = SiteOrder
     context_object_name = 'orders'
-    paginate_by = 6
+    # paginate_by = 6
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin').exists()

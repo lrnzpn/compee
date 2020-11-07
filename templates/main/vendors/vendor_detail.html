@@ -45,7 +45,8 @@
                    </div>
                    <div class="col-md-6 d-flex justify-content-center align-items-center">
                     <div class="ss-add-desc">
-                        <span class="d-block">Products: <span>{{products.count}}</span></span>
+                        <span class="d-block">Ratings: <span>{{review_count}}</span></span>
+                        <span class="d-block">Products: <span>{{p_count}}</span></span>
                         <span class="d-block">Joined: <span>{{object.date_joined}}</span></span>
                     </div>
                    </div>
@@ -81,7 +82,7 @@
                 <hr>
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="https://via.placeholder.com/150" alt="">
+                        <img src="{{ object.about_image.url }}" alt="">
                     </div>
                     <div class="col-md-6">
                         <p>{{object.store_info}}</p>
@@ -93,6 +94,7 @@
         <div class="ss-items">
             <h3>All Products</h3>
             {% include 'main/partials/_products.html' %}
+            <a href="{% url 'vendor-products' object.slug %}">View All</a>
         </div>
     </div>
     {% endif %}

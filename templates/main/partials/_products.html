@@ -4,25 +4,27 @@
 {% if forloop.first %}<div class="row item-row">{% endif %}
     <div class="col-md-3 item-wrapper">
         <div class="mb-4 card">
-            <a href="{% url 'vendor-product' product.slug %}">
+            <a href="{% url 'vendor-product' product.product.slug %}">
                 <div class="d-flex justify-content-center align-items-center">
-                    <img src="{{ product.image.url }}" width="100%" height="200px">
+                    <img src="{{ product.product.image.url }}" width="100%" height="200px">
                 </div>
-                <p class="card-text">{{ product.name }}</p>
+                <p class="card-text">{{ product.product.name }}</p>
             </a>
             <div class="card-body product-body">
                 <div class="price d-flex justify-content-between align-items-center">
                     <span>
-                        Php {{ product.price }}
+                        Php {{ product.product.price }}
                     </span>
-                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product_id }}", "product")' data-toggle="modal" data-target="#{{product.slug}}">Add to Cart</button>
+                    <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ product.product.product_id }}","product")'>Add to Wishlist</button>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ product.product.product_id }}", "product")' data-toggle="modal" data-target="#{{product.slug}}">Add to Cart</button>
                 </div>
 
                 <div class="vendor">
-                    <a href="{% url 'vendor-detail-main' product.vendor.slug %}">
-                        {{product.vendor.store_name}}
+                    <a href="{% url 'vendor-detail-main' product.product.vendor.slug %}">
+                        <img src="{{ product.product.image.url }}" alt="" width="120px" height="120px">
                     </a>
                 </div>
+                <p>Rating: {{ product.rating}}</p>
             </div>
         </div>
     </div>

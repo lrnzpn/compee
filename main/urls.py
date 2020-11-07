@@ -15,14 +15,13 @@ urlpatterns = [
     path('product-guides/post/<str:slug>', v.ProductGuideDetailView.as_view(
         template_name='main/pages/concierge/product_guide.html'), name='product-guide'),
 
-    path('categories/', v.CategoryListView.as_view(
-        template_name='main/filters/categories.html'), name='all-categories'),
     path('tag/<str:name>/', v.TagProductsListView, name='tag-filter'),
     path('category/<str:name>/', v.CategoryProductsListView, name='category-filter'),
     path('compare-prices/<str:name>/', v.PriceComparison, name='compare-price'),
 
     path('services/', v.ProviderListView.as_view(
         template_name="main/providers/providers.html"), name='services-main'),
+    path('services/<str:category>', v.ProviderListByCategory, name='services-category'),
     path('service/<str:slug>/', v.ProviderDetailView.as_view(
         template_name='main/providers/provider_detail.html'), name='provider-detail-main'),
     path('service-item/<str:slug>/', v.ServiceItemDetailView.as_view(
@@ -32,6 +31,7 @@ urlpatterns = [
 
     path('vendors/', v.VendorListView.as_view(
         template_name="main/vendors/vendors.html"), name='vendors-main'),
+    path('vendors/<str:category>', v.VendorListByCategory, name='vendors-category'),
     path('shop/<str:slug>/', v.VendorDetailView.as_view(
         template_name='main/vendors/vendor_detail.html'), name='vendor-detail-main'),
             path('shop/<str:vendor>/products/', v.VendorProductsListView, name='vendor-products'),

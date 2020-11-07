@@ -14,7 +14,7 @@
         <h3>The vendor who sells this product is inactive.</h3>
     {% else %}
         <p class="link-nav">
-            <a href="{% url 'home' %}">Home</a> > <a href="{% url 'all-categories' %}">Categories</a> > <a href="{% url 'category-filter' category.category.name %}">{{category.category.name}}</a> 
+            <a href="{% url 'home' %}">Home</a> > <a href="{% url 'category-filter' category.category.name %}">{{category.category.name}}</a> 
             > <span>{{object.name}}</span>
         </p>
         <div class="row">
@@ -26,7 +26,7 @@
                      <span>{{object.name}}</span>
                  </div>
                  <div>
-                     Avg Rating - Total Ratings - Total Sold
+                     {{ rev_average }} Avg Rating - {{ review_count }} Ratings - {{ total_sold }} Total Sold
                  </div>
                  <div class="ss-price">
                     <span>Php {{ object.price }}</span>
@@ -88,7 +88,8 @@
                </div>
                <div class="col-md-6 d-flex justify-content-center align-items-center">
                 <div class="ss-add-desc">
-                    <span class="d-block">Products: <span>{{products.count|add:"1" }}</span></span>
+                    <span class="d-block">Ratings: <span>{{v_review_count}}</span></span>
+                    <span class="d-block">Products: <span>{{p_count}}</span></span>
                     <span class="d-block">Joined: <span>{{object.vendor.date_joined}}</span></span>
                 </div>
                </div>

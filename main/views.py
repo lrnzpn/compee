@@ -23,6 +23,47 @@ from admins.models import (
     CompeeCaresRate, ProductGuide, DisplayGroup, ProductGroup, Banner, Faq
 ) 
 
+
+def getRatings(products, p_type):
+    if p_type == "product":
+        final = []
+        for p in products:
+            p_rating = {
+                "product": 0,
+                "rating": 0
+            }
+            p_rating['product'] = p
+            reviews = ProductReview.objects.filter(product=p)
+            if reviews:
+                ave = 0
+                for r in reviews:
+                    ave = int(r.rating) + ave
+                ave = ave/len(reviews)
+                p_rating['rating'] = ave
+            else:
+                p_rating['rating'] = 0
+            final.append(p_rating)
+        return final
+    elif p_type == "service":
+        final = []
+        for p in products:
+            p_rating = {
+                "product": 0,
+                "rating": 0
+            }
+            p_rating['product'] = p
+            reviews = ServiceReview.objects.filter(service=p)
+            if reviews:
+                ave = 0
+                for r in reviews:
+                    ave = int(r.rating) + ave
+                ave = ave/len(reviews)
+                p_rating['rating'] = ave
+            else:
+                p_rating['rating'] = 0
+            final.append(p_rating)
+        return final
+        
 def SearchBar(request):
     if request.method == 'GET':
         query = request.GET.get('search')
@@ -67,12 +108,12 @@ def SearchBar(request):
 
         context = {'title': 'Search'}
         if products:
-            context.update({'products':list(set(products))})
+            context.update({'products':getRatings(list(set(products)), "product")})
         if vendors:
             context.update({'vendors':list(set(vendors))})
 
         if services:
-            context.update({'services':list(set(services))})
+            context.update({'services':getRatings(list(set(services)), "service")})
         if service_items:
             context.update({'items':list(set(items))})
         if providers:
@@ -214,9 +255,9 @@ def SearchFilter(request):
 
         context = {'title': 'Search'}
         if products:
-            context.update({'products':list(set(products))})
+            context.update({'products':getRatings(list(set(products)), "product")})
         if services:
-            context.update({'services':list(set(services))})
+            context.update({'services':getRatings(list(set(services)), "service")})
                 
         return render(request, 'main/filters/search_result.html', context)
 
@@ -283,15 +324,6 @@ class ProductGuideDetailView(DetailView):
         context['title'] = f'Product Guides | {self.object.title}'
         return context
 
-class CategoryListView(ListView):
-    model = Category
-    context_object_name = 'categories'
-
-    def get_context_data(self, **kwargs):
-        context = super(CategoryListView, self).get_context_data(**kwargs)
-        context['title'] = "All Categories"
-        return context
-
 def TagProductsListView(request, name):
     tag = get_object_or_404(Tag, name=name)
 
@@ -304,8 +336,8 @@ def TagProductsListView(request, name):
     items = ServiceItem.objects.filter(tags=tag)
 
     context = {
-        'products' : products,
-        'services':services,
+        'products' : getRatings(products, "product"),
+        'services' : getRatings(services, "service"),
         'items':items,
         'tag' : tag,
         'title' : f"Search for '{tag}'"
@@ -332,13 +364,37 @@ def CategoryProductsListView(request, name):
     #     items.append(i.service_item)
 
     context = {
-        'products' : products,
-        'services' : services,
+        'products' : getRatings(products, "product"),
+        'services' : getRatings(services, "service"),
         # 'items' : items,
         'category' : category,
         'title' : f"Search for '{category}'"
     }
     return render(request, 'main/filters/category_detail.html', context)
+
+def VendorListByCategory(request, category):
+    vendors = Vendor.objects.filter(status="Active")
+    final = []
+    for i in vendors:
+        vendor = {
+            'vendor': i,
+            'categories': []
+        }
+        products = Product.objects.filter(vendor=i)
+        for j in products:
+            cat = ProductCategory.objects.get(product=j)
+            if cat.category.name not in vendor['categories']:
+                vendor['categories'].append(cat.category.name)
+        if category in vendor['categories']:
+            final.append(vendor)
+
+    context = {
+        'vendors': final,
+        'v_count': len(final),
+        'categories': Category.objects.all(),
+        'title': "Vendors"
+    }
+    return render(request, 'main/vendors/vendors.html', context)
 
 class VendorListView(ListView):
     model = Vendor
@@ -346,28 +402,27 @@ class VendorListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        return Vendor.objects.filter(status="Active")
+        vendors = Vendor.objects.filter(status="Active")
+        final = []
+        for i in vendors:
+            vendor = {
+                'vendor': i,
+                'categories': []
+            }
+            products = Product.objects.filter(vendor=i)
+            for j in products:
+                cat = ProductCategory.objects.get(product=j)
+                if cat.category.name not in vendor['categories']:
+                    vendor['categories'].append(cat.category.name)
+            final.append(vendor)
+        return final
 
     def get_context_data(self, **kwargs):
         context = super(VendorListView, self).get_context_data(**kwargs)
         updateVendorStatus()
         context['title'] = "Vendors"
         context['categories'] = Category.objects.all()
-        vendors = Vendor.objects.filter(status="Active")
-        final = []
-        for i in vendors:
-            vendor = {
-                'vendor': i.vendor_id,
-                'categories': []
-            }
-            products = Product.objects.filter(vendor=i)
-            for j in products:
-                cat = ProductCategory.objects.get(product=j)
-                if cat.category not in vendor['categories']:
-                    vendor['categories'].append(cat.category)
-            final.append(vendor)
-        context['vendor_cats'] = final[:4]
-        context['vendor_cats_end'] = final[4:]
+        context['v_count'] = Vendor.objects.filter(status="Active").count()
         return context
 
 class VendorDetailView(DetailView):
@@ -377,7 +432,9 @@ class VendorDetailView(DetailView):
         context = super(VendorDetailView, self).get_context_data(**kwargs)
         vendor = Vendor.objects.get(slug=self.kwargs['slug'])
         products = Product.objects.filter(vendor=vendor)
-        context['products'] = products.order_by('-date_created')
+        prods =  getRatings(products.order_by('-date_created'), "product")
+        context['products'] = prods
+        context['p_count'] = len(prods)
         context['title'] = vendor.store_name
         context['categories'] = Category.objects.all()
         d1 = self.object.date_joined
@@ -389,6 +446,8 @@ class VendorDetailView(DetailView):
         if revs:
             context['reviews'] = revs
             context['review_count'] = len(revs)
+        else: 
+            context['review_count'] = 0
         if self.object.status == "Inactive":
             context['inactive'] = True
 
@@ -406,16 +465,44 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['title'] = self.object.name
-        context['categories'] = Category.objects.all()
         if self.object.vendor.status == "Inactive":
             context['inactive'] = True
         else:
-            context['products'] = Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id)
-            context['reviews'] = ProductReview.objects.filter(product=self.object)
+            #vendor info
+            if Product.objects.filter(vendor=self.object.vendor).exists():
+                prods =  getRatings(Product.objects.filter(vendor=self.object.vendor).order_by('-date_created'), "product")
+                context['p_count'] = len(prods)
+            else: 
+                context['p_count'] = 0
+            revs = VendorReview.objects.filter(vendor=self.object.vendor)
+            if revs:
+                context['v_review_count'] = len(revs)
+            else: 
+                context['v_review_count'] = 0
 
-            if ProductCategory.objects.filter(product=self.object).exists():
-                context['category'] = ProductCategory.objects.get(product=self.object)
+            #product
+            context['products'] = getRatings(Product.objects.filter(vendor=self.object.vendor).order_by('-date_created').exclude(product_id=self.object.product_id), "product")
+            revs = ProductReview.objects.filter(product=self.object)
+            if revs:
+                ave = 0
+                for r in revs:
+                    ave = int(r.rating) + ave
+                context['rev_average'] = ave/len(revs)
+                context['reviews'] = revs
+                context['review_count'] = len(revs)
+            else: 
+                context['rev_average'] = 0
+                context['review_count'] = 0
             
+            sold = OrderItem.objects.filter(product=self.object)
+            total_sold=0
+            if sold:
+                for i in sold:
+                    order = SiteOrder.objects.get(ref_id=i.order.ref_id)
+                    if order.status == "Shipped" or order.status == "Received":
+                        total_sold = total_sold + i.quantity
+            context['total_sold'] = total_sold
+
             if self.request.user.is_authenticated:
                 if WishlistItem.objects.filter(product=self.object, user=self.request.user).exists():
                     context['wishlist_item'] = True
@@ -431,36 +518,77 @@ def PriceComparison(request, name):
         if p.vendor.status == "Inactive":
             products = products.exclude(product_id=p.product_id)
     context = {
-        'products' : products,
+        'products' : getRatings(products, "products"),
         'name' : name,
         'title' : f"Prices for '{name}'"
     }
     return render(request, 'main/filters/price_comparison.html', context)
 
+def ProviderListByCategory(request, category):
+    vendors = Vendor.objects.filter(status="Active")
+    final = []
+    for i in vendors:
+        vendor = {
+            'vendor': i,
+            'categories': []
+        }
+        products = Product.objects.filter(vendor=i)
+        for j in products:
+            cat = ProductCategory.objects.get(product=j)
+            if cat.category.name not in vendor['categories']:
+                vendor['categories'].append(cat.category.name)
+        if category in vendor['categories']:
+            final.append(vendor)
+
+    providers = ServiceProvider.objects.all()
+    final = []
+    for i in providers: 
+        provider = {
+            'provider': i,
+            'categories': []
+        }
+        services = Service.objects.filter(provider=i)
+        for j in services:
+            cat = ServiceCategory.objects.get(service=j)
+            if cat.category.name not in provider['categories']:
+                provider['categories'].append(cat.category.name)
+        if category in provider['categories']:
+            final.append(provider) 
+
+    context = {
+        'providers': final,
+        'p_count': len(final),
+        'categories': Category.objects.all(),
+        'title': "Vendors"
+    }
+    return render(request, 'main/providers/providers.html', context)
+
 class ProviderListView(ListView):
     model = ServiceProvider
     context_object_name = 'providers'
     paginate_by = 12
-    
-    def get_context_data(self, **kwargs):
-        context = super(ProviderListView, self).get_context_data(**kwargs)
-        context['title'] = "Services"
-        context['categories'] = Category.objects.all()
+
+    def get_queryset(self):
         providers = ServiceProvider.objects.all()
         final = []
         for i in providers:
             provider = {
-                'provider': i.provider_id,
+                'provider': i,
                 'categories': []
             }
             services = Service.objects.filter(provider=i)
             for j in services:
                 cat = ServiceCategory.objects.get(service=j)
-                if cat.category not in provider['categories']:
-                    provider['categories'].append(cat.category)
+                if cat.category.name not in provider['categories']:
+                    provider['categories'].append(cat.category.name)
             final.append(provider)
-        context['service_cats'] = final[:4]
-        context['service_cats_end'] = final[4:]
+        return final
+    
+    def get_context_data(self, **kwargs):
+        context = super(ProviderListView, self).get_context_data(**kwargs)
+        context['title'] = "Services"
+        context['categories'] = Category.objects.all()
+        context['p_count'] = ServiceProvider.objects.all().count()
         return context
 
 class ProviderDetailView(DetailView):
@@ -471,11 +599,19 @@ class ProviderDetailView(DetailView):
         provider = ServiceProvider.objects.get(slug=self.kwargs['slug'])
         services = Service.objects.filter(provider=provider)
         items = ServiceItem.objects.filter(provider=provider)
-        context['services'] = services.order_by('-date_created')
+
+        servs = getRatings(services.order_by('-date_created'), "service")
+        context['services'] = servs
+        context['s_count'] = len(servs)
         context['items'] = items.order_by('-date_created')
         context['title'] = provider.store_name
         context['categories'] = Category.objects.all()
-        context['reviews'] = ProviderReview.objects.filter(provider=self.object)
+        revs = ProviderReview.objects.filter(provider=self.object)
+        if revs:
+            context['reviews'] = revs
+            context['review_count'] = len(revs)
+        else: 
+            context['review_count'] = 0
 
         categories = []
         for j in services:
@@ -502,11 +638,42 @@ class ServiceDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(ServiceDetailView, self).get_context_data(**kwargs)
-        context['services'] = Service.objects.filter(provider=self.object.provider).order_by('-date_created').exclude(service_id=self.object.service_id)
-        if ServiceCategory.objects.filter(service=self.object).exists():
-            context['category'] = ServiceCategory.objects.get(service=self.object)
+        #provider info
+        if Service.objects.filter(provider=self.object.provider).exists():
+            prods =  getRatings(Service.objects.filter(provider=self.object.provider).order_by('-date_created'), "service")
+            context['p_count'] = len(prods)
+        else: 
+            context['p_count'] = 0
+        revs = ProviderReview.objects.filter(provider=self.object.provider)
+        if revs:
+            context['v_review_count'] = len(revs)
+        else: 
+            context['v_review_count'] = 0
+        
+        #service
+        context['services'] = getRatings(Service.objects.filter(provider=self.object.provider).order_by('-date_created').exclude(service_id=self.object.service_id), "service")
+        revs = ServiceReview.objects.filter(product=self.object)
+        if revs:
+            ave = 0
+            for r in revs:
+                ave = int(r.rating) + ave
+            context['rev_average'] = ave/len(revs)
+            context['reviews'] = revs
+            context['review_count'] = len(revs)
+        else: 
+            context['rev_average'] = 0
+            context['review_count'] = 0
+
+        sold = OrderItem.objects.filter(service=self.object)
+        total_sold=0
+        if sold:
+            for i in sold:
+                order = SiteOrder.objects.get(ref_id=i.order.ref_id)
+                if order.status == "Shipped" or order.status == "Received":
+                    total_sold = total_sold + i.quantity
+        context['total_sold'] = total_sold
+
         context['title'] = self.object.name
-        context['categories'] = Category.objects.all()
         return context
 
 def VendorProductsListView(request, vendor):
@@ -514,7 +681,7 @@ def VendorProductsListView(request, vendor):
         vendor = Vendor.objects.get(slug=vendor)
         if vendor.status == "Active":
             context = {
-                'products' : Product.objects.filter(vendor=vendor),
+                'products' : getRatings(Product.objects.filter(vendor=vendor), "product"),
                 'vendor': vendor,
                 'title' : f"{vendor.store_name} | All Products",
             }
@@ -523,7 +690,7 @@ def VendorProductsListView(request, vendor):
     elif ServiceProvider.objects.filter(slug=vendor).exists():
         provider = ServiceProvider.objects.get(slug=vendor)
         context = {
-            'services' : Service.objects.filter(provider=provider),
+            'services' : getRatings(Service.objects.filter(provider=provider), "service"),
             'items' : ServiceItem.objects.filter(provider=provider),
             'provider': provider,
             'title' : f"{provider.store_name} | All Products",
@@ -540,7 +707,7 @@ def VendorCategoryProductsListView(request, vendor, category):
             if p.product.vendor == vendor:
                 products.append(p.product)
         context = {
-            'products' : products,
+            'products' : getRatings(products, "product"),
             'category' : category,
             'vendor' : vendor,
             'title' : f"Search for '{category}' in {vendor.store_name} ",
@@ -558,13 +725,13 @@ def VendorCategoryProductsListView(request, vendor, category):
             if i.service_item.provider == provider:
                 items.append(i.service_item)
         context = {
-            'services' : services,
+            'services' : getRatings(services, "service"),
             'items' : items,
             'category' : category,
+            'provider' : provider,
             'title' : f"Search for '{category}' in {provider.store_name} ",
         }
-    return render(request, 'main/vendors/vendor_category.html', context)
-
+    return render(request, 'main/filters/vendor_category.html', context)
 
 @login_required
 def AddToWishlist(request):
@@ -750,6 +917,7 @@ class CartView(LoginRequiredMixin, ListView):
         fees = []
         subtotal = decimal.Decimal(0.00)
         total = decimal.Decimal(0.00)
+        item_count = 0
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -757,9 +925,10 @@ class CartView(LoginRequiredMixin, ListView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
-                subtotal = subtotal + i.product.price
+                subtotal = subtotal + i.product.price*i.quantity
             else:
-                subtotal = subtotal + i.service.price
+                subtotal = subtotal + i.service.price*i.quantity
+            item_count = item_count + i.quantity
         
         if vendors == []:
             context['s_only'] = True
@@ -773,6 +942,7 @@ class CartView(LoginRequiredMixin, ListView):
             total = total + i.rate.rate
         context['subtotal'] = subtotal
         context['total'] = total + subtotal
+        context['item_count'] = item_count
         return context
 
 class CartItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -842,7 +1012,7 @@ class CartItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, *args, **kwargs):
         item = CartItem.objects.get(id=self.kwargs['pk'])
         if item.product:
-            item = CartItem.objects.get(id=self.kwargs['pk'])
+            product = Product.objects.get(product_id=item.product.product_id)
             product.item_stock = product.item_stock + item.quantity
             product.save()
         return super(CartItemDeleteView, self).delete(*args, **kwargs)
@@ -910,12 +1080,12 @@ class Checkout(LoginRequiredMixin, CreateView):
                     if VendorShipping.objects.filter(vendor=vendor).exists():
                         fees.append(VendorShipping.objects.get(vendor=vendor))
                     vendors.append(i.product.vendor.vendor_id)
-                subtotal = subtotal + i.product.price
+                subtotal = subtotal + i.product.price*i.quantity
             else:
                 if i.service.provider.provider_id not in providers:
                     provider = ServiceProvider.objects.get(provider_id=i.service.provider.provider_id)
                     providers.append(i.service.provider.provider_id)
-                subtotal = subtotal + i.service.price
+                subtotal = subtotal + i.service.price*i.quantity
         
         if vendors == []:
             context['s_only'] = True

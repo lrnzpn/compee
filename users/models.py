@@ -23,6 +23,7 @@ class Vendor(models.Model):
     date_joined = models.DateTimeField(default=timezone.now)
     contact_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
     secondary_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
+    about_image = models.ImageField(default='default.jpg', upload_to='store_pics')
     image = models.ImageField(default='default.jpg', upload_to='store_pics')
     about_image = models.ImageField(blank=True, null=True, upload_to='store_pics')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -51,6 +52,7 @@ class ServiceProvider(models.Model):
     date_joined = models.DateTimeField(default=timezone.now)
     contact_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
     secondary_no = models.CharField(max_length=15, blank=True, null=True, validators=[numericCheck])
+    about_image = models.ImageField(default='default.jpg', upload_to='store_pics')
     image = models.ImageField(default='default.jpg', upload_to='store_pics')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

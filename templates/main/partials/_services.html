@@ -4,25 +4,27 @@
 {% if forloop.first %}<div class="row item-row">{% endif %}
     <div class="col-md-3 item-wrapper">
         <div class="mb-4 card">
-            <a href="{% url 'service-product' service.slug %}">
+            <a href="{% url 'service-product' service.product.slug %}">
                 <div class="d-flex justify-content-center align-items-center">
-                    <img src="{{ service.image.url }}" width="100%" height="200px">
+                    <img src="{{ service.product.image.url }}" width="100%" height="200px">
                 </div>
-                <p class="card-text">{{ service.name }}</p>
+                <p class="card-text">{{ service.product.name }}</p>
             </a>
             <div class="card-body product-body">
                 <div class="price d-flex justify-content-between align-items-center">
                     <span>
-                        Php {{ service.price }}
+                        Php {{ service.product.price }}
                     </span>
-                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ service.service_id }}", "service")' data-toggle="modal" data-target="#{{service.slug}}>Add to Cart</button>
+                    <button id="AddWishlist" class="btn btn-sm btn-outline-secondary" value='{% url "wishlist-add" %}'onclick='addToWishlist("{{ service.product.service_id }}", "service")'>Add to Wishlist</button>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ service.product.service_id }}", "service")' data-toggle="modal" data-target="#{{service.slug}}>Add to Cart</button>
                 </div>
 
                 <div class="vendor">
-                    <a href="{% url 'provider-detail-main' service.slug %}">
-                        {{service.provider.store_name}}
+                    <a href="{% url 'provider-detail-main' service.product.slug %}">
+                        <img src="{{ service.product.provider.image.url }}" alt="" width="120px" height="120px">
                     </a>
                 </div>
+                <p>Rating: {{ service.rating}}</p>
             </div>
         </div>
     </div>
@@ -40,10 +42,10 @@
                     <p class="card-text">{{ service.name }}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <a href="{% url 'service-product' service.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a href="{% url 'service-product' service.product.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
                             <button id="AddCart" class="btn btn-sm btn-outline-secondary" value="{% url 'cart-add' %}" onclick='addToCart("{{ service.service_id }}", "service")'>Add to Cart</button>
                         </div>
-                        <small class="text-muted">{{ service.price }}</small>
+                        <small class="text-muted">{{ service.product.price }}</small>
                     </div>
                 </div>
             </div>
