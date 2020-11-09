@@ -10,3 +10,8 @@ class RenewalForm(forms.ModelForm):
     class Meta:
         model = CompeeCaresRenewal
         fields = ['order_item', 'notes']
+
+class ContactForm(forms.Form):
+    from_email = forms.EmailField(label="Your Email")
+    subject = forms.CharField(label="Subject")
+    message = forms.CharField(label="Message",widget=forms.Textarea)

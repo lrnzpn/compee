@@ -51,7 +51,9 @@ urlpatterns = [
     path('admin/remove/<int:pk>/', v.RemoveAdmin, name='remove-admin'),
 
     path('users/<int:pk>/wishlist/', v.WishlistView.as_view(
-        template_name='admins/users/wishlist.html'), name='user-wishlist'),
+        template_name='admins/users/wishlist/wishlist.html'), name='user-wishlist'),
+    path('users/<int:user_pk>/wishlist/<int:pk>/remove/', v.WishlistItemDeleteView.as_view(
+        template_name='admins/users/wishlist/wishlist_remove.html'), name='user-wishlist-remove'),
     path('users/<int:pk>/cart/', v.CartView.as_view(
         template_name='admins/users/cart.html'), name='user-cart'),
 

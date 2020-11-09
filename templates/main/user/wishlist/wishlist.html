@@ -40,12 +40,12 @@
                             <div class="col-md-3 col-6">
                                 <div class="cart-item-qty mb-4 d-flex align-items-center justify-content-md-end justify-content-start">
                                     <span class="mr-5">Quantity: {{item.quantity}}</span>
-                                    <a href="{% url 'cart-remove' item.id %}">
+                                    <a href="{% url 'wishlist-remove' item.id %}">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </div>
                                 <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
-                                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.id }}", "product")'>
+                                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.product.product_id }}", "product")'>
                                         Add to Cart
                                     </button>
                                 </div>
@@ -82,7 +82,7 @@
                                         </a>
                                     </div>
                                     <div class="cart-item-ud d-flex align-items-center justify-content-md-end justify-content-start">
-                                        <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.id }}", "service")'>
+                                        <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ item.service.service_id }}", "service")'>
                                             Add to Cart
                                         </button>
                                     </div>

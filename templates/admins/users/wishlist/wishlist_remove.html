@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class = "content-section">
+        <form method = "POST">
+            {% csrf_token %}
+            <fieldset class = "form-group">
+                <legend class = "border-bottom mb-4">Remove from Wishlist</legend>
+                {% if object.product %}
+                    <h2>Are you sure you want to remove "{{ object.product.name }}" from your wishlist? </h2>
+                {% else %}
+                    <h2>Are you sure you want to remove "{{ object.service.name }}" from your wishlist? </h2>
+                {% endif %}
+            </fieldset>
+            <div class="form-group">
+                <button class = "btn btn-outline-danger" type = "submit">Yes, Remove</button>
+                <a class = "btn btn-outline-secondary" href = "{% url 'user-wishlist' user.id %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

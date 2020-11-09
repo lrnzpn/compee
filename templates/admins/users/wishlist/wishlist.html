@@ -24,7 +24,7 @@
                         <td>{{item.service.provider.store_name}}</td>
                         <td><a href="{% url 'service-product' item.service.slug %}">Go to Service</a></td>
                     {% endif %}
-                    <td><a href="{% url 'wishlist-remove' item.id %}">x</a></td>
+                    <td><a href="{% url 'user-wishlist-remove' user.id item.id %}">x</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

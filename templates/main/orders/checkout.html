@@ -126,7 +126,7 @@
                     <h4>Order Summary</h4>
                     <div class="order-summary mb-4">
                         <p class="d-flex justify-content-between align-items-center">
-                            <span>Subtotal ({% if items|length > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                            <span>Subtotal ({% if item_count > 1 %}{{item_count}} Items{% else %}1 Item {% endif %})</span>
                             <span>Php {{ subtotal }}</span>
                         </p>
                         <div class="d-flex justify-content-between align-items-start">
@@ -144,7 +144,7 @@
                         </div>
                         {% if cc_total %}
                         <p class="d-flex justify-content-between align-items-center">
-                            <span>Compee Cares Fee ({% if cc_count > 1 %}{{items|length}} Items{% else %}1 Item {% endif %})</span>
+                            <span>Compee Cares Fee ({% if cc_count > 1 %}{{cc_count}} Items{% else %}1 Item {% endif %})</span>
                             <span>Php {{cc_total}}</span>
                         </p>
                         {% endif %}

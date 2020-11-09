@@ -1,0 +1,36 @@
+ORDER CONFIRMATION
+{{ order.user.username }}, thank you for your order!
+
+We've received your order and will contact you as soon as your package is shipped. You can find your purchase information below.
+
+SUMMARY
+Ref ID: {{ order.ref_id }}
+Date: {{ order.date_placed }}
+Payment Method: {{ order.payment_method.title }}
+
+SHIPPING ADDRESS:
+{{ order.address_line }} {{ order.city }} {{ order.state }} {{ order.zip_code }}
+
+ITEMS SHIPPED
+{% for item in items %}
+    {% if item.product %}
+        {{ item.product.name }} {% if item.c_cares %}(With Compee Cares) {% endif %}- {{ item.product.price }} x{{ item.quantity }}
+    {% else %}
+        {{ item.service.name }} {% if item.c_cares %}(With Compee Cares) {% endif %}- {{ item.service.price }} x{{ item.quantity }}
+    {% endif %}
+{% endfor %}
+
+Subtotal({{ items_count }} Items): {{ subtotal }}
+{% if order.shipping_fee %}
+    Shipping Fee: {{ order.shipping_fee.rate }}
+{% endif %}
+{% if c_cares %}
+    Compee Cares Fee: {{ c_cares }} ({{ cares_items }} Items)
+{% endif %}
+Order Total: {{ order.total }}
+
+
+
+
+
+
