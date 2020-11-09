@@ -13,8 +13,6 @@
             <p>{{ object.discount_price }}</p>
             <h5>Date Created: </h5>
             <p>{{ object.date_created }}</p>
-            <h5>Category: </h5>
-            <p><a href="{% url 'category-filter' category.category.name %}">{{ category.category.name }}</a></p>
             <h5>Tags:</h5>
             <p>
                 {% for tag in object.tags.all %}

@@ -593,6 +593,23 @@ class WishlistView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['title'] = "Dashboard | " + user.username + "'s Wishlist"
         return context
 
+class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = WishlistItem
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin').exists()
+
+    def get_context_data(self, **kwargs):
+        context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Delete Wishlist Item"
+        context['user'] = User.objects.get(id=self.kwargs['user_pk'])
+        return context
+
+    def get_success_url(self, **kwargs):
+        user = User.objects.get(id=self.kwargs['user_pk'])
+        messages.success(self.request, 'Item has been removed from their wishlist')
+        return reverse('user-wishlist', kwargs={'pk': user.id})
+
 class CartView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CartItem
     context_object_name = 'items'

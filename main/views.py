@@ -3,6 +3,7 @@ from xhtml2pdf import pisa
 from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
+from django.core.mail import send_mail
 from django.template.loader import get_template
 from admins.funcs import updateVendorStatus, get_ref_id, get_wish_ref_id
 from django.shortcuts import render, get_object_or_404, reverse, redirect
@@ -13,7 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from taggit.models import Tag
-from .forms import RenewalForm
+from .forms import RenewalForm, ContactForm
 from users.models import Vendor, ServiceProvider, VendorReview, ProviderReview
 from .models import (
     WishlistItem, SharedWishlist, CartItem, SiteOrder, OrderItem, CompeeCaresRenewal)
@@ -287,7 +288,26 @@ def About(request):
     return render(request, 'main/pages/about.html', context)
 
 def Contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            send_mail(
+                'Contact Compee: ' + form.cleaned_data.get('subject'),
+                form.cleaned_data.get('message'),
+                form.cleaned_data.get('from_email'),
+                ["megtuason@gmail.com"],
+                fail_silently=False
+            )
+            messages.success(request, "Thanks for contacting us! We'll get back to you as soon as we can.")
+            return redirect('contact')
+        else:
+            messages.error(request, "There was an error in sending your message. Please try again later.")
+            return redirect('contact')
+    else:
+        form = ContactForm()
+        
     context = {
+        'form': form,
         'title': 'Contact Us'
     }
     return render(request, 'main/pages/contact.html', context)
@@ -652,7 +672,7 @@ class ServiceDetailView(DetailView):
         
         #service
         context['services'] = getRatings(Service.objects.filter(provider=self.object.provider).order_by('-date_created').exclude(service_id=self.object.service_id), "service")
-        revs = ServiceReview.objects.filter(product=self.object)
+        revs = ServiceReview.objects.filter(service=self.object)
         if revs:
             ave = 0
             for r in revs:
@@ -827,7 +847,7 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
     def test_func(self):
         item = WishlistItem.objects.get(id=self.kwargs['pk'])
-        return self.request.user == item.user or self.request.user.groups.filter(name='Admin').exists()
+        return self.request.user == item.user
 
     def get_context_data(self, **kwargs):
         context = super(WishlistItemDeleteView, self).get_context_data(**kwargs)
@@ -835,12 +855,8 @@ class WishlistItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return context
 
     def get_success_url(self, **kwargs):
-        if self.request.user.groups.filter(name='Admin').exists():
-            messages.success(self.request, 'Item has been removed from their wishlist')
-            return reverse("user-wishlist", kwargs={'pk':self.kwargs['pk']})
-        else:
-            messages.success(self.request, 'Item has been removed from your wishlist')
-            return reverse('wishlist')
+        messages.success(self.request, 'Item has been removed from your wishlist')
+        return reverse('wishlist')
 
 @login_required
 def AddToCart(request):
@@ -1051,7 +1067,49 @@ def CompeeCaresForm(request):
         return render(request, 'main/orders/compee_cares.html', context)
     else:
         return reverse('home')
-        
+
+def order_email(order):
+    subject = 'Order Confirmation: #' + order.ref_id
+
+    items = OrderItem.objects.filter(order=order)
+    subtotal = decimal.Decimal(0.00)
+    c_cares = decimal.Decimal(0.00)
+    cares_items = 0
+    cares_fee = CompeeCaresRate.objects.all().first().rate
+    for i in items:
+        if i.product:
+            subtotal = subtotal + i.product.price*i.quantity
+        else:
+            subtotal = subtotal + i.service.price*i.quantity
+        if i.c_cares:
+            c_cares = i.quantity*cares_fee
+            cares_items = cares_items + i.quantity
+    
+    context = {
+        'order':order,
+        'items': items, 
+        'items_count': items.count(),
+        'subtotal': subtotal,
+    }
+
+    if c_cares > 0:
+        context.update({
+            'c_cares':c_cares,
+            'cares_items':cares_items
+        })
+
+    text_content = get_template('main/orders/email/confirm_email.txt').render(context)
+    html_content = get_template('main/orders/email/confirm_email.html').render(context)
+
+    send_mail(
+        'Order Confirmation: #' + order.ref_id,
+        text_content,
+        'compee@gmail.com',
+        [order.user.email], 
+        fail_silently=False,
+        html_message=html_content
+    )
+
 class Checkout(LoginRequiredMixin, CreateView):
     model = SiteOrder
     fields = ['contact_no', 'address_line', 'city', 'state', 'zip_code', 'payment_method']
@@ -1063,16 +1121,20 @@ class Checkout(LoginRequiredMixin, CreateView):
         context['items'] = items
         items = items.filter(c_cares=True)
         cc_total = decimal.Decimal(0.00)
+        cc_count = 0
         if items:
-            cc_total = decimal.Decimal(len(items))* CompeeCaresRate.objects.all().first().rate
+            for i in items:
+                cc_count = cc_count + i.quantity
+            context['cc_count'] = cc_count
+            cc_total = decimal.Decimal(cc_count)* CompeeCaresRate.objects.all().first().rate
             context['cc_total'] = cc_total
-            context['cc_count'] = len(items)
 
         vendors = []
         providers = []
         fees = []
         subtotal = decimal.Decimal(0.00)
-        total = decimal.Decimal(0.00)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+        total = decimal.Decimal(0.00)    
+        item_count = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
         for i in CartItem.objects.filter(user=self.request.user):
             if i.product:
                 if i.product.vendor.vendor_id not in vendors:
@@ -1086,6 +1148,7 @@ class Checkout(LoginRequiredMixin, CreateView):
                     provider = ServiceProvider.objects.get(provider_id=i.service.provider.provider_id)
                     providers.append(i.service.provider.provider_id)
                 subtotal = subtotal + i.service.price*i.quantity
+            item_count = item_count + i.quantity
         
         if vendors == []:
             context['s_only'] = True
@@ -1101,6 +1164,7 @@ class Checkout(LoginRequiredMixin, CreateView):
         for i in fees:
             total = total + i.rate.rate
         context['subtotal'] = subtotal
+        context['item_count'] = item_count
         context['total'] = total + subtotal + cc_total
         return context
 
@@ -1130,7 +1194,7 @@ class Checkout(LoginRequiredMixin, CreateView):
                     product['c_cares'] = i.c_cares
                     order['items'] = [product]
                     if i.c_cares == True:
-                        order['total'] = i.product.price * decimal.Decimal(i.quantity) + c_cares
+                        order['total'] = (i.product.price + c_cares)* decimal.Decimal(i.quantity)
                     else:
                         order['total'] = i.product.price * decimal.Decimal(i.quantity)
                     order_list.append(order)
@@ -1143,7 +1207,7 @@ class Checkout(LoginRequiredMixin, CreateView):
                             d['items'].append(product)
                             d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
                             if i.c_cares == True:
-                                d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity) + c_cares
+                                d['total'] = d['total'] + (i.product.price + c_cares) * decimal.Decimal(i.quantity)
                             else:
                                 d['total'] = d['total'] + i.product.price * decimal.Decimal(i.quantity)
             else:
@@ -1199,6 +1263,8 @@ class Checkout(LoginRequiredMixin, CreateView):
                         c_item = CartItem.objects.get(product=prod, user=self.request.user)
                         c_item.delete()
 
+                    order_email(order)
+
             for d in service_order_list:
                 provider = ServiceProvider.objects.get(provider_id=d['vendor_id'])
                 order = SiteOrder(
@@ -1215,12 +1281,15 @@ class Checkout(LoginRequiredMixin, CreateView):
                 if form.instance.payment_method.title != "Cash On Delivery":
                     order.status = "Payment Pending"
                 order.save()
+
                 for i in d['items']:
                     serv = Service.objects.get(service_id=i['product_id'])
                     item = OrderItem(order=order, service=serv, quantity=i['quantity'], c_cares=i['c_cares'])
                     item.save()
                     c_item = CartItem.objects.get(service=serv, user=self.request.user)
                     c_item.delete()
+
+                order_email(order)
         else:
             first = True
             for d in service_order_list:
@@ -1254,10 +1323,13 @@ class Checkout(LoginRequiredMixin, CreateView):
                         item.save()
                         c_item = CartItem.objects.get(serivce=serv, user=self.request.user)
                         c_item.delete()
+                    
+                    order_email(order)
 
         return super().form_valid(form)
     
     def get_success_url(self, **kwargs):
+        print("SUCCESS")
         items = CartItem.objects.filter(user=self.request.user)
         for i in items:
             if i.product:
@@ -1266,6 +1338,9 @@ class Checkout(LoginRequiredMixin, CreateView):
                 item = OrderItem(order=self.object, service=i.service, quantity=i.quantity)
             item.save()
             i.delete()
+        
+        order_email(self.object)
+
         if self.object.payment_method.title == "Paypal or Debit/Credit Card":
             return reverse("credit-payment", kwargs={'pk':self.object.ref_id})
         elif self.object.payment_method.title == "Cash on Delivery":
