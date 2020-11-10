@@ -1,0 +1,28 @@
+<span>{% if vendors|length != 1 %}{{vendors|length}} sellers{% else %} 1 seller {% endif %} found</span>
+
+{% for vendor in vendors %}
+    {% if forloop.first %}<div class="row item-row">{% endif %}
+    <div class="col-md-3 item-wrapper">
+        <div class="mb-4 card">
+            <a href="{% url 'vendor-detail-main' vendor.slug %}">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="{{ vendor.image.url }}" width="100%" height="200px">
+                </div>
+                <p class="card-text">{{ vendor.store_name }}</p>
+            </a>
+            <div class="card-body">
+                <ul>
+                    {% for cat in vendor_cats %}
+                        {% if cat.vendor == vendor.vendor_id %}
+                            {% for i in cat.categories %}
+                                <li><a href="{% url 'vendor-category' vendor.slug i.name %}">{{i.name}}</a></li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% if forloop.counter|divisibleby:"4" %}</div><div class="row item-row">{% endif %}
+    {% if forloop.last %}</div>{% endif %}
+{% endfor %}

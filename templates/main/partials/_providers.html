@@ -1,0 +1,29 @@
+<span>{% if providers|length != 1 %}{{providers|length}} service providers{% else %} 1 service provider{% endif %} found</span>
+
+
+{% for p in providers %}
+    {% if forloop.first %}<div class="row item-row">{% endif %}
+    <div class="col-md-3 item-wrapper">
+        <div class="mb-4 card">
+            <a href="{% url 'provider-detail-main' p.slug %}">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="{{ p.image.url }}" width="100%" height="200px">
+                </div>
+                <p class="card-text">{{ p.store_name }}</p>
+            </a>
+            <div class="card-body">
+                <ul>
+                    {% for cat in service_cats %}
+                        {% if cat.provider == p.provider_id %}
+                            {% for i in cat.categories %}
+                                <li><a href="{% url 'vendor-category' p.slug i.name %}">{{i.name}}</a></li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% if forloop.counter|divisibleby:"4" %}</div><div class="row item-row">{% endif %}
+    {% if forloop.last %}</div>{% endif %}
+{% endfor %}

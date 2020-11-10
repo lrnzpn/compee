@@ -1,18 +1,30 @@
-<div class="row">
-    {% for item in items %}
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <img src="{{ item.image.url }}" width="100%" height="200px">
-                <div class="card-body">
-                    <p class="card-text">{{ item.name }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <a href="{% url 'service-item' item.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
-                        </div>
-                        <small class="text-muted">{{ item.price }}</small>
-                    </div>
+<span>{% if items|length != 1 %}{{items|length}} items{% else %} 1 item {% endif %} found in {% if category %}{{category.name}}{% elif tag %}{{tag}}{% else %}Service Items{% endif %}</span>
+{% for item in items %}
+{% if forloop.first %}<div class="row item-row">{% endif %}
+    <div class="col-md-3 item-wrapper">
+        <div class="mb-4 card">
+            <a href="{% url 'service-item' item.slug %}">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="{{ item.image.url }}" width="100%" height="200px">
+                </div>
+                <p class="card-text">{{ item.name }}</p>
+            </a>
+            <div class="card-body product-body">
+                <div class="price d-flex justify-content-between align-items-center">
+                    <span>
+                        Php {{ item.price }}
+                    </span>
+                    <button id="AddCart" class="btn btn-sm btn-blue-outline" value="{% url 'cart-add' %}" onclick='addToCart("{{ service.service_id }}", "service")' data-toggle="modal" data-target="#{{service.slug}}">Add to Cart</button>
+                </div>
+
+                <div class="vendor">
+                    <a href="{% url 'provider-detail-main' item.provider.slug %}">
+                        {{item.provider.store_name}}
+                    </a>
                 </div>
             </div>
         </div>
-    {% endfor %}
-</div>
+    </div>
+    {% if forloop.counter|divisibleby:"4" %}</div><div class="row item-row">{% endif %}
+    {% if forloop.last %}</div>{% endif %}
+{% endfor %}

@@ -26,10 +26,7 @@ from admins.models import (
 def SearchBar(request):
     if request.method == 'GET':
         query = request.GET.get('search')
-        context = {
-            'title':"Search results for " + query,
-            'query':query
-        }
+        
         queries = query.split(" ")
 
         products = []
@@ -65,7 +62,11 @@ def SearchBar(request):
                 for prov in s_provs:
                     providers.append(prov)
 
-        context = {'title': 'Search'}
+        # context = {'title': 'Search'}
+        context = {
+            'title':"Search results for " + query,
+            'query':query
+        }
         if products:
             context.update({'products':list(set(products))})
         if vendors:

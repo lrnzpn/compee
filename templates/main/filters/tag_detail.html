@@ -1,18 +1,26 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/category.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles/ss.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
     {% if products or services or items %}
         {% if products %}
-            <h2>Showing products for '{{ tag }}'</h2>
+            <h2>Showing products for <span>{{ tag }}</span></h2>
             {%include 'main/partials/_products.html' %}
         {% endif %}
 
         {% if services %}
-            <h2>Showing services under '{{ tag }}'</h2>
+            <h2>Showing services under <span>{{ tag }}</span></h2>
             {%include 'main/partials/_services.html' %}
         {% endif %}
 
         {% if items %}
-            <h2>Showing items required by services under '{{ tag }}'</h2>
+            <h2>Showing items required by services under <span>{{ tag }}</span></h2>
             {%include 'main/partials/_service_items.html' %}
         {% endif %}
 

@@ -33,6 +33,10 @@ ul {
     list-style-type: none;
 }
 
+h2 span {
+    font-weight: 600;
+}
+
 .header-spacer {
     height: 8.5em;
 }

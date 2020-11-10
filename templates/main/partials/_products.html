@@ -1,4 +1,4 @@
-<span>{% if products|length != 1 %}{{products|length}} items{% else %} 1 item {% endif %} found in {{category.name}}</span>
+<span>{% if products|length != 1 %}{{products|length}} items{% else %} 1 item {% endif %} found in {% if category %}{{category.name}}{% elif tag %}{{tag}}{% else %}Products{% endif %}</span>
 
 {% for product in products %}
 {% if forloop.first %}<div class="row item-row">{% endif %}
@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    {% if forloop.counter|divisibleby:"4" %}</div><div class="row">{% endif %}
+    {% if forloop.counter|divisibleby:"4" %}</div><div class="row item-row">{% endif %}
     {% if forloop.last %}</div>{% endif %}
     {% include 'main/partials/_cart_product_modal.html'%}
 
