@@ -1,5 +1,5 @@
 <div class="col-md-3">
-    <ul class="list-group">
+    <ul class="list-group cat-list">
         {% for cat in categories %}
             <li class="list-group-item"><a href="{% url 'category-filter' cat.name %}" >{{ cat.name }}</a></li>
         {% endfor %}

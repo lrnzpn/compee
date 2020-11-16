@@ -508,6 +508,7 @@ class ServiceDetailView(DetailView):
             context['category'] = ServiceCategory.objects.get(service=self.object)
         context['title'] = self.object.name
         context['categories'] = Category.objects.all()
+        print(context['date_joined'])
         return context
 
 def VendorProductsListView(request, vendor):

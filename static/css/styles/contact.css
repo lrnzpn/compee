@@ -1,0 +1,18 @@
+.contact-us, .contact-info {
+    padding: 2em;
+}
+
+.contact-info {
+    background-color: #005F7B;
+    color: #fff;
+}
+
+.contact-info .icon, .contact-info i {
+    font-size: 1.75em;
+    width: 1.25em;
+    height: 1.25em;
+}
+
+.contact-info li {
+    margin: 1em 0;
+}

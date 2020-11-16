@@ -91,6 +91,10 @@ h2 span {
 
 }
 
+.btn-container button:hover {
+    background-color:  #005F7B;
+}
+
 .btn-container i {
     color: #fff;
     font-size: 1.25em;
@@ -389,6 +393,13 @@ footer {
     height: 5em;
     width: 5em;
     background-color: #005F7B;
+}
+
+.modal-blue .modal-body .circle-orange {
+    border-radius: 50%;
+    height: 5em;
+    width: 5em;
+    background-color: #EC7357;
 }
 
 .modal-blue .modal-body p {

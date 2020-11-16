@@ -1,4 +1,57 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/styles/contact.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome/all.min.css' %}">
+{% endblock stylesheets %}
+
 {% block content %}
-    <h1>Contact Page</h1>
+    <div class="row">
+        <div class="col-md-7 contact-us">
+            <h2>Contact Us</h2>
+            <form action="POST">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="email" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" class="form-control" id="subject" placeholder="">
+                  </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea class="form-control" id="message" rows="5"></textarea>
+                  </div>
+                <div class="form-group d-flex align-items-center justify-content-end">
+                    <button type="submit" class="btn btn-navy mb-2">Send Mail</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-5 contact-info">
+            <h2>Contact Information</h2>
+            <ul>
+                <li class="d-flex justify-content-start align-items-center">
+                    <i class="fas fa-map-marker-alt mr-3"></i>
+                    <span>address</span>
+                </li>
+                <li class="d-flex justify-content-start align-items-center">
+                    <i class="fas fa-envelope mr-3"></i>
+                    <span>email</span>
+                </li>
+                <li class="d-flex justify-content-start align-items-center">
+                    <i class="fas fa-phone-alt mr-3"></i>
+                    <span>mobile</span>
+                </li>
+                <li class="d-flex justify-content-start align-items-center">
+                    <div class="fb icon mr-3"></div>
+                    <span>facebook</span>
+                </li>
+                <li class="d-flex justify-content-start align-items-center">
+                    <div class="ig icon mr-3"></div>
+                    <span>instagram</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 {% endblock content %}

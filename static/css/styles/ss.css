@@ -201,12 +201,16 @@
     margin-left: 1em;
 }
 
-.ss-options button:last-child {
-    margin-left: 40px;
+.ss-options button:not(:last-child) {
+    margin-right: 30px;
 }
 
 .ss-options button span {
     margin-left: 10px;
+}
+
+.ss-options .btn-orange:hover path{
+    fill: #EC7357;
 }
 
 /* SS PRODUCT INFO */

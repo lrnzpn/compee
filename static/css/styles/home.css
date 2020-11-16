@@ -169,6 +169,11 @@ ul li a {
     border-right: 1px solid #CECDCD;
 }
 
+.banner-menu .cat-list li a:hover {
+    color: #005F7B;
+    text-decoration: none;
+}
+
 
 /* blog posts */
 .blog-item {

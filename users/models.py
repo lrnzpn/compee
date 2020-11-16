@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from PIL import Image
+from django.utils.timezone import now
+
 
 numericCheck = RegexValidator(r'^\d+$', 'Only numeric characters are allowed.')
 
@@ -38,6 +40,9 @@ class Vendor(models.Model):
             output_size = (300,300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+    
+    def month_diff(self):
+        return now().month - self.date_joined.month
 
 class ServiceProvider(models.Model):
     provider_id = models.AutoField(primary_key=True)
